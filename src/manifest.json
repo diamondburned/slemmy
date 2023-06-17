@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "Slemmy",
+  "short_name": "Lemmy Reader in Svelte",
+  "description": "A Lemmy Reader app written in Svelte, working on both desktop and mobile.",
+  "theme_color": "#F7A8B8",
+  "background_color": "#141414",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "developer": {
+    "name": "diamondburned",
+    "url": "https://libdb.so"
+  },
+  "locales": {
+    "en-US": {
+      "name": "Slemmy",
+      "subtitle": "Lemmy Reader in Svelte",
+      "description": "A Lemmy Reader app written in Svelte, working on both desktop and mobile."
+    }
+  },
+  "default_locale": "en-US"
+}
