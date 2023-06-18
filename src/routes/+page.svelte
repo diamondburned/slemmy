@@ -1,18 +1,12 @@
 <script lang="ts">
-  import * as svelte from "svelte"
-  import { goto } from "$app/navigation"
-  import { modalStore } from "@skeletonlabs/skeleton"
-  import {
-    profiles,
-    currentProfile,
-    currentProfileIx,
-    settings,
-  } from "#/stores.js"
+  import { slide } from "svelte/transition"
+  import { profiles, settings, currentProfile } from "#/stores.js"
 
   import { LemmyHTTP } from "#/lib/types.js"
+  import type { Profile } from "#/lib/types.js"
+  import type { Site } from "lemmy-js-client"
 
   import {
-    AppShell,
     Avatar,
     ListBox,
     ListBoxItem,
@@ -21,43 +15,43 @@
   } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
 
-  svelte.onMount(() => {
-    if ($settings.autoLogin && $currentProfile) {
-      goto(`/p/${$currentProfile.index}`)
-    }
-  })
+  // Defaults.
+  let instance = "beehaw.org"
+  let username = ""
+  let password = ""
 
-  let createParams = {
-    instance: "",
-    username: "",
-    password: "",
-  }
-
-  let createInstanceIsValid: boolean = false
+  let createInstanceIsValid: boolean | null = null
+  let instanceInfo: Site | null = null
   $: {
-    const lastInstance = createParams.instance
-    createInstanceIsValid = false
-    isValidInstance(lastInstance).then((valid) => {
-      if (lastInstance !== createParams.instance) return
-      createInstanceIsValid = valid
-    })
+    const lastInstance = instance
+    createInstanceIsValid = null
+    instanceInfo = null
+
+    new LemmyHTTP(instance.includes("://") ? instance : `https://${instance}`)
+      .getSite({})
+      .then((resp) => {
+        if (lastInstance !== instance) return
+        createInstanceIsValid = true
+        instanceInfo = resp.site_view.site
+      })
+      .catch(() => {
+        if (lastInstance !== instance) return
+        createInstanceIsValid = false
+      })
   }
 
-  async function isValidInstance(instance: string): Promise<boolean> {
-    if (!instance.includes("://")) {
-      instance = `https://${instance}`
+  async function createProfile() {
+    const profile: Profile = {
+      instance: {
+        url: instance,
+        name: instanceInfo?.name,
+        icon: instanceInfo?.icon,
+      },
     }
 
-    const client = new LemmyHTTP(instance)
-    try {
-      await client.getSite({})
-      return true
-    } catch (err) {
-      return false
-    }
+    $profiles = [...$profiles, profile]
+    $currentProfile = $profiles.length - 1
   }
-
-  async function createProfile() {}
 </script>
 
 <svelte:head>
@@ -74,23 +68,42 @@
       on:complete={() => createProfile()}
     >
       <Step
-        class="h-full flex flex-col flex-1"
-        regionContent="flex flex-col flex-1"
+        class="h-full flex flex-col flex-1 space-y-0"
+        regionContent="flex flex-col flex-1 space-y-0"
         buttonNext="variant-ghost"
         buttonNextLabel="Create Profile"
       >
-        <svelte:fragment slot="header">Choose a Profile</svelte:fragment>
+        <svelte:fragment slot="header">
+          <h2>Choose a Profile</h2>
+        </svelte:fragment>
 
-        <ListBox class="profiles py-2 flex-1">
+        <ListBox class="profiles py-1 flex-1">
           {#each $profiles as profile, i}
             <ListBoxItem
-              bind:group={$currentProfileIx}
+              bind:group={$currentProfile}
               name="profile"
               value={i}
+              rounded="rounded-container-token"
+              padding="px-2 py-2"
             >
-              <div class="flex flex-row">
+              <div class="flex flex-row items-center space-x-2">
+                {#if profile.instance.icon}
+                  <Avatar
+                    src={profile.instance.icon}
+                    class="inline"
+                    width="w-8"
+                    rounded="rounded-full"
+                  />
+                {/if}
                 <div class="flex-1">
-                  {profile.instance}
+                  {#if profile.instance.name}
+                    <span>{profile.instance.name}</span>
+                    <span class="text-xs font-mono ml-1 hidden sm:inline">
+                      {profile.instance.url}
+                    </span>
+                  {:else}
+                    <span>{profile.instance.url}</span>
+                  {/if}
                 </div>
               </div>
             </ListBoxItem>
@@ -100,46 +113,72 @@
             </p>
           {/each}
         </ListBox>
+
+        {#if $profiles.length != 0}
+          <label class="label pb-2">
+            <input
+              type="checkbox"
+              class="checkbox mr-2"
+              bind:checked={$settings.autoLogin}
+            />
+            <span>Automatically log in to this profile</span>
+          </label>
+        {/if}
       </Step>
       <Step
         class="h-full flex flex-col flex-1"
         regionContent="flex flex-col flex-1"
-        locked={createInstanceIsValid}
+        locked={!createInstanceIsValid}
       >
-        <svelte:fragment slot="header">Create Profile</svelte:fragment>
+        <svelte:fragment slot="header">
+          <h2>Create Profile</h2>
+        </svelte:fragment>
 
         <form
           class="flex flex-col flex-1"
           on:submit|preventDefault={createProfile}
         >
           <label class="label mb-2">
-            <span>Instance</span>
+            <span>
+              Instance
+              {#if createInstanceIsValid === true}
+                <Symbol
+                  name="check"
+                  inline
+                  class="text-green-500 float-right"
+                />
+              {/if}
+              {#if createInstanceIsValid === false}
+                <Symbol name="close" inline class="text-red-500 float-right" />
+              {/if}
+            </span>
             <input
               type="text"
               class="input"
-              class:input-success={createInstanceIsValid}
-              placeholder="beehaw.org"
-              bind:value={createParams.instance}
+              class:input-error={createInstanceIsValid === false}
+              class:input-success={createInstanceIsValid === true}
+              bind:value={instance}
             />
           </label>
 
           <label class="label mb-2">
-            <span>Username or Email (optional)</span>
+            <span>Username/Email</span>
+            <!-- TODO: login support -->
             <input
               type="text"
               class="input"
-              bind:value={createParams.username}
+              placeholder="(optional)"
+              bind:value={username}
+              disabled
             />
           </label>
 
-          <label class="label mb-2">
-            <span>Password (optional)</span>
-            <input
-              type="password"
-              class="input"
-              bind:value={createParams.password}
-            />
-          </label>
+          {#if username}
+            <label class="label mb-2" transition:slide={{ duration: 100 }}>
+              <span>Password</span>
+              <input type="password" class="input" bind:value={password} />
+            </label>
+          {/if}
         </form>
       </Step>
     </Stepper>

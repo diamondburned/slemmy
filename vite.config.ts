@@ -1,15 +1,15 @@
-import { defineConfig } from "vite";
-import { sveltekit } from "@sveltejs/kit/vite";
-import { SvelteKitPWA } from "@vite-pwa/sveltekit";
-import webfontDownload from "vite-plugin-webfont-dl";
-import * as path from "path";
-import manifest from "./src/manifest.json";
+import { defineConfig } from "vite"
+import { sveltekit } from "@sveltejs/kit/vite"
+import { SvelteKitPWA as svelteKitPWA } from "@vite-pwa/sveltekit"
+import { viteWebfontDownload } from "vite-plugin-webfont-dl"
+import * as path from "path"
+import manifest from "./src/manifest.json"
 
 export default defineConfig({
   plugins: [
     sveltekit(),
-    webfontDownload(),
-    SvelteKitPWA({
+    viteWebfontDownload(),
+    svelteKitPWA({
       manifest,
       registerType: "autoUpdate",
       // See:
@@ -24,6 +24,14 @@ export default defineConfig({
   envPrefix: "APP_",
   server: {
     port: 8000,
+    proxy: {
+      "/_beehaw.org": {
+        target: "https://beehaw.org",
+        changeOrigin: true,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/_beehaw.org/, ""),
+      },
+    },
   },
   build: {
     emptyOutDir: true,
@@ -34,4 +42,4 @@ export default defineConfig({
       "#": path.resolve(__dirname, "./src/"),
     },
   },
-});
+})

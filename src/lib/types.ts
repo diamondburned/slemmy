@@ -1,7 +1,11 @@
 import { LemmyHttp } from "lemmy-js-client"
 
 export type Profile = {
-  instance: string
+  instance: {
+    url: string
+    name?: string
+    icon?: string
+  }
   user?: {
     name: string
     jwt: string

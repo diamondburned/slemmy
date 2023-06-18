@@ -4,20 +4,29 @@
   import "#/styles/base.scss"
 
   import { Modal, Toast } from "@skeletonlabs/skeleton"
-</script>
 
-<svelte:head>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0"
-    rel="stylesheet"
-  />
-</svelte:head>
+  import { profiles, currentProfile } from "#/stores.js"
+  import { page } from "$app/stores"
+  import { goto } from "$app/navigation"
+
+  function navIfNotIn(base: string) {
+    if (!location.pathname.startsWith(base)) {
+      goto(base)
+    }
+  }
+
+  $: {
+    if ($page.params.id && parseInt($page.params.id) !== $currentProfile) {
+      $currentProfile = parseInt($page.params.id)
+    }
+
+    if ($profiles[$currentProfile]) {
+      navIfNotIn(`/_/${$currentProfile}`)
+    } else if (location.pathname != "/") {
+      goto("/")
+    }
+  }
+</script>
 
 <Modal />
 <Toast />
