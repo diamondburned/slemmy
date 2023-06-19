@@ -10,7 +10,6 @@
   import Symbol from "#/components/Symbol.svelte"
 
   import { goto } from "$app/navigation"
-  import { page } from "$app/stores"
   import { profiles, currentProfile } from "#/stores.js"
 
   $: instance = $profiles[$currentProfile].instance
@@ -18,19 +17,24 @@
   const tiles = [
     { name: "Posts", icon: "home", path: "/" },
     { name: "Search", icon: "explore", path: "/search" },
+    { name: "Profiles", icon: "people", path: "/profiles" },
     { name: "Settings", icon: "settings", path: "/settings" },
   ]
 
-  let currentTileIx: number = 0
+  let currentTileIx: number = -1
   $: {
-    if ($page.params._id && parseInt($page.params._id) !== $currentProfile) {
-      $currentProfile = parseInt($page.params._id)
-    }
-
-    const prefix = `/_/${$currentProfile}}`
-    if (location.pathname.startsWith(prefix)) {
-      // workaround for the lack of TabAnchor
-      goto(`${prefix}${tiles[currentTileIx].path}`)
+    const tile = tiles[currentTileIx]
+    if (tile) {
+      if (!location.pathname.startsWith(tile.path)) {
+        goto(tile.path)
+      }
+    } else {
+      for (const tile of tiles) {
+        if (location.pathname.startsWith(tile.path)) {
+          currentTileIx = tiles.indexOf(tile)
+          break
+        }
+      }
     }
   }
 </script>

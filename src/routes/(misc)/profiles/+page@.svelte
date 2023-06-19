@@ -1,10 +1,5 @@
 <script lang="ts">
-  import { slide } from "svelte/transition"
   import { profiles, settings, currentProfile } from "#/stores.js"
-
-  import { LemmyHTTP } from "#/lib/types.js"
-  import type { Profile } from "#/lib/types.js"
-  import type { Site } from "lemmy-js-client"
 
   import {
     Avatar,
@@ -14,6 +9,24 @@
     Step,
   } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
+
+  import { goto } from "$app/navigation"
+  import { slide } from "svelte/transition"
+  import { onMount } from "svelte"
+  import { LemmyHTTP } from "#/lib/types.js"
+  import type { Profile } from "#/lib/types.js"
+  import type { Site } from "lemmy-js-client"
+
+  let resetting = true
+  $: {
+    if (resetting) {
+      $currentProfile = -1
+      resetting = false
+    } else {
+      $currentProfile
+      goto("/")
+    }
+  }
 
   // Defaults.
   let instance = "beehaw.org"
