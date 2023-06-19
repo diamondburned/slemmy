@@ -23,8 +23,8 @@
 
   let currentTileIx: number = 0
   $: {
-    if ($page.params.id && parseInt($page.params.id) !== $currentProfile) {
-      $currentProfile = parseInt($page.params.id)
+    if ($page.params._id && parseInt($page.params._id) !== $currentProfile) {
+      $currentProfile = parseInt($page.params._id)
     }
 
     const prefix = `/_/${$currentProfile}}`
