@@ -4,8 +4,6 @@
     AppBar,
     Avatar,
     ProgressRadial,
-    ListBox,
-    ListBoxItem,
     toastStore,
   } from "@skeletonlabs/skeleton"
   import { slide } from "svelte/transition"
@@ -18,8 +16,6 @@
   import { profiles, currentProfile, client, cachedPosts } from "#/stores.js"
   import type { ScrollDeltaEvent } from "#/lib/events.js"
   import type { ListingType, SortType, PostView } from "lemmy-js-client"
-
-  $: instance = $profiles[$currentProfile].instance
 
   let listing: ListingType = "Local"
   let sort: SortType = "Active"
@@ -156,7 +152,7 @@
           {#each posts as post}
             <li class="flex flex-row gap-0 px-4 items-center">
               <div class="flex-1 flex flex-col gap-1">
-                <p class="text-sm text-gray-400">
+                <p class="text-sm text-gray-400 truncate">
                   <span class="inline-flex items-baseline">
                     <Avatar
                       src={post.creator.avatar}
@@ -167,7 +163,7 @@
                     {post.creator.display_name || post.creator.name}
                   </span>
                   <span class="mx-1">·</span>
-                  <span class="inline-flex items-baseline">
+                  <span class="inline-flex items-baseline truncate">
                     <Avatar
                       src={post.community.icon}
                       width="w-4"
@@ -188,7 +184,6 @@
                   <a href={post.post.url} target="_blank">{post.post.name}</a>
                   {#if post.post.url}
                     <Symbol
-                      inline
                       name="open_in_new"
                       size="sm"
                       class="align-text-bottom text-gray-400"

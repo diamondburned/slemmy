@@ -58,7 +58,7 @@
   <title>Profiles | Slemmy</title>
 </svelte:head>
 
-<main class="m-auto">
+<main class="m-auto" id="profiles">
   <h1 class="mx-4 text-3xl text-center">Slemmy</h1>
 
   <section class="card p-4 m-2 sm:m-4">
@@ -186,7 +186,7 @@
 </main>
 
 <style global lang="postcss">
-  main {
+  #profiles {
     @apply h-full;
 
     width: 100vw;

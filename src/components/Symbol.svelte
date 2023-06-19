@@ -4,6 +4,7 @@
   export let tooltip = ""
   export let large = false
   export let inline = false
+  export let margin = ""
 
   let className = ""
   export { className as class }
@@ -12,10 +13,11 @@
 <span
   class="
     material-symbols-rounded symbol
-    {className} {size ? `text-${size}` : ''}
+    {className} {margin} {size ? `text-${size}` : ''}
   "
   class:large
   class:sized={!!size}
+  class:margin={!!margin}
   class:inline
   title={tooltip || undefined}
 >
@@ -39,7 +41,9 @@
       &:not(.sized) {
         font-size: 1.5em;
       }
-      margin: 0 -0.1em;
+      &:not(.margin) {
+        margin: 0 -0.1em;
+      }
       vertical-align: bottom;
       display: inline-flex;
     }
