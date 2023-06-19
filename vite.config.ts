@@ -24,6 +24,7 @@ export default defineConfig({
   envPrefix: "APP_",
   server: {
     port: 8000,
+    host: true,
     proxy: {
       "/_beehaw.org": {
         target: "https://beehaw.org",
