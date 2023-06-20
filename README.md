@@ -1,7 +1,8 @@
 # Slemmy
 
 <div align="center">
-  <img src=".github/screenshot1.png" width="400px" />
+  <p>Lemmy web app written in Svelte</p>
+  <img src=".github/screenshot1.png" width="600px" />
 </div>
 
 ## Status
