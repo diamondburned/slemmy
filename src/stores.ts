@@ -1,6 +1,7 @@
 import * as store from "svelte/store"
 import * as persistent from "#/lib/persistent.js"
 import { LemmyHTTP } from "#/lib/types.js"
+import { LemmyWebsocketClient } from "#/lib/lemmyws.js"
 import type { Profile, Settings } from "#/lib/types.js"
 import type { PostView, CommentView } from "lemmy-js-client"
 
@@ -23,6 +24,15 @@ export const client = store.derived(
   [profiles, currentProfile],
   ([profiles, currentProfile]) => {
     return new LemmyHTTP(profiles[currentProfile]?.instance.url ?? "")
+  },
+)
+
+export const ws = store.derived(
+  [profiles, currentProfile],
+  ([profiles, currentProfile]) => {
+    return new LemmyWebsocketClient(
+      profiles[currentProfile]?.instance.url ?? "",
+    )
   },
 )
 
