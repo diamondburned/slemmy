@@ -10,9 +10,6 @@ export type StatusEvent = {
   _error?: string
 }
 
-export const _X = "GetPost" as keyof typeof UserOperation
-export const x = 2 as (typeof UserOperation)[typeof _X]
-
 export type ServerEvent = {
   op: string
   data: Record<string, unknown>
@@ -21,7 +18,7 @@ export type ServerEvent = {
 export type Event = StatusEvent | ServerEvent
 
 export class LemmyWebsocketClient extends LemmyWebsocket {
-  static timeout = 15000 // seconds
+  static timeout = 15000 // ms
 
   private ws: WebSocket | null = null
   private wsEndpoint: string
