@@ -9,7 +9,8 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { onMount } from "svelte"
-  import { client, cachedPosts } from "#/stores.js"
+  import { ws, cachedPosts } from "#/stores.js"
+  import { UserOperation } from "lemmy-js-client"
   import type { ListingType, SortType, PostView } from "lemmy-js-client"
 
   let showFilters = false
@@ -19,32 +20,33 @@
   let loading = true
   let posts: PostView[] = []
 
-  async function refresh() {
-    loading = true
-
-    try {
-      const resp = await $client.getPosts({ type_: listing, sort })
-      posts = resp.posts
-
-      $cachedPosts = {}
-      posts.forEach((post) => ($cachedPosts[post.post.id] = post))
-    } catch (err) {
-      console.error(`Error getting posts:`, err)
-      toastStore.trigger({
-        message: `${err}`,
-        autohide: false,
-        background: "variant-filled-error",
-      })
+  $: getPostsEvent = $ws.derive(UserOperation.GetPosts)
+  $: {
+    if ($getPostsEvent) {
+      posts = [...posts, ...$getPostsEvent.posts]
+      loading = false
+    } else {
+      posts = []
     }
-
-    loading = false
   }
 
-  onMount(() => refresh())
+  let currentPage: number
+
+  async function loadNext() {
+    currentPage++
+    loading = true
+    $ws.send(UserOperation.GetPosts, {
+      type_: listing,
+      sort,
+      page: currentPage,
+    })
+  }
+
   $: {
     listing
     sort
-    refresh()
+    currentPage = 0
+    loadNext()
   }
 </script>
 
@@ -103,11 +105,11 @@
     {/if}
   </div>
 
-  {#if loading}
+  {#await $ws.ready}
     <div class="grid h-full place-items-center">
       <ProgressRadial stroke={80} width="w-12" />
     </div>
-  {:else}
+  {:then}
     <ol class="list flex flex-col gap-4 py-4">
       {#each posts as post}
         <li class="flex flex-row gap-0 px-4 items-center">
@@ -168,5 +170,14 @@
         </li>
       {/each}
     </ol>
-  {/if}
+
+    {#if loading}
+      <div class="grid h-full place-items-center">
+        <p class="inline-flex items-center gap-2">
+          <ProgressRadial stroke={80} width="w-4" />
+          <span>Fetching more posts...</span>
+        </p>
+      </div>
+    {/if}
+  {/await}
 </RevealingShell>

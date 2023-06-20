@@ -14,6 +14,8 @@
   import { slide } from "svelte/transition"
   import { onMount } from "svelte"
   import { LemmyHTTP } from "#/lib/types.js"
+  import { UserOperation } from "lemmy-js-client"
+  import { LemmyWebsocketClient } from "#/lib/lemmyws.js"
   import type { Profile } from "#/lib/types.js"
   import type { Site } from "lemmy-js-client"
 
@@ -35,28 +37,49 @@
 
   let createInstanceIsValid: boolean | null = null
   let instanceInfo: Site | null = null
-  $: {
+  $: (async () => {
     const lastInstance = instance
     createInstanceIsValid = null
     instanceInfo = null
 
-    new LemmyHTTP(instance.includes("://") ? instance : `https://${instance}`)
-      .getSite({})
-      .then((resp) => {
-        if (lastInstance !== instance) return
+    const instanceURL = instance.includes("://")
+      ? instance
+      : `https://${instance}`
+
+    try {
+      await fetch(instanceURL, { mode: "no-cors" })
+
+      const ws = new LemmyWebsocketClient(instanceURL)
+      await ws.ready
+
+      console.log("ready")
+
+      const getSite = ws.wait(UserOperation.GetSite)
+      ws.send(UserOperation.GetSite, {})
+
+      const resp = await getSite
+      if (lastInstance == instance) {
         createInstanceIsValid = true
         instanceInfo = resp.site_view.site
-      })
-      .catch(() => {
-        if (lastInstance !== instance) return
+      }
+
+      ws.close()
+    } catch (err) {
+      console.debug(lastInstance, "failed:", err)
+      if (lastInstance == instance) {
         createInstanceIsValid = false
-      })
-  }
+      }
+    }
+  })()
 
   async function createProfile() {
+    const instanceURL = instance.includes("://")
+      ? instance
+      : `https://${instance}`
+
     const profile: Profile = {
       instance: {
-        url: instance,
+        url: instanceURL,
         name: instanceInfo?.name,
         icon: instanceInfo?.icon,
       },

@@ -10,13 +10,30 @@
   import Symbol from "#/components/Symbol.svelte"
 
   import { page } from "$app/stores"
-  import { profiles, currentProfile } from "#/stores.js"
+  import { toastStore } from "@skeletonlabs/skeleton"
+  import { ws, profiles, currentProfile } from "#/stores.js"
 
   import { fade } from "svelte/transition"
   import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
   import { cubicIn, cubicOut } from "svelte/easing"
 
   $: instance = $profiles[$currentProfile].instance
+
+  $: event = $ws.event
+  $: $ws.ready.catch((err) => warnWS(err))
+  $: {
+    if ($profiles[$currentProfile] && $event.op == null && $event._error) {
+      warnWS($event._error)
+    }
+  }
+
+  function warnWS(err: unknown) {
+    toastStore.trigger({
+      message: `WS: ${err}`,
+      autohide: true,
+      background: "variant-filled-error",
+    })
+  }
 
   // Needed to prevent page blinking on transition.
   let navigating = false
