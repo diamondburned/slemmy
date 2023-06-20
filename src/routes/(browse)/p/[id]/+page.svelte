@@ -59,7 +59,6 @@
           max_depth: 8,
         })
         comments = nestComments(resp.comments)
-        console.log(comments)
       } catch (err) {
         toastError("Cannot fetch comments:", err)
       }

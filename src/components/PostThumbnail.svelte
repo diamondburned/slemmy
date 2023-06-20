@@ -4,8 +4,6 @@
   import { onMount } from "svelte"
 
   export let post: Post
-
-  onMount(() => console.log(post))
 </script>
 
 {#if post.thumbnail_url}
