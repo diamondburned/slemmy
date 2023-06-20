@@ -164,7 +164,7 @@
             </p>
           </div>
 
-          <PostThumbnail {post} />
+          <PostThumbnail post={post.post} />
         </li>
       {/each}
     </ol>
