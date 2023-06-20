@@ -9,10 +9,19 @@
   import { TabGroup, Tab } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
 
-  import { goto } from "$app/navigation"
+  import { page } from "$app/stores"
   import { profiles, currentProfile } from "#/stores.js"
 
+  import { fade } from "svelte/transition"
+  import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
+  import { cubicIn, cubicOut } from "svelte/easing"
+
   $: instance = $profiles[$currentProfile].instance
+
+  // Needed to prevent page blinking on transition.
+  let navigating = false
+  beforeNavigate(() => (navigating = true))
+  afterNavigate(() => (navigating = false))
 
   const tiles = [
     { name: "Posts", icon: "home", path: "/" },
@@ -25,12 +34,12 @@
   $: {
     const tile = tiles[currentTileIx]
     if (tile) {
-      if (!location.pathname.startsWith(tile.path)) {
+      if (!$page.url.pathname.startsWith(tile.path)) {
         goto(tile.path)
       }
     } else {
       for (const tile of tiles) {
-        if (location.pathname.startsWith(tile.path)) {
+        if ($page.url.pathname.startsWith(tile.path)) {
           currentTileIx = tiles.indexOf(tile)
           break
         }
@@ -39,7 +48,7 @@
   }
 </script>
 
-<AppShell slotPageContent="overflow-hidden">
+<AppShell slotPageContent="h-full overflow-">
   <svelte:fragment slot="sidebarLeft">
     <AppRail class="hidden sm:grid" width="w-16">
       <svelte:fragment slot="lead" />
@@ -50,8 +59,9 @@
           name={tile.name.toLowerCase()}
           title={tile.name}
           value={i}
+          class=""
         >
-          <Symbol name={tile.icon} size="3xl" />
+          <Symbol name={tile.icon} size="3xl" class="leading-8 m-4" />
         </AppRailTile>
       {/each}
 
@@ -90,7 +100,7 @@
           rounded="rounded-full"
         />
       </div>
-      <div class="grid grid-cols-3">
+      <div class="grid grid-cols-4">
         {#each tiles as tile, i}
           <Tab
             bind:group={currentTileIx}
@@ -110,5 +120,16 @@
     </TabGroup>
   </svelte:fragment>
 
-  <slot />
+  {#key $page.url.pathname}
+    {#if !navigating}
+      <div
+        class="h-full"
+        in:fade={{ easing: cubicOut, duration: 150, delay: 200 }}
+        out:fade={{ easing: cubicIn, duration: 150 }}
+        data-url={$page.url.pathname}
+      >
+        <slot />
+      </div>
+    {/if}
+  {/key}
 </AppShell>

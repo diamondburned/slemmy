@@ -41,3 +41,10 @@ export function relative(
 
   return formatter.format(delta, unit as any)
 }
+
+export function absolute(date: Date): string {
+  return date.toLocaleString(undefined, {
+    dateStyle: "full",
+    timeStyle: "long",
+  })
+}

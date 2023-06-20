@@ -1,6 +1,6 @@
 <script lang="ts">
   export let name: string
-  export let size = ""
+  export let size: string | undefined = undefined
   export let tooltip = ""
   export let large = false
   export let inline = false
@@ -13,15 +13,15 @@
 <span
   class="
     material-symbols-rounded symbol
-    {className} {margin} {size ? `text-${size}` : ''}
+    {className} {margin} {size != undefined ? `text-${size}` : ''}
   "
   class:large
-  class:sized={!!size}
+  class:sized={size != undefined}
   class:margin={!!margin}
   class:inline
   title={tooltip || undefined}
 >
-  {name}
+  {name.replaceAll("-", "_")}
 </span>
 
 <style lang="scss">
@@ -31,10 +31,6 @@
 
     &:not(.sized) {
       font-size: 1.35em;
-    }
-
-    &.large {
-      font-size: 2.25em;
     }
 
     &.inline {

@@ -121,7 +121,7 @@
               </div>
             </ListBoxItem>
           {:else}
-            <p class="italic text-sm text-center text-gray-400 py-4">
+            <p class="italic text-sm text-center text-surface-400 py-4">
               No profiles yet.
             </p>
           {/each}

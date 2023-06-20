@@ -1,0 +1,93 @@
+html,
+body {
+  @apply h-full overflow-hidden leading-6;
+}
+
+.input-error,
+.input-success {
+  background-color: rgb(var(--color-surface-700)) !important;
+}
+
+.space-y-0 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0px * var(--tw-space-y-reverse));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .transition {
+    @apply ease-in-out duration-100;
+  }
+  .transition-slow {
+    @apply ease-in-out duration-200;
+  }
+}
+
+.prose,
+.prose a,
+.prose strong {
+  @apply max-w-none text-current;
+}
+
+.prose {
+  @apply leading-6;
+
+  & > * {
+    margin: 0.5em 0;
+  }
+  & > p:first-child {
+    margin-top: 0;
+  }
+  & > p:last-child {
+    margin-bottom: 0;
+  }
+
+  h1,
+  h3,
+  h5 {
+    @apply !text-xl !font-semibold;
+  }
+
+  h2,
+  h4,
+  h6 {
+    @apply !text-lg !font-semibold;
+  }
+
+  li {
+    @apply !m-0;
+  }
+
+  a {
+    @apply !text-blue-400 !font-semibold no-underline hover:underline;
+  }
+
+  blockquote {
+    @apply border-l-4 border-surface-400 text-current not-italic px-2 py-1;
+
+    & > * {
+      margin: 0.5em 0;
+    }
+    & > *:first-child {
+      margin-top: 0;
+    }
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  pre {
+    @apply bg-surface-800 py-2 px-4 leading-4;
+  }
+
+  code {
+    @apply text-base;
+  }
+
+  :where(blockquote p)::before,
+  :where(blockquote p)::after,
+  code::before,
+  code::after {
+    content: none;
+  }
+}

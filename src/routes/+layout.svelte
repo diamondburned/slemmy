@@ -1,7 +1,7 @@
 <script lang="ts">
   import "#/styles/theme.scss"
   import "@skeletonlabs/skeleton/styles/skeleton.css"
-  import "#/styles/base.scss"
+  import "#/styles/base.postcss"
 
   import { Modal, Toast } from "@skeletonlabs/skeleton"
 

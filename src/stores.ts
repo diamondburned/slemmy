@@ -2,7 +2,7 @@ import * as store from "svelte/store"
 import * as persistent from "#/lib/persistent.js"
 import { LemmyHTTP } from "#/lib/types.js"
 import type { Profile, Settings } from "#/lib/types.js"
-import type { PostView } from "lemmy-js-client"
+import type { PostView, CommentView } from "lemmy-js-client"
 
 /*
  * Persistent (local-storage) stores
@@ -26,4 +26,5 @@ export const client = store.derived(
   },
 )
 
-export const cachedPosts = store.writable<Record<string, PostView>>({})
+export const cachedPosts = store.writable<Record<number, PostView>>({})
+export const cachedComments = store.writable<Record<number, CommentView>>({})

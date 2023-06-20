@@ -11,8 +11,10 @@ module.exports = {
   theme: {
     extend: {},
   },
+  safelist: [{ pattern: /border-.*-400/ }],
   plugins: [
     require("@tailwindcss/forms"),
+    require("@tailwindcss/typography"),
     ...require("@skeletonlabs/skeleton/tailwind/skeleton.cjs")(),
   ],
 }
