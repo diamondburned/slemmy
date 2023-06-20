@@ -9,7 +9,7 @@
 
 <a
   href="/c/{community.name}"
-  class="inline-flex items-baseline hover:underline truncate"
+  class="inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
     src={community.icon}

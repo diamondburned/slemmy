@@ -9,7 +9,7 @@
 
 <a
   href="/u/{user.id}"
-  class="inline-flex items-baseline hover:underline truncate"
+  class="inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
     src={user.avatar}

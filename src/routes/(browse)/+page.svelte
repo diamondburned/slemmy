@@ -127,7 +127,13 @@
             </p>
 
             <h3>
-              <a href={post.post.url} target="_blank">{post.post.name}</a>
+              <a
+                href={post.post.url || `/p/${post.post.id}`}
+                class="hover:underline"
+                target={post.post.url ? "_blank" : ""}
+              >
+                {post.post.name}
+              </a>
               {#if post.post.url}
                 <Symbol
                   name="open_in_new"
@@ -158,7 +164,7 @@
             </p>
           </div>
 
-          <PostThumbnail post={post.post} />
+          <PostThumbnail {post} />
         </li>
       {/each}
     </ol>

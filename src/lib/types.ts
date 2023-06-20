@@ -17,6 +17,7 @@ export type Profile = {
 
 export type Settings = {
   autoLogin?: boolean
+  leftThumbnail?: boolean
 }
 
 // NestedCommentView is a CommentView with a children field.
