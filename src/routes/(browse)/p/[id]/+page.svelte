@@ -67,6 +67,9 @@
       post_id: postID,
       sort,
       type_: listing,
+      // TODO: automatic pagination on scroll
+      limit: 50,
+      max_depth: 8,
     })
     .catch((err) => handleError(err))
 

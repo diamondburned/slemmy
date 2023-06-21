@@ -13,10 +13,10 @@
 - [x] WS support
 - [x] Multiple instances (profiles support)
 - [x] Posts feed
-  - [x] Autoloading
+  - [x] Autoload on scroll
   - [x] Filtering and sorting
 - [x] Comments feed
-  - [ ] Autoloading
+  - [ ] Autoload on scroll
   - [ ] Filtering and sorting
 - [ ] Logging in
   - [ ] Upvoting
