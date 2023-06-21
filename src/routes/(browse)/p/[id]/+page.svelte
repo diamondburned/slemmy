@@ -52,8 +52,8 @@
     if (!comments) {
       try {
         const resp = await $client.getComments({
-          // type_: listing,
-          // sort,
+          type_: listing,
+          sort,
           post_id: postID,
           parent_id: parentCommentID,
           max_depth: 8,

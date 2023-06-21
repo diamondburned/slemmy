@@ -33,12 +33,13 @@
   let currentPage: number
 
   async function loadNext() {
-    currentPage++
     loading = true
+    currentPage++
     $ws.send(UserOperation.GetPosts, {
       type_: listing,
       sort,
       page: currentPage,
+      limit: 10,
     })
   }
 
@@ -48,13 +49,24 @@
     currentPage = 0
     loadNext()
   }
+
+  function handleScroll({ detail }: CustomEvent<Event>) {
+    const { scrollTop, clientHeight, scrollHeight } =
+      detail.target as HTMLElement
+    const scrollThreshold = clientHeight * 0.8 // 80% of the viewport
+    if (scrollTop + clientHeight + scrollThreshold >= scrollHeight) {
+      if (!loading) {
+        loadNext()
+      }
+    }
+  }
 </script>
 
 <svelte:head>
   <title>Posts | Slemmy</title>
 </svelte:head>
 
-<RevealingShell>
+<RevealingShell on:scroll={handleScroll}>
   <div slot="pageHeader">
     <AppBar slotLead="items-baseline">
       <h1 slot="lead" class="text-2xl font-bold">Posts</h1>
@@ -173,7 +185,7 @@
 
     {#if loading}
       <div class="grid h-full place-items-center">
-        <p class="inline-flex items-center gap-2">
+        <p class="inline-flex items-center gap-2 mt-8 mb-16">
           <ProgressRadial stroke={80} width="w-4" />
           <span>Fetching more posts...</span>
         </p>

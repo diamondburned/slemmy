@@ -1,8 +1,14 @@
 <script lang="ts">
   import { AppShell, toastStore } from "@skeletonlabs/skeleton"
 
+  import { createEventDispatcher } from "svelte"
   import { scrollDelta } from "#/lib/events.js"
   import type { ScrollDeltaEvent } from "#/lib/events.js"
+
+  const dispatch = createEventDispatcher<{
+    scroll: Event
+    scrollDelta: ScrollDeltaEvent
+  }>()
 
   let headerSize = { w: 0, h: 0 }
   let headerPadding: HTMLElement
@@ -10,6 +16,11 @@
 
   let hideBar = false
   function handlePostsScroll(event: ScrollDeltaEvent) {
+    const { scrollTop } = event.target as HTMLElement
+    if (scrollTop < 5) {
+      hideBar = false
+      return
+    }
     if (event.detail.y < 0) {
       hideBar = false
     } else if (event.detail.y > 0) {
@@ -21,7 +32,7 @@
 <AppShell
   regionPage="h-full overflow-hidden"
   slotPageContent="h-full overflow-hidden"
-  slotPageHeader="relative "
+  slotPageHeader="relative"
 >
   <div
     slot="pageHeader"
@@ -33,11 +44,15 @@
   </div>
 
   <div
-    class="overflow-y-scroll h-full"
+    class="overflow-y-scroll h-full flex flex-col"
     use:scrollDelta
-    on:scrolldelta={handlePostsScroll}
+    on:scroll={(ev) => dispatch("scroll", ev)}
+    on:scrolldelta={(ev) => {
+      dispatch("scrollDelta", ev)
+      handlePostsScroll(ev)
+    }}
   >
-    <div bind:this={headerPadding} />
+    <div><div bind:this={headerPadding} /></div>
     <div class="container m-auto">
       <slot />
     </div>

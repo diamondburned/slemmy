@@ -4,6 +4,7 @@ export type ScrollDeltaEvent = CustomEvent<{
   x: number
   y: number
   last: { x: number; y: number }[]
+  scroll: Event
 }>
 
 export function scrollDelta(node: HTMLElement) {
@@ -11,7 +12,7 @@ export function scrollDelta(node: HTMLElement) {
   let lastScrollLeft = 0
   let lastDeltas = new Array(10).fill({ x: 0, y: 0 })
 
-  const handleScroll = () => {
+  const handleScroll = (scrollEvent: Event) => {
     const { scrollTop, scrollLeft } = node
     const delta = {
       x: scrollLeft - lastScrollLeft,
@@ -27,6 +28,7 @@ export function scrollDelta(node: HTMLElement) {
         detail: {
           ...delta,
           last: lastDeltas,
+          scroll: scrollEvent,
         },
       }),
     )
