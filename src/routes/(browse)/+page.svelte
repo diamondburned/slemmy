@@ -1,6 +1,6 @@
 <script lang="ts">
   import { AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
-  import { slide } from "svelte/transition"
+  import { slide, fade } from "svelte/transition"
   import Symbol from "#/components/Symbol.svelte"
   import PostThumbnail from "#/components/PostThumbnail.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
@@ -80,6 +80,7 @@
         // Page 0 means we've never loaded posts before.
         // Mark to 1 so we fetch some.
         currentPosts.page = 1
+        currentPage = 0
       }
 
       if (currentPage != currentPosts.page) {
@@ -136,16 +137,31 @@
   <div slot="pageHeader">
     <AppBar slotLead="items-baseline">
       <h1 slot="lead" class="text-2xl font-bold">Posts</h1>
-      <button
-        slot="trail"
-        type="button"
-        class="btn-icon btn-icon-sm"
-        class:variant-filled={showFilters}
-        class:variant-outlined={!showFilters}
-        on:click={() => (showFilters = !showFilters)}
-      >
-        <Symbol name="filter_alt" tooltip="Filter" />
-      </button>
+      <div slot="trail" class="space-x-1">
+        <button
+          type="button"
+          title="Refresh"
+          class="btn-icon btn-icon-sm hover:bg-surface-100-800-token"
+          on:click={() =>
+            currentPosts.update((currentPosts) => {
+              currentPosts.posts = []
+              currentPosts.page = 0
+              return currentPosts
+            })}
+        >
+          <Symbol name="refresh" />
+        </button>
+        <button
+          type="button"
+          title="Filter"
+          class="btn-icon btn-icon-sm hover:bg-surface-100-800-token"
+          class:!variant-filled={showFilters}
+          class:!variant-outlined={!showFilters}
+          on:click={() => (showFilters = !showFilters)}
+        >
+          <Symbol name="filter_alt" />
+        </button>
+      </div>
     </AppBar>
 
     {#if showFilters}
@@ -206,7 +222,10 @@
   {:then}
     <ol class="list flex flex-col gap-4 py-4">
       {#each $currentPosts.posts as post}
-        <li class="flex flex-row gap-0 px-4 items-center">
+        <li
+          class="flex flex-row gap-0 items-center"
+          transition:fade|local={{ duration: 50 }}
+        >
           <div class="flex-1 flex flex-col gap-1">
             <p class="text-sm text-surface-400 truncate">
               <UserBadge user={post.creator} />
@@ -266,7 +285,10 @@
     </ol>
 
     {#if loading}
-      <div class="grid h-full place-items-center">
+      <div
+        class="grid h-full place-items-center"
+        transition:fade|local={{ duration: 50 }}
+      >
         <p class="inline-flex items-center gap-2 mt-8 mb-16">
           <ProgressRadial stroke={80} width="w-4" />
           <span>Fetching more posts...</span>

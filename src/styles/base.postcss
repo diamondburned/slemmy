@@ -23,6 +23,12 @@ body {
   }
 }
 
+.container {
+  --max-page-width: 1000px;
+  max-width: min(100%, var(--max-page-width)) !important;
+  padding: 0 clamp(0.5rem, 3vw, 2rem);
+}
+
 .prose,
 .prose a,
 .prose strong {
