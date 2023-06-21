@@ -92,7 +92,6 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     filter: (_: types[T][1]) => boolean = () => true,
   ): store.Readable<types[T][1] | null> {
     const opStr = UserOperation[op]
-    console.log("derive op", opStr, "got", this.lastEvents.get(op))
     let last: types[T][1] | null = this.lastEvents.get(op) ?? null
     return store.derived(
       this.event,

@@ -31,7 +31,6 @@
   // different page, so this value would've been destroyed.
   const getPostsEvent = $ws.derive(UserOperation.GetPosts)
   $: currentPosts.update((currentPosts) => {
-    console.log("got posts event", $getPostsEvent)
     if ($getPostsEvent) {
       const posts = currentPosts.posts
 
@@ -60,24 +59,12 @@
     if (lastScrollTop) {
       // Try to restore the scrolling if the user has not scrolled at all.
       setTimeout(() => {
-        console.log(
-          "timeout hit, scrollContainer is",
-          scrollContainer ? "valid" : "invalid",
-          "and the saved scroll height is",
-          lastScrollTop,
-          "and the current scroll height is",
-          scrollContainer?.scrollTop,
-          "with the viewport height being",
-          scrollContainer?.scrollHeight,
-        )
-
         if (
           scrollContainer &&
           scrollContainer.scrollTop == 0 &&
           scrollContainer.scrollHeight >= lastScrollTop
         ) {
           scrollContainer.scrollTo(0, lastScrollTop)
-          console.log("restored scroll height to", scrollContainer.scrollTop)
         }
       }, 100)
     }
@@ -136,7 +123,6 @@
     currentPosts.update((currentPosts) => {
       currentPosts.scrollTop = scrollTop
       if (loadMore) currentPosts.page++
-      console.log("saving scroll height as", scrollTop, "for page", currentPage)
       return currentPosts
     })
   }
