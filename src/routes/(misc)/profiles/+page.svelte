@@ -95,7 +95,14 @@
 </svelte:head>
 
 <main class="m-auto" id="profiles">
-  <h1 class="mx-4 text-3xl text-center">Slemmy</h1>
+  <h1 class="mx-4 text-3xl text-center">
+    <img
+      src="/favicon.png"
+      alt="Slemmy logo"
+      class="inline align-middle w-10 mx-1"
+    />
+    Slemmy
+  </h1>
 
   <section class="card p-4 m-2 sm:m-4">
     <Stepper
