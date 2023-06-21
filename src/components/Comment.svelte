@@ -25,6 +25,7 @@
   $: color = level == 0 ? "surface" : colors[(level - 1) % colors.length]
 
   let expanded = true
+  const expandingTransition = { duration: 200, easing: inOut }
 </script>
 
 <blockquote
@@ -36,12 +37,19 @@
   <!-- Special treatment for our first button on:click :) -->
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <button
-    class="comment-self px-2 pt-2 w-full text-left hover:bg-surface-700 ease-out duration-150 hover:transition-none"
+    class="comment-self px-2 w-full text-left hover:bg-surface-700 ease-out duration-150 hover:transition-none"
     class:cursor-default={children.length == 0}
-    on:click|stopPropagation|preventDefault={() => (expanded = !expanded)}
+    on:click|stopPropagation|preventDefault={() => {
+      if (children.length > 0) {
+        expanded = !expanded
+      }
+    }}
   >
     <!-- on:click|stopPropagation to allow selecting text -->
-    <div class="comment-header text-sm">
+    <div
+      class="comment-header text-sm my-1 ease-out duration-150"
+      class:text-surface-400={!expanded}
+    >
       <UserBadge width="w-4" user={comment.creator} />
       <span class="text-surface-400">
         <span class="mx-1">ꞏ</span>
@@ -56,15 +64,18 @@
         <RelativeTimestamp date={comment.comment.published} icon={false} />
       </span>
     </div>
-    <div
-      class="comment-body select-text cursor-text z-2 prose prose-nopad py-1"
-      on:click|stopPropagation
-    >
-      {@html markdown(comment.comment.content)}
-    </div>
+    {#if expanded}
+      <div
+        class="comment-body select-text cursor-text z-2 prose prose-nopad my-1"
+        on:click|stopPropagation
+        transition:slide|local={expandingTransition}
+      >
+        {@html markdown(comment.comment.content)}
+      </div>
+    {/if}
   </button>
   {#if expanded}
-    <div class="pl-2" transition:slide|local={{ duration: 200, easing: inOut }}>
+    <div class="pl-2" transition:slide|local={expandingTransition}>
       {#each children as comment}
         <svelte:self {comment} level={level + 1} />
       {/each}
