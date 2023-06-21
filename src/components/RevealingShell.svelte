@@ -10,6 +10,8 @@
     scrollDelta: ScrollDeltaEvent
   }>()
 
+  export let scrollContainer: HTMLElement
+
   let headerSize = { w: 0, h: 0 }
   let headerPadding: HTMLElement
   $: headerPadding && (headerPadding.style.height = `${headerSize.h}px`)
@@ -46,6 +48,7 @@
   <div
     class="overflow-y-scroll h-full flex flex-col"
     use:scrollDelta
+    bind:this={scrollContainer}
     on:scroll={(ev) => dispatch("scroll", ev)}
     on:scrolldelta={(ev) => {
       dispatch("scrollDelta", ev)

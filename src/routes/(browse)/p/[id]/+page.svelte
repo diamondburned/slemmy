@@ -7,7 +7,7 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { page } from "$app/stores"
-  import { ws, cachedPosts } from "#/stores.js"
+  import { ws, currentPosts } from "#/stores.js"
 
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
@@ -34,14 +34,22 @@
     (ev) => ev.post_view.post.id == postID,
   )
 
-  $: if ($postEvent) $cachedPosts[postID] = $postEvent.post_view
   $: if ($postEvent) post = $postEvent.post_view
+  $: {
+    if (!post) {
+      const cachedPost = $currentPosts.posts.find((p) => p.post.id == postID)
+      if (cachedPost) {
+        post = cachedPost
+      }
+    }
+  }
 
   $: commentsEvent = $ws.derive(
     UserOperation.GetComments,
     (ev) => ev.comments[0]?.post.id == postID,
   )
 
+  $: console.log("commentsEvent", $commentsEvent)
   $: comments = $commentsEvent
     ? nestComments($commentsEvent.comments)
     : undefined

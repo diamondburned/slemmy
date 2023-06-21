@@ -55,6 +55,11 @@
       }
     }
   }
+
+  // Allow us to navigate back and preserve scroll position.
+  if (history.scrollRestoration) {
+    history.scrollRestoration = "auto"
+  }
 </script>
 
 <AppShell slotPageContent="h-full overflow-">

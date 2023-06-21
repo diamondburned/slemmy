@@ -2,7 +2,6 @@ import { LemmyWebsocket } from "lemmy-js-client/dist/websocket.js"
 import { UserOperation } from "lemmy-js-client"
 import * as store from "svelte/store"
 import type types from "#/lib/lemmyws.types.js"
-import type * as lemmy from "lemmy-js-client"
 
 export type StatusEvent = {
   op: null
@@ -11,7 +10,7 @@ export type StatusEvent = {
 }
 
 export type ServerEvent = {
-  op: string
+  op: keyof typeof UserOperation
   data: Record<string, unknown>
 }
 
@@ -19,16 +18,23 @@ export type Event = StatusEvent | ServerEvent
 
 export class LemmyWebsocketClient extends LemmyWebsocket {
   static timeout = 15000 // ms
+  // invalid is a LemmyWebsocketClient that is always closed and returns errors
+  // for all operations.
+  static invalid = new LemmyWebsocketClient()
 
   private ws: WebSocket | null = null
-  private wsEndpoint: string
+  private wsEndpoint: string = ""
+  private lastEvents = new Map<UserOperation, ServerEvent["data"]>()
   private readyPromise = Promise.resolve()
-  private closed = false
 
   event = store.writable<Event>({ op: null, _status: "connecting" })
 
-  constructor(url: string) {
+  constructor(url?: string) {
     super()
+    if (!url) {
+      this.readyPromise = Promise.reject("No URL")
+      return
+    }
 
     this.wsEndpoint = url.replace("http", "ws") + "/api/v3/ws"
     try {
@@ -51,10 +57,15 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     return { op: null, _status: "connected" }
   }
 
+  // closed returns true if the Websocket is closed.
+  get closed(): boolean {
+    return this.ws == null
+  }
+
   // send sends a message to the server.
   async send<T extends UserOperation>(op: T, data: types[T][0]) {
     if (!this.ws) {
-      throw new Error("Websocket not connected")
+      throw new Error("Websocket closed")
     }
     await this.ready
     this.ws.send(
@@ -65,10 +76,13 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     )
   }
 
-  // close closes the Websocket.
+  // close closes the Websocket. It does nothing if the Websocket is already
+  // closed.
   close() {
-    this.closed = true
-    this.ws?.close()
+    if (this.ws) {
+      this.ws.close()
+      this.ws = null
+    }
   }
 
   // derive returns a new readable store that contains the latest version of an
@@ -78,15 +92,20 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     filter: (_: types[T][1]) => boolean = () => true,
   ): store.Readable<types[T][1] | null> {
     const opStr = UserOperation[op]
-    let last: types[T][1] | null = null
-    return store.derived(this.event, (ev) => {
-      if (ev.op == null) {
-        last = null
-      } else if (ev.op == opStr && filter(ev.data as typeof last)) {
-        last = ev.data as typeof last
-      }
-      return last
-    })
+    console.log("derive op", opStr, "got", this.lastEvents.get(op))
+    let last: types[T][1] | null = this.lastEvents.get(op) ?? null
+    return store.derived(
+      this.event,
+      (ev) => {
+        if (ev.op == null) {
+          last = null
+        } else if (ev.op == opStr && filter(ev.data as typeof last)) {
+          last = ev.data as typeof last
+        }
+        return last
+      },
+      last,
+    )
   }
 
   wait<T extends UserOperation>(op: T): Promise<types[T][1]> {
@@ -106,10 +125,15 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
         console.log("while waiting for", opStr, "got", ev)
         if (ev.op == null) {
           reject(ev._error || "Websocket closed")
+          unsub()
+          clearTimeout(timeoutHandle)
           return
         }
+
         if (ev.op == opStr) {
           resolve(ev.data as typeof last)
+          unsub()
+          clearTimeout(timeoutHandle)
           return
         }
       })
@@ -117,7 +141,6 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
   }
 
   private newWebsocket(): WebSocket {
-    console.log(this.wsEndpoint)
     const ws = new WebSocket(this.wsEndpoint)
 
     ws.addEventListener("message", (msg) => {
@@ -127,8 +150,9 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
         return
       }
 
+      this.lastEvents.set(UserOperation[ev.op], ev.data)
       this.event.set(ev)
-      console.debug("websocket received event", ev)
+      console.debug("websocket received event", UserOperation[ev.op], ev)
     })
 
     ws.addEventListener("open", () => {

@@ -3,7 +3,12 @@ import * as persistent from "#/lib/persistent.js"
 import { LemmyHTTP } from "#/lib/types.js"
 import { LemmyWebsocketClient } from "#/lib/lemmyws.js"
 import type { Profile, Settings } from "#/lib/types.js"
-import type { PostView, CommentView } from "lemmy-js-client"
+import type {
+  PostView,
+  CommentView,
+  SortType,
+  ListingType,
+} from "lemmy-js-client"
 
 /*
  * Persistent (local-storage) stores
@@ -20,6 +25,9 @@ export const currentProfile = persistent.writable<number>(
  * In-memory/temporary stores
  */
 
+// client is a LemmyHTTP client for the current profile.
+//
+// Deprecated: use ws instead.
 export const client = store.derived(
   [profiles, currentProfile],
   ([profiles, currentProfile]) => {
@@ -27,14 +35,42 @@ export const client = store.derived(
   },
 )
 
+let lastWS: LemmyWebsocketClient | null = null
+
+// ws is a LemmyWebsocketClient for the current profile.
 export const ws = store.derived(
   [profiles, currentProfile],
   ([profiles, currentProfile]) => {
-    return new LemmyWebsocketClient(
-      profiles[currentProfile]?.instance.url ?? "",
-    )
+    if (lastWS) {
+      lastWS.close()
+    }
+
+    lastWS = profiles[currentProfile]
+      ? new LemmyWebsocketClient(profiles[currentProfile].instance.url)
+      : LemmyWebsocketClient.invalid
+    return lastWS
   },
 )
 
-export const cachedPosts = store.writable<Record<number, PostView>>({})
+export const currentPosts = store.writable<{
+  posts: PostView[]
+  page: number
+  sort: SortType
+  listing: ListingType
+  scrollTop?: number
+}>({
+  posts: [],
+  page: 0,
+  sort: "Active",
+  listing: "Local",
+})
+
+export function resetCurrentPosts() {
+  currentPosts.update((p) => {
+    p.posts = []
+    p.page = 0
+    return p
+  })
+}
+
 export const cachedComments = store.writable<Record<number, CommentView>>({})
