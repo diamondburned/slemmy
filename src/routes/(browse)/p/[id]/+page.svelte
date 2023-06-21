@@ -84,6 +84,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>{post?.post.name || `Post ${postID}`} | Slemmy</title>
+</svelte:head>
+
 <div
   class="contents"
   use:swipe={{ touchAction: "pan-x" }}
