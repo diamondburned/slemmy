@@ -35,6 +35,7 @@ export function markdown(md: string): string {
   return renderer
     .render(parsed)
     .replaceAll(/<a /g, '<a target="_blank" rel="noopener noreferrer" ')
+    .replaceAll(/<img /g, '<img loading="lazy" alt="Post image" ')
 }
 
 function walk(node: commonmark.Node, f: (_: commonmark.Node) => void) {

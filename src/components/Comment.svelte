@@ -33,10 +33,14 @@
     {level > 0 ? `border-l-2 border-${color}-400` : ''}
   "
 >
+  <!-- Special treatment for our first button on:click :) -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <button
     class="comment-self px-2 pt-2 w-full text-left hover:bg-surface-700 ease-out duration-150 hover:transition-none"
-    on:click={() => (expanded = !expanded)}
+    class:cursor-default={children.length == 0}
+    on:click|stopPropagation|preventDefault={() => (expanded = !expanded)}
   >
+    <!-- on:click|stopPropagation to allow selecting text -->
     <div class="comment-header text-sm">
       <UserBadge width="w-4" user={comment.creator} />
       <span class="text-surface-400">
@@ -52,7 +56,10 @@
         <RelativeTimestamp date={comment.comment.published} icon={false} />
       </span>
     </div>
-    <div class="comment-body prose prose-nopad py-1">
+    <div
+      class="comment-body select-text cursor-text z-2 prose prose-nopad py-1"
+      on:click|stopPropagation
+    >
       {@html markdown(comment.comment.content)}
     </div>
   </button>
