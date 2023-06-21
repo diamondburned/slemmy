@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AppBar, ProgressRadial, toastStore } from "@skeletonlabs/skeleton"
+  import { AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import { slide } from "svelte/transition"
   import Symbol from "#/components/Symbol.svelte"
   import PostThumbnail from "#/components/PostThumbnail.svelte"
@@ -9,6 +9,7 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { onMount } from "svelte"
+  import { errorToast } from "#/lib/toasty.js"
   import { ws, cachedPosts } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
   import type { ListingType, SortType, PostView } from "lemmy-js-client"
@@ -23,31 +24,32 @@
   $: getPostsEvent = $ws.derive(UserOperation.GetPosts)
   $: {
     if ($getPostsEvent) {
-      posts = [...posts, ...$getPostsEvent.posts]
+      // Be a bit more careful: if Lemmy adds a post into the first page, our
+      // second page may contain posts from the first page, so we need to filter
+      // them out.
+      $getPostsEvent.posts
+        .filter((newPost) => !posts.find((p) => p.post.id == newPost.post.id))
+        .forEach((newPost) => posts.push(newPost))
+      posts = posts // force update
       loading = false
     } else {
       posts = []
     }
   }
 
-  let currentPage: number
-
-  async function loadNext() {
-    loading = true
-    currentPage++
-    $ws.send(UserOperation.GetPosts, {
-      type_: listing,
-      sort,
-      page: currentPage,
-      limit: 10,
-    })
-  }
-
+  let currentPage = 1
   $: {
-    listing
-    sort
-    currentPage = 0
-    loadNext()
+    loading = true
+    $ws
+      .send(UserOperation.GetPosts, {
+        type_: listing,
+        sort,
+        page: currentPage,
+        limit: 10,
+      })
+      .catch((err) => {
+        errorToast(`Cannot request posts: ${err}`)
+      })
   }
 
   function handleScroll({ detail }: CustomEvent<Event>) {
@@ -56,7 +58,7 @@
     const scrollThreshold = clientHeight * 0.8 // 80% of the viewport
     if (scrollTop + clientHeight + scrollThreshold >= scrollHeight) {
       if (!loading) {
-        loadNext()
+        currentPage++
       }
     }
   }

@@ -22,12 +22,17 @@
     "purple",
   ]
 
-  $: color = colors[level % colors.length]
+  $: color = level == 0 ? "surface" : colors[(level - 1) % colors.length]
 
   let expanded = true
 </script>
 
-<blockquote class="comment my-2 w-full border-l-2 border-{color}-400">
+<blockquote
+  class="
+    comment my-2 w-full
+    {level > 0 ? `border-l-2 border-${color}-400` : ''}
+  "
+>
   <button
     class="comment-self px-2 pt-2 w-full text-left hover:bg-surface-700 ease-out duration-150 hover:transition-none"
     on:click={() => (expanded = !expanded)}

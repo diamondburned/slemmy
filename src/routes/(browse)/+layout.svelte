@@ -10,7 +10,7 @@
   import Symbol from "#/components/Symbol.svelte"
 
   import { page } from "$app/stores"
-  import { toastStore } from "@skeletonlabs/skeleton"
+  import { errorToast } from "#/lib/toasty.js"
   import { ws, profiles, currentProfile } from "#/stores.js"
 
   import { fade } from "svelte/transition"
@@ -20,19 +20,11 @@
   $: instance = $profiles[$currentProfile].instance
 
   $: event = $ws.event
-  $: $ws.ready.catch((err) => warnWS(err))
+  $: $ws.ready.catch((err) => errorToast(`WS: ${err}`))
   $: {
     if ($profiles[$currentProfile] && $event.op == null && $event._error) {
-      warnWS($event._error)
+      errorToast(`WS: ${$event._error}`)
     }
-  }
-
-  function warnWS(err: unknown) {
-    toastStore.trigger({
-      message: `WS: ${err}`,
-      autohide: true,
-      background: "variant-filled-error",
-    })
   }
 
   // Needed to prevent page blinking on transition.

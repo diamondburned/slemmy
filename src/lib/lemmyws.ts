@@ -73,13 +73,16 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
 
   // derive returns a new readable store that contains the latest version of an
   // event.
-  derive<T extends UserOperation>(op: T): store.Readable<types[T][1] | null> {
+  derive<T extends UserOperation>(
+    op: T,
+    filter: (_: types[T][1]) => boolean = () => true,
+  ): store.Readable<types[T][1] | null> {
     const opStr = UserOperation[op]
     let last: types[T][1] | null = null
     return store.derived(this.event, (ev) => {
       if (ev.op == null) {
         last = null
-      } else if (ev.op == opStr) {
+      } else if (ev.op == opStr && filter(ev.data as typeof last)) {
         last = ev.data as typeof last
       }
       return last

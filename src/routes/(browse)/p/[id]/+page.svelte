@@ -7,70 +7,65 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { page } from "$app/stores"
-  import { toastStore } from "@skeletonlabs/skeleton"
-  import { client, cachedPosts } from "#/stores.js"
+  import { ws, cachedPosts } from "#/stores.js"
 
-  import { relative, absolute } from "#/lib/time.js"
-  import { onMount } from "svelte"
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
   import { markdown } from "#/lib/markdown.js"
-  import type {
-    CommentView,
-    ListingType,
-    CommentSortType,
-  } from "lemmy-js-client"
-  import type { NestedCommentView } from "#/lib/types.js"
+  import { errorToast } from "#/lib/toasty.js"
   import { nestComments } from "#/lib/types.js"
+  import { UserOperation } from "lemmy-js-client"
+  import type { PostView, ListingType, CommentSortType } from "lemmy-js-client"
+  import type { NestedCommentView } from "#/lib/types.js"
 
   $: query = $page.url.searchParams
-
   $: postID = parseInt($page.params.id)
-  $: parentCommentID = parseInt(query.get("comment") || "") || undefined
 
   let listing: ListingType
   let sort: CommentSortType
+  let post: PostView | undefined
+  let comments: NestedCommentView[] | undefined
 
   $: listing = (query.get("listing") as ListingType) || "Local"
   $: sort = (query.get("sort") as CommentSortType) || "Top"
 
-  let post = $cachedPosts[postID]
-  let comments: NestedCommentView[] | undefined
+  $: postEvent = $ws.derive(
+    UserOperation.GetPost,
+    (ev) => ev.post_view.post.id == postID,
+  )
 
-  onMount(async () => {
-    if (!post) {
-      try {
-        const resp = await $client.getPost({ id: postID })
-        $cachedPosts[postID] = resp.post_view
-        post = resp.post_view
-      } catch (err) {
-        toastError("Cannot fetch posts:", err)
-        goto("/")
-      }
-    }
+  $: if ($postEvent) $cachedPosts[postID] = $postEvent.post_view
+  $: if ($postEvent) post = $postEvent.post_view
 
-    if (!comments) {
-      try {
-        const resp = await $client.getComments({
-          type_: listing,
-          sort,
-          post_id: postID,
-          parent_id: parentCommentID,
-          max_depth: 8,
-        })
-        comments = nestComments(resp.comments)
-      } catch (err) {
-        toastError("Cannot fetch comments:", err)
-      }
-    }
-  })
+  $: commentsEvent = $ws.derive(
+    UserOperation.GetComments,
+    (ev) => ev.comments[0]?.post.id == postID,
+  )
 
-  function toastError(prefix: string, error: string | unknown) {
-    console.log("Error on route /p:", error)
-    toastStore.trigger({
-      message: `${prefix}: ${error}`,
-      background: "variant-filled-error",
+  $: comments = $commentsEvent
+    ? nestComments($commentsEvent.comments)
+    : undefined
+
+  $: $ws
+    .send(UserOperation.GetPost, {
+      id: postID,
     })
+    .catch((err) => handleError(err))
+
+  // It's kind of impossible to guard a possible race condition where a previous
+  // user change may arrive after the latest one.
+  $: $ws
+    .send(UserOperation.GetComments, {
+      post_id: postID,
+      sort,
+      type_: listing,
+    })
+    .catch((err) => handleError(err))
+
+  function handleError(err: unknown) {
+    console.log("Fetch error on route /p:", err)
+    errorToast(`Fetch error: ${err}`)
+    goto("/")
   }
 
   function goBack() {
