@@ -4,16 +4,16 @@
   "short_name": "Lemmy Reader in Svelte",
   "description": "A Lemmy Reader app written in Svelte, working on both desktop and mobile.",
   "theme_color": "#F7A8B8",
-  "background_color": "#141414",
+  "background_color": "#252426",
   "icons": [
     {
       "src": "/favicon.png",
-      "sizes": "144x144",
+      "sizes": "89x89",
       "type": "image/png"
     },
     {
       "src": "/favicon.png",
-      "sizes": "144x144",
+      "sizes": "89x89",
       "type": "image/png",
       "purpose": "any maskable"
     }
