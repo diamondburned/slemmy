@@ -113,7 +113,22 @@
       </div>
 
       <hgroup class="space-y-4 my-4">
-        <h2 class="text-2xl font-semibold">{post.post.name}</h2>
+        <h2 class="text-2xl font-semibold">
+          <a
+            href={post.post.url}
+            class={post.post.url ? "hover:underline" : ""}
+            target="_blank"
+          >
+            {post.post.name}
+          </a>
+          {#if post.post.url}
+            <Symbol
+              name="open_in_new"
+              size="lg"
+              class="align-middle text-surface-400"
+            />
+          {/if}
+        </h2>
         <p>
           <UserBadge width="w-[1.5rem]" user={post.creator} />
           <span class="mx-1 text-surface-400">to</span>

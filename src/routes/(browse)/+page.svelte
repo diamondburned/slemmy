@@ -234,7 +234,7 @@
                 <Symbol
                   name="open_in_new"
                   size="sm"
-                  class="align-text-bottom text-surface-400"
+                  class="align-bottom text-surface-400"
                 />
               {/if}
             </h3>
