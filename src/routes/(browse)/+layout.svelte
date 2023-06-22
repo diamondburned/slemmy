@@ -80,11 +80,12 @@
 
       {#each tiles as tile, i}
         <AppRailTile
-          bind:group={currentTileIx}
           name={tile.name.toLowerCase()}
           title={tile.name}
           value={i}
           class=""
+          on:click={() => goto(tile.path)}
+          bind:group={currentTileIx}
         >
           <Symbol name={tile.icon} size="3xl" class="leading-8 m-4" />
         </AppRailTile>
@@ -128,10 +129,11 @@
       <div class="grid grid-cols-4">
         {#each tiles as tile, i}
           <Tab
-            bind:group={currentTileIx}
             name={tile.name.toLowerCase()}
             title={tile.name}
             value={i}
+            on:click={() => goto(tile.path)}
+            bind:group={currentTileIx}
           >
             <svelte:fragment slot="lead">
               <Symbol inline name={tile.icon} size="2xl" />
