@@ -1,16 +1,9 @@
 <script lang="ts" context="module">
-  import type { PostView } from "lemmy-js-client"
   import { posts } from "#/stores.js"
   import * as store from "svelte/store"
 
   const lastScrollTop = store.writable<number>(0)
   const page = store.writable<number>(1)
-
-  function resetPosts() {
-    console.debug("resetting posts")
-    posts.set([])
-    page.set(1)
-  }
 </script>
 
 <script lang="ts">
@@ -25,33 +18,22 @@
 
   import { onMount } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
-  import { ws, postsSettings, subscribeLater } from "#/stores.js"
+  import { ws, postsSettings } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
 
-  let scrollContainer: HTMLElement
   let showFilters = false
   let loading = false
 
-  // You may notice uses of .update in this file. This is to prevent Svelte from
-  // re-rendering the entire page when an irrelevant value changes.
-
-  // I don't think doing const here is a concern. $ws will only be changing in a
-  // different page, so this value would've been destroyed.
-  const getPostsEvent = $ws.derive(UserOperation.GetPosts, {
-    reset: () => resetPosts(),
-    initial: $ws.lastEvent(UserOperation.GetPosts),
-  })
-
   onMount(() =>
-    getPostsEvent.subscribe((getPostsEvent) => {
-      if (!getPostsEvent) {
+    $ws.derive(UserOperation.GetPosts).subscribe((ev) => {
+      if (!ev) {
         return
       }
 
       // Be a bit more careful: if Lemmy adds a post into the first page, our
       // second page may contain posts from the first page, so we need to filter
       // them out.
-      getPostsEvent.posts
+      ev.posts
         .filter((got) => !$posts.find((old) => old.post.id == got.post.id))
         .forEach((newPost) => $posts.push(newPost))
 
@@ -75,56 +57,53 @@
     }),
   )
 
-  onMount(() =>
-    page.subscribe(() => {
-      console.log("page changed")
-      emitLoadPage()
-    }),
-  )
+  // Load page on first mount.
+  onMount(() => page.subscribe((page) => emitLoadPage(page)))
 
-  function checkShouldLoadMore() {
-    if (loading) {
-      return
-    }
-
-    let loadMore = $posts.length == 0
-    if (!loadMore && scrollContainer) {
-      // Exit if we're already loading or the page is still loading.
-      // Svelte will re-run this function when this changes.
-      if (!scrollContainer) return
-
-      const { scrollTop, clientHeight, scrollHeight } = scrollContainer
-      const scrollThreshold = 200 // hard-coded 200px threshold
-
-      loadMore =
-        // scrolledDown, true if we've scrolled down enough to fetch more posts.
-        scrollTop + clientHeight + scrollThreshold >= scrollHeight ||
-        // postsAllFit, true if we've fetched some posts but all posts fit on the
-        // screen. This is a special case because we need to fetch more posts even
-        // though we're not scrolled down.
-        ($posts.length > 0 && clientHeight >= scrollHeight)
-    }
-
-    if (loadMore) {
-      $page++
-      emitLoadPage()
-    }
-  }
-
-  function emitLoadPage() {
+  function emitLoadPage(page: number) {
+    console.log("emitLoadPage")
     if (!loading) {
+      console.log("emitLoadPage loading")
       loading = true
       $ws
         .send(UserOperation.GetPosts, {
           type_: $postsSettings.listing,
           sort: $postsSettings.sort,
-          page: $page,
+          page,
           limit: 10,
         })
         .catch((err) => {
           errorToast(`Cannot request posts: ${err}`)
         })
     }
+  }
+
+  let scrollContainer: HTMLElement
+  function checkShouldLoadMore() {
+    if (loading) {
+      return
+    }
+
+    const scrollThreshold = 200 // hard-coded 200px threshold
+    const { scrollTop, clientHeight, scrollHeight } = scrollContainer
+
+    const loadMore =
+      // scrolledDown, true if we've scrolled down enough to fetch more posts.
+      scrollTop + clientHeight + scrollThreshold >= scrollHeight ||
+      // postsAllFit, true if we've fetched some posts but all posts fit on
+      // the screen. This is a special case because we need to fetch more
+      // posts even though we're not scrolled down.
+      ($posts.length > 0 && clientHeight >= scrollHeight)
+
+    if (loadMore) {
+      $page++
+    }
+  }
+
+  function resetPosts() {
+    console.debug("resetting posts")
+    $posts = []
+    $page = 1
   }
 </script>
 
@@ -214,7 +193,7 @@
       {#each $posts as post}
         <li
           class="flex flex-row gap-0 items-center"
-          transition:fade|local={{ duration: 50 }}
+          transition:fade|local={{ duration: 75 }}
         >
           <div class="flex-1 flex flex-col gap-1 w-full">
             <p class="text-sm text-surface-400">
