@@ -33,7 +33,7 @@
   let sort: CommentSortType
   let comments: NestedCommentView[] | undefined
 
-  $: listing = (query.get("listing") as ListingType) || "Local"
+  $: listing = (query.get("listing") as ListingType) || "All"
   $: sort = (query.get("sort") as CommentSortType) || "Top"
 
   $: postEvent = $ws.derive(UserOperation.GetPost, {
