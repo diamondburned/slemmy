@@ -7,6 +7,17 @@ import manifest from "./src/manifest.json"
 
 export default defineConfig({
   plugins: [
+    {
+      name: "force-reload-hmr",
+      handleHotUpdate({ file, server }) {
+        if (file.endsWith(".svelte") || file.endsWith(".ts")) {
+          server.ws.send({
+            type: "full-reload",
+            path: "*",
+          })
+        }
+      },
+    },
     sveltekit(),
     viteWebfontDownload(),
     svelteKitPWA({
