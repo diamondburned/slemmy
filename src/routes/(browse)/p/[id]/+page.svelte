@@ -51,9 +51,7 @@
   })
 
   $: console.log("commentsEvent", $commentsEvent)
-  $: comments = $commentsEvent
-    ? nestComments($commentsEvent.comments)
-    : undefined
+  $: if ($commentsEvent) comments = nestComments($commentsEvent.comments)
 
   $: $ws
     .send(UserOperation.GetPost, {
@@ -164,7 +162,7 @@
       <hr class="my-4" />
 
       {#if !comments}
-        <div class="grid h-full place-items-center">
+        <div class="grid my-8 place-items-center">
           <ProgressRadial stroke={80} width="w-12" />
         </div>
       {:else}
