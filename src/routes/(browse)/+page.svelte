@@ -1,3 +1,18 @@
+<script lang="ts" context="module">
+  import type { PostView } from "lemmy-js-client"
+  import { posts } from "#/stores.js"
+  import * as store from "svelte/store"
+
+  const lastScrollTop = store.writable<number>(0)
+  const page = store.writable<number>(1)
+
+  function resetPosts() {
+    console.debug("resetting posts")
+    posts.set([])
+    page.set(1)
+  }
+</script>
+
 <script lang="ts">
   import { AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import { slide, fade } from "svelte/transition"
@@ -8,59 +23,23 @@
   import RevealingShell from "#/components/RevealingShell.svelte"
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
-  import * as store from "svelte/store"
-  import { onMount, onDestroy } from "svelte"
+  import { onMount } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
-  import { ws, currentPosts } from "#/stores.js"
+  import { ws, postsSettings, subscribeLater } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
 
   let scrollContainer: HTMLElement
-
   let showFilters = false
-  let currentPage = $currentPosts.page
   let loading = false
-
-  // Intentionally declare as variables without reactivity.
-  let listing = $currentPosts.listing
-  let sort = $currentPosts.sort
-  $: {
-    currentPosts.update(() => ({
-      posts: [],
-      page: 1,
-      listing,
-      sort,
-    }))
-    emitLoadPage()
-  }
 
   // You may notice uses of .update in this file. This is to prevent Svelte from
   // re-rendering the entire page when an irrelevant value changes.
 
-  function emitLoadPage() {
-    if (!loading) {
-      loading = true
-      $ws
-        .send(UserOperation.GetPosts, {
-          type_: $currentPosts.listing,
-          sort: $currentPosts.sort,
-          page: $currentPosts.page,
-          limit: 10,
-        })
-        .catch((err) => {
-          errorToast(`Cannot request posts: ${err}`)
-        })
-    }
-  }
-
   // I don't think doing const here is a concern. $ws will only be changing in a
   // different page, so this value would've been destroyed.
   const getPostsEvent = $ws.derive(UserOperation.GetPosts, {
-    reset: () => {
-      if ($currentPosts.posts.length == 0) {
-        $currentPosts.page = 1
-        emitLoadPage()
-      }
-    },
+    reset: () => resetPosts(),
+    initial: $ws.lastEvent(UserOperation.GetPosts),
   })
 
   onMount(() =>
@@ -72,29 +51,34 @@
       // Be a bit more careful: if Lemmy adds a post into the first page, our
       // second page may contain posts from the first page, so we need to filter
       // them out.
-      const posts = $currentPosts.posts
       getPostsEvent.posts
-        .filter((got) => !posts.find((old) => old.post.id == got.post.id))
-        .forEach((newPost) => posts.push(newPost))
+        .filter((got) => !$posts.find((old) => old.post.id == got.post.id))
+        .forEach((newPost) => $posts.push(newPost))
 
-      $currentPosts.posts = posts
-      currentPage = $currentPosts.page
+      $posts = $posts // force update
       loading = false
 
       // Save the last scrollTop value for the async callback.
-      const lastScrollTop = $currentPosts.scrollTop
-      if (lastScrollTop) {
+      const scrollTop = $lastScrollTop
+      if (scrollTop) {
         // Try to restore the scrolling if the user has not scrolled at all.
         setTimeout(() => {
           if (
             scrollContainer &&
             scrollContainer.scrollTop == 0 &&
-            scrollContainer.scrollHeight >= lastScrollTop
+            scrollContainer.scrollHeight >= scrollTop
           ) {
-            scrollContainer.scrollTo(0, lastScrollTop)
+            scrollContainer.scrollTo(0, scrollTop)
           }
         }, 100)
       }
+    }),
+  )
+
+  onMount(() =>
+    page.subscribe(() => {
+      console.log("page changed")
+      emitLoadPage()
     }),
   )
 
@@ -103,7 +87,7 @@
       return
     }
 
-    let loadMore = $currentPosts.posts.length == 0
+    let loadMore = $posts.length == 0
     if (!loadMore && scrollContainer) {
       // Exit if we're already loading or the page is still loading.
       // Svelte will re-run this function when this changes.
@@ -118,12 +102,28 @@
         // postsAllFit, true if we've fetched some posts but all posts fit on the
         // screen. This is a special case because we need to fetch more posts even
         // though we're not scrolled down.
-        (currentPage > 0 && clientHeight >= scrollHeight)
+        ($posts.length > 0 && clientHeight >= scrollHeight)
     }
 
     if (loadMore) {
-      $currentPosts.page++
+      $page++
       emitLoadPage()
+    }
+  }
+
+  function emitLoadPage() {
+    if (!loading) {
+      loading = true
+      $ws
+        .send(UserOperation.GetPosts, {
+          type_: $postsSettings.listing,
+          sort: $postsSettings.sort,
+          page: $page,
+          limit: 10,
+        })
+        .catch((err) => {
+          errorToast(`Cannot request posts: ${err}`)
+        })
     }
   }
 </script>
@@ -134,8 +134,8 @@
 
 <RevealingShell
   bind:scrollContainer
-  on:scroll={(ev) => {
-    $currentPosts.scrollTop = scrollContainer.scrollTop
+  on:scroll={() => {
+    $lastScrollTop = scrollContainer.scrollTop
     checkShouldLoadMore()
   }}
 >
@@ -147,10 +147,7 @@
           type="button"
           title="Refresh"
           class="btn-icon btn-icon-sm hover:bg-surface-100-800-token"
-          on:click={() => {
-            $currentPosts.posts = []
-            emitLoadPage()
-          }}
+          on:click={() => resetPosts()}
         >
           <Symbol name="refresh" />
         </button>
@@ -176,7 +173,10 @@
           <div class="input-group-shim" title="Filter">
             <Symbol name="filter_alt" tooltip="Filter" />
           </div>
-          <select bind:value={listing}>
+          <select
+            bind:value={$postsSettings.listing}
+            on:change={() => resetPosts()}
+          >
             <option value="All">All</option>
             <option value="Local">Local</option>
             <option value="Subscribed">Subscribed</option>
@@ -187,7 +187,10 @@
           <div class="input-group-shim" title="Sort">
             <Symbol name="sort" tooltip="Sort" />
           </div>
-          <select bind:value={sort}>
+          <select
+            bind:value={$postsSettings.sort}
+            on:change={() => resetPosts()}
+          >
             <option value="Active">Active</option>
             <option value="New">New</option>
             <option value="Hot">Hot</option>
@@ -208,13 +211,13 @@
     </div>
   {:then}
     <ol class="list flex flex-col gap-4 py-4">
-      {#each $currentPosts.posts as post}
+      {#each $posts as post}
         <li
           class="flex flex-row gap-0 items-center"
           transition:fade|local={{ duration: 50 }}
         >
-          <div class="flex-1 flex flex-col gap-1">
-            <p class="text-sm text-surface-400 truncate">
+          <div class="flex-1 flex flex-col gap-1 w-full">
+            <p class="text-sm text-surface-400">
               <UserBadge user={post.creator} />
               <span>to</span>
               <CommunityBadge community={post.community} />

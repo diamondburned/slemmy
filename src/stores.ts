@@ -16,10 +16,19 @@ import type {
 
 export const profiles = persistent.writable<Profile[]>("slemmy-profiles", [])
 export const settings = persistent.writable<Settings>("slemmy-settings", {})
+
 export const currentProfile = persistent.writable<number>(
   "slemmy-current-profile",
   -1,
 )
+
+export const postsSettings = persistent.writable<{
+  sort: SortType
+  listing: ListingType
+}>("slemmy-posts-settings", {
+  sort: "Active",
+  listing: "Local",
+})
 
 /*
  * In-memory/temporary stores
@@ -34,6 +43,9 @@ export const client = store.derived(
     return new LemmyHTTP(profiles[currentProfile]?.instance.url ?? "")
   },
 )
+
+// posts is a cache of posts for the current profile.
+export const posts = store.writable<PostView[]>([])
 
 let lastWS: LemmyWebsocketClient | null = null
 
@@ -52,25 +64,21 @@ export const ws = store.derived(
   },
 )
 
-export const currentPosts = store.writable<{
-  posts: PostView[]
-  page: number
-  sort: SortType
-  listing: ListingType
-  scrollTop?: number
-}>({
-  posts: [],
-  page: 0,
-  sort: "Active",
-  listing: "Local",
-})
+export const cachedComments = store.writable<Record<number, CommentView>>({})
 
-export function resetCurrentPosts() {
-  currentPosts.update((p) => {
-    p.posts = []
-    p.page = 0
-    return p
+// subscribeLater is a helper function for subscribing to a store, but only
+// calling the callback when the value changes (and not on initial
+// subscription).
+export function subscribeLater<T>(
+  store: store.Writable<T>,
+  callback: (value: T) => void,
+) {
+  let first = true
+  return store.subscribe((value) => {
+    if (first) {
+      first = false
+      return
+    }
+    callback(value)
   })
 }
-
-export const cachedComments = store.writable<Record<number, CommentView>>({})

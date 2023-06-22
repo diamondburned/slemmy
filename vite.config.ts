@@ -9,8 +9,9 @@ export default defineConfig({
   plugins: [
     {
       name: "force-reload-hmr",
-      handleHotUpdate({ file, server }) {
+      handleHotUpdate({ file, server, modules }) {
         if (file.endsWith(".svelte") || file.endsWith(".ts")) {
+          console.log("modules", modules)
           server.ws.send({
             type: "full-reload",
             path: "*",

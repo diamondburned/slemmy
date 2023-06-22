@@ -13,6 +13,7 @@
   import { errorToast } from "#/lib/toasty.js"
   import { ws, profiles, currentProfile } from "#/stores.js"
 
+  import { tick, afterUpdate } from "svelte"
   import { fade } from "svelte/transition"
   import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
   import { cubicIn, cubicOut } from "svelte/easing"
@@ -29,8 +30,18 @@
 
   // Needed to prevent page blinking on transition.
   let navigating = false
-  beforeNavigate(() => (navigating = true))
-  afterNavigate(() => (navigating = false))
+  beforeNavigate(() => {
+    console.log("beforeNav")
+    navigating = true
+  })
+  afterUpdate(() => {
+    console.log("afterUpdate")
+  })
+  afterNavigate(async () => {
+    await tick()
+    console.log("afterNav")
+    navigating = false
+  })
 
   const tiles = [
     { name: "Posts", icon: "home", path: "/" },
@@ -134,11 +145,11 @@
     </TabGroup>
   </svelte:fragment>
 
-  {#key $page.url.pathname}
+  {#key $page.url.href}
     {#if !navigating}
       <div
         class="h-full"
-        in:fade={{ easing: cubicOut, duration: 150, delay: 200 }}
+        in:fade={{ easing: cubicOut, duration: 150, delay: 150 }}
         out:fade={{ easing: cubicIn, duration: 150 }}
         data-url={$page.url.pathname}
       >

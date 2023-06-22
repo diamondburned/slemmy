@@ -7,7 +7,7 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { page } from "$app/stores"
-  import { ws, currentPosts } from "#/stores.js"
+  import { ws, posts } from "#/stores.js"
 
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
@@ -15,39 +15,38 @@
   import { errorToast } from "#/lib/toasty.js"
   import { nestComments } from "#/lib/types.js"
   import { UserOperation } from "lemmy-js-client"
-  import type { PostView, ListingType, CommentSortType } from "lemmy-js-client"
+  import type {
+    PostView,
+    ListingType,
+    CommentSortType,
+    GetPostResponse,
+  } from "lemmy-js-client"
   import type { NestedCommentView } from "#/lib/types.js"
 
-  $: query = $page.url.searchParams
-  $: postID = parseInt($page.params.id)
+  const query = $page.url.searchParams
+  const postID = parseInt($page.params.id)
 
   let listing: ListingType
+  let post: PostView
   let sort: CommentSortType
-  let post: PostView | undefined
   let comments: NestedCommentView[] | undefined
 
   $: listing = (query.get("listing") as ListingType) || "Local"
   $: sort = (query.get("sort") as CommentSortType) || "Top"
 
-  $: postEvent = $ws.derive(
-    UserOperation.GetPost,
-    (ev) => ev.post_view.post.id == postID,
-  )
+  $: postEvent = $ws.derive(UserOperation.GetPost, {
+    filter: (ev) => ev.post_view.post.id == postID,
+    initial: $posts.find((p) => p.post.id == postID)
+      ? ({
+          post_view: $posts.find((p) => p.post.id == postID),
+        } as GetPostResponse)
+      : null,
+  })
 
   $: if ($postEvent) post = $postEvent.post_view
-  $: {
-    if (!post) {
-      const cachedPost = $currentPosts.posts.find((p) => p.post.id == postID)
-      if (cachedPost) {
-        post = cachedPost
-      }
-    }
-  }
-
-  $: commentsEvent = $ws.derive(
-    UserOperation.GetComments,
-    (ev) => ev.comments[0]?.post.id == postID,
-  )
+  $: commentsEvent = $ws.derive(UserOperation.GetComments, {
+    filter: (ev) => ev.comments[0]?.post.id == postID,
+  })
 
   $: console.log("commentsEvent", $commentsEvent)
   $: comments = $commentsEvent

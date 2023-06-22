@@ -25,7 +25,6 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
   private ws: WebSocket | null = null
   private wsEndpoint: string = ""
   private lastEvents = new Map<UserOperation, ServerEvent["data"]>()
-
   private readyPromise = Promise.resolve()
   private promiseResolved = true
 
@@ -61,6 +60,10 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     return this.ws == null
   }
 
+  lastEvent<T extends UserOperation, Event = types[T][1]>(op: T): Event | null {
+    return (this.lastEvents.get(op) as Event) ?? null
+  }
+
   // send sends a message to the server.
   async send<T extends UserOperation>(op: T, data: types[T][0]) {
     if (this.closed) {
@@ -87,7 +90,7 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
 
   // derive returns a new readable store that contains the latest version of an
   // event.
-  derive<T extends UserOperation>(
+  derive<T extends UserOperation, Event extends types[T][1]>(
     op: T,
     {
       reset,
@@ -95,12 +98,12 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
       initial,
     }: {
       reset?: (_: LemmyWebsocketClient) => void
-      filter?: (_: types[T][1]) => boolean
-      initial?: types[T][1] | null
+      filter?: (_: Event) => boolean
+      initial?: Event | null
     } = {},
-  ): store.Readable<types[T][1] | null> {
+  ): store.Readable<Event | null> {
     filter = filter ?? (() => true)
-    initial = this.lastEvents.get(op) ?? initial ?? null
+    initial = initial ?? null
 
     const opStr = UserOperation[op]
     return store.derived(
@@ -108,13 +111,13 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
       (ev) => {
         if (ev.op == null) {
           initial = null
-        } else if (ev.op == opStr && filter!(ev.data as typeof initial)) {
+        } else if (ev.op == opStr && filter!(ev.data as Event)) {
           initial = ev.data as typeof initial
         }
         if (this.connected && initial == null && reset) {
           reset(this)
         }
-        return initial
+        return initial ?? null
       },
       initial,
     )
