@@ -2,6 +2,8 @@
   import { AppShell, AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
   import Comment from "#/components/Comment.svelte"
+  import PostThumbnail from "#/components/PostThumbnail.svelte"
+  import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
   import CommunityBadge from "#/components/CommunityBadge.svelte"
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
@@ -152,6 +154,7 @@
             </svelte:fragment>
           </RelativeTimestamp>
         </p>
+        <PostThumbnailLarge post={post.post} />
       </hgroup>
 
       <div class="body prose !text-white">
