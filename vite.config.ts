@@ -36,6 +36,7 @@ export default defineConfig({
   },
   build: {
     emptyOutDir: true,
+    sourcemap: true,
   },
   // https://github.com/vitejs/vite/issues/7385#issuecomment-1286606298
   resolve: {
