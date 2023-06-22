@@ -10,7 +10,10 @@
       type: "component",
       component: {
         ref: PostThumbnailLarge,
-        props: { post },
+        props: {
+          post,
+          class: "pointer-events-none",
+        },
       },
     })
   }
