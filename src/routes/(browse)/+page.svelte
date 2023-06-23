@@ -214,9 +214,6 @@
               >
                 {post.post.name}
               </a>
-              {#if post.post.nsfw}
-                <span class="text-surface-400 text-sm">(NSFW)</span>
-              {/if}
               {#if post.post.url}
                 <Symbol
                   name="open_in_new"
