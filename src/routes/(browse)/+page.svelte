@@ -17,7 +17,7 @@
   import RevealingShell from "#/components/RevealingShell.svelte"
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
-  import { onMount } from "svelte"
+  import { onMount, tick } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
   import { urlHostname } from "#/lib/lemmyutils.js"
   import { ws, postsSettings } from "#/stores.js"
@@ -26,8 +26,20 @@
   let showFilters = false
   let loading = false
 
+  onMount(async () => {
+    await tick()
+
+    // Try to restore the scrolling if the user has not scrolled at all.
+    if (
+      scrollContainer.scrollTop == 0 &&
+      scrollContainer.scrollHeight >= $lastScrollTop
+    ) {
+      scrollContainer.scrollTo(0, $lastScrollTop)
+    }
+  })
+
   onMount(() =>
-    $ws.derive(UserOperation.GetPosts).subscribe((ev) => {
+    $ws.derive(UserOperation.GetPosts).subscribe(async (ev) => {
       if (!ev) {
         return
       }
@@ -41,21 +53,6 @@
 
       $posts = $posts // force update
       loading = false
-
-      // Save the last scrollTop value for the async callback.
-      const scrollTop = $lastScrollTop
-      if (scrollTop) {
-        // Try to restore the scrolling if the user has not scrolled at all.
-        setTimeout(() => {
-          if (
-            scrollContainer &&
-            scrollContainer.scrollTop == 0 &&
-            scrollContainer.scrollHeight >= scrollTop
-          ) {
-            scrollContainer.scrollTo(0, scrollTop)
-          }
-        }, 100)
-      }
 
       checkShouldLoadMore()
     }),
