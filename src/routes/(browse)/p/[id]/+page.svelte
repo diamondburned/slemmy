@@ -191,18 +191,20 @@
         {@html markdown(post?.post.body || "")}
       </div>
 
-      <hr class="my-4" />
+      {#if post && post.counts.comments > 0}
+        <hr class="my-4" />
 
-      {#if !comments}
-        <div class="grid my-8 place-items-center">
-          <ProgressRadial stroke={80} width="w-12" />
-        </div>
-      {:else}
-        <div class="comments">
-          {#each comments as comment}
-            <Comment {comment} />
-          {/each}
-        </div>
+        {#if !comments}
+          <div class="grid my-8 place-items-center">
+            <ProgressRadial stroke={80} width="w-12" />
+          </div>
+        {:else}
+          <div class="comments">
+            {#each comments as comment}
+              <Comment {comment} />
+            {/each}
+          </div>
+        {/if}
       {/if}
     </AppShell>
   {/if}
