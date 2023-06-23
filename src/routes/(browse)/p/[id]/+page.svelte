@@ -183,6 +183,10 @@
               />
             </svelte:fragment>
           </RelativeTimestamp>
+          {#if post.post.nsfw}
+            <span class="mx-2">ꞏ</span>
+            <span class="text-red-400">NSFW</span>
+          {/if}
         </p>
         <PostThumbnailLarge post={post.post} />
       </hgroup>
