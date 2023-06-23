@@ -13,13 +13,12 @@
   import { errorToast } from "#/lib/toasty.js"
   import { ws, profiles, currentProfile } from "#/stores.js"
 
-  import { tick, afterUpdate } from "svelte"
+  import { tick } from "svelte"
   import { fade } from "svelte/transition"
   import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
   import { cubicIn, cubicOut } from "svelte/easing"
 
-  // Guaranteed valid by root +layout.svelte.
-  $: instance = $profiles[$currentProfile]?.instance
+  $: instance = $profiles[$currentProfile]?.instance || goto("/profiles")
 
   $: event = $ws.event
   $: $ws.ready.catch((err) => errorToast(`WS: ${err}`))
@@ -32,15 +31,10 @@
   // Needed to prevent page blinking on transition.
   let navigating = false
   beforeNavigate(() => {
-    console.log("beforeNav")
     navigating = true
-  })
-  afterUpdate(() => {
-    console.log("afterUpdate")
   })
   afterNavigate(async () => {
     await tick()
-    console.log("afterNav")
     navigating = false
   })
 
