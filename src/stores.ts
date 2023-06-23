@@ -46,6 +46,7 @@ export const client = store.derived(
 
 // posts is a cache of posts for the current profile.
 export const posts = store.writable<PostView[]>([])
+currentProfile.subscribe(() => posts.set([]))
 
 let lastWS: LemmyWebsocketClient | null = null
 
@@ -57,6 +58,7 @@ export const ws = store.derived(
       lastWS.close()
     }
 
+    console.debug("switching to profile", profiles[currentProfile])
     lastWS = profiles[currentProfile]
       ? new LemmyWebsocketClient(profiles[currentProfile].instance.url)
       : LemmyWebsocketClient.invalid

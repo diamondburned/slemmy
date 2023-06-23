@@ -20,15 +20,15 @@
   import type { Site } from "lemmy-js-client"
 
   let resetting = true
-  $: {
-    if (resetting) {
-      $currentProfile = -1
-      resetting = false
-    } else {
-      $currentProfile
+  onMount(() =>
+    currentProfile.subscribe(() => {
+      if (resetting) {
+        resetting = false
+        return -1
+      }
       goto("/")
-    }
-  }
+    }),
+  )
 
   // Defaults.
   let instance = "beehaw.org"

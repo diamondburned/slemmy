@@ -54,6 +54,8 @@
           }
         }, 100)
       }
+
+      checkShouldLoadMore()
     }),
   )
 

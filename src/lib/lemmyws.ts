@@ -195,7 +195,7 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     })
 
     this.ws.addEventListener("open", () => {
-      console.debug("websocket opened")
+      console.debug("websocket opened with endpoint", this.wsEndpoint)
       this.event.set({ op: null, _status: "connected" })
     })
 
