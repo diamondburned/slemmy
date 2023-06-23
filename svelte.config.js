@@ -14,12 +14,6 @@ const isCloud =
   !!process.env.CF_PAGES ||
   process.env.GITHUB_ACTION_REPOSITORY === "Azure/static-web-apps-deploy"
 
-const fonts = [
-  "https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap",
-  "https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap",
-  "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0&display=block",
-]
-
 const preHooks = []
 
 async function injectHead(outdir, head) {

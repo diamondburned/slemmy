@@ -1,7 +1,6 @@
 import { defineConfig } from "vite"
 import { sveltekit } from "@sveltejs/kit/vite"
 import { VitePWA as vitePWA } from "vite-plugin-pwa"
-import { viteWebfontDownload } from "vite-plugin-webfont-dl"
 import * as path from "path"
 import manifest from "./src/manifest.json"
 
@@ -31,11 +30,6 @@ export default defineConfig({
         enabled: true,
       },
       injectRegister: "inline",
-    }),
-    viteWebfontDownload([], {
-      injectAsStyleTag: true,
-      minifyCss: true,
-      cache: true,
     }),
   ],
   envPrefix: "APP_",
