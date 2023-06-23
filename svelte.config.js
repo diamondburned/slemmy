@@ -20,25 +20,7 @@ const fonts = [
   "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0&display=block",
 ]
 
-const preHooks = [
-  async (outdir) => {
-    const tags = []
-    for (const font of fonts) {
-      tags.push(`<link rel="stylesheet" href="${font}">`)
-      tags.push(`<link rel="preload" href="${font}" as="style">`)
-      try {
-        const css = await (await fetch(font)).text()
-        const urlRegex = /url\((.*\.(?:ttf|woff))\)/gm
-        for (const [_, url] of css.matchAll(urlRegex)) {
-          tags.push(
-            `<link rel="preload" href="${url}" as="font" type="font/woff2">`,
-          )
-        }
-      } catch (_) {}
-    }
-    await injectHead(outdir, tags.join("\n"))
-  },
-]
+const preHooks = []
 
 async function injectHead(outdir, head) {
   await editFile(`${outdir}/index.html`, (html) => {

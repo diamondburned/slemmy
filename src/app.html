@@ -10,7 +10,6 @@
     <meta property="og:description" content="Lemmy Reader in Svelte" />
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script>
     <!-- begin:fonts -->
     <link
       rel="stylesheet"
@@ -41,6 +40,13 @@
     />
     <!-- end:fonts -->
     %sveltekit.head%
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js", { scope: "/" })
+        })
+      }
+    </script>
   </head>
   <body data-sveltekit-preload-data="hover">
     <div style="display: contents" class="h-full overflow-hidden">
