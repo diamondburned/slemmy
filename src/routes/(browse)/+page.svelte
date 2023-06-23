@@ -10,6 +10,7 @@
   import { AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import { slide, fade } from "svelte/transition"
   import Symbol from "#/components/Symbol.svelte"
+  import BarButton from "#/components/BarButton.svelte"
   import PostThumbnail from "#/components/PostThumbnail.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
   import CommunityBadge from "#/components/CommunityBadge.svelte"
@@ -18,6 +19,7 @@
 
   import { onMount } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
+  import { urlHostname } from "#/lib/lemmyutils.js"
   import { ws, postsSettings } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
 
@@ -124,24 +126,16 @@
     <AppBar slotLead="items-baseline">
       <h1 slot="lead" class="text-2xl font-bold">Posts</h1>
       <div slot="trail" class="space-x-1">
-        <button
-          type="button"
-          title="Refresh"
-          class="btn-icon btn-icon-sm hover:bg-surface-100-800-token"
+        <BarButton
+          icon="refresh"
+          tooltip="Refresh"
           on:click={() => resetPosts()}
-        >
-          <Symbol name="refresh" />
-        </button>
-        <button
-          type="button"
-          title="Filter"
-          class="btn-icon btn-icon-sm hover:bg-surface-100-800-token"
-          class:!variant-filled={showFilters}
-          class:!variant-outlined={!showFilters}
-          on:click={() => (showFilters = !showFilters)}
-        >
-          <Symbol name="filter_alt" />
-        </button>
+        />
+        <BarButton
+          icon="filter_alt"
+          tooltip="Filter"
+          bind:active={showFilters}
+        />
       </div>
     </AppBar>
 
@@ -220,21 +214,28 @@
               >
                 {post.post.name}
               </a>
+              {#if post.post.nsfw}
+                <span class="text-surface-400 text-sm">(NSFW)</span>
+              {/if}
               {#if post.post.url}
                 <Symbol
                   name="open_in_new"
                   size="sm"
                   class="align-bottom text-surface-400"
                 />
+                {#if urlHostname(post.post.url)}
+                  <span class="text-surface-400 text-xs">
+                    ({urlHostname(post.post.url)})
+                  </span>
+                {/if}
               {/if}
             </h3>
 
-            <p class="flex gap-2 mt-1">
+            <p class="flex flex-wrap gap-2 mt-1">
               <span class="badge variant-soft inline-flex gap-1 px-3">
                 <Symbol name="expand_less" />
                 {post.counts.upvotes - post.counts.downvotes}
               </span>
-
               <a
                 href="/p/{post.post.id}"
                 class="badge variant-soft hover:variant-filled transition inline-flex gap-1 px-3"
@@ -242,11 +243,15 @@
                 <Symbol name="comment" />
                 {post.counts.comments}
               </a>
-
               <RelativeTimestamp
                 date={post.post.published + "Z"}
                 class="badge variant-soft inline-flex gap-1 px-3"
               />
+              {#if post.post.nsfw}
+                <span class="badge variant-soft !text-red-400 gap-1 px-3">
+                  NSFW
+                </span>
+              {/if}
             </p>
           </div>
 

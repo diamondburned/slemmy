@@ -1,16 +1,34 @@
 <script lang="ts">
   import type { Post } from "lemmy-js-client"
+  import { postThumbnailURL } from "#/lib/lemmyutils.js"
+
+  import { ProgressRadial } from "@skeletonlabs/skeleton"
 
   export let post: Post
+  $: thumbnailURL = postThumbnailURL(post)
 
   let className = ""
   export { className as class }
+
+  let loaded = false
+  let imageElement: HTMLImageElement
 </script>
 
-<img
-  class="rounded m-auto w-full max-w-md max-h-md {className}"
-  class:hidden={!post.thumbnail_url}
-  loading="lazy"
-  src={post.thumbnail_url}
-  alt="Post thumbnail"
-/>
+{#if thumbnailURL}
+  <div class="rounded m-auto w-full max-w-lg max-h-lg">
+    <img
+      class="rounded max-w-full max-h-full duration-100 transition-opacity {className}"
+      class:absolute={!loaded}
+      class:opacity-0={!loaded}
+      on:load={() => (loaded = true)}
+      loading="lazy"
+      src={post.thumbnail_url}
+      alt="Post thumbnail"
+    />
+    {#if !loaded}
+      <div class="grid h-full place-items-center">
+        <ProgressRadial stroke={80} width="w-12" />
+      </div>
+    {/if}
+  </div>
+{/if}

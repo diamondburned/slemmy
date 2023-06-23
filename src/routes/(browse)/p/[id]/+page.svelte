@@ -2,6 +2,7 @@
   import { AppShell, AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
   import Comment from "#/components/Comment.svelte"
+  import BarButton from "#/components/BarButton.svelte"
   import PostThumbnail from "#/components/PostThumbnail.svelte"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
@@ -14,7 +15,7 @@
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
   import { markdown } from "#/lib/markdown.js"
-  import { errorToast } from "#/lib/toasty.js"
+  import { errorToast, infoToast } from "#/lib/toasty.js"
   import { nestComments } from "#/lib/types.js"
   import { UserOperation } from "lemmy-js-client"
   import type {
@@ -81,6 +82,11 @@
   function goBack() {
     history.back()
   }
+
+  function copyLink() {
+    navigator.clipboard.writeText(post.post.ap_id)
+    infoToast("Copied post link to clipboard!")
+  }
 </script>
 
 <svelte:head>
@@ -108,6 +114,19 @@
             <Symbol inline name="arrow_back_ios" class="w-5" />
             Back
           </button>
+
+          <div slot="trail" class="space-x-1">
+            <BarButton
+              icon="link"
+              tooltip="Copy Post Link"
+              on:click={() => copyLink()}
+            />
+            <BarButton
+              icon="open_in_new"
+              tooltip="Open Post"
+              on:click={() => window.open(post.post.ap_id)}
+            />
+          </div>
         </AppBar>
       </div>
 
@@ -133,22 +152,35 @@
           <span class="mx-1 text-surface-400">to</span>
           <CommunityBadge width="w-[1.5rem]" community={post.community} />
 
-          <span class="hidden sm:inline ml-2 text-lg leading-4">│</span>
+          <span
+            class="sm:border-r-2 border-current text-2xl mx-2 align-middle leading-0"
+          />
           <br class="sm:hidden mb-3" />
 
           <span>
-            <Symbol name="expand_less" inline margin="mr-1" size="" />
+            <Symbol
+              name="expand_less"
+              inline
+              margin="mr-1"
+              size=""
+              class="!align-middle"
+            />
             {post.counts.upvotes - post.counts.downvotes}
           </span>
           <span class="mx-2">ꞏ</span>
           <span>
-            <Symbol name="comment" inline margin="mr-1" />
+            <Symbol name="comment" inline margin="mr-1" class="!align-middle" />
             {post.counts.comments}
           </span>
           <span class="mx-2">ꞏ</span>
           <RelativeTimestamp date={post.post.published}>
             <svelte:fragment slot="icon">
-              <Symbol name="schedule" inline margin="mr-1" />
+              <Symbol
+                name="schedule"
+                inline
+                margin="mr-1"
+                class="!align-middle"
+              />
             </svelte:fragment>
           </RelativeTimestamp>
         </p>

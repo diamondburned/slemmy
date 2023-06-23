@@ -14,6 +14,7 @@
   <Avatar
     src={user.avatar}
     {width}
+    initials=""
     class="mr-1 self-center"
     rounded="rounded-full"
   />
