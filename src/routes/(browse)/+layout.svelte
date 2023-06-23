@@ -13,12 +13,13 @@
   import { errorToast } from "#/lib/toasty.js"
   import { ws, profiles, currentProfile } from "#/stores.js"
 
-  import { tick, afterUpdate, onMount } from "svelte"
+  import { tick, afterUpdate } from "svelte"
   import { fade } from "svelte/transition"
   import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
   import { cubicIn, cubicOut } from "svelte/easing"
 
-  $: instance = $profiles[$currentProfile].instance
+  // Guaranteed valid by root +layout.svelte.
+  $: instance = $profiles[$currentProfile]?.instance
 
   $: event = $ws.event
   $: $ws.ready.catch((err) => errorToast(`WS: ${err}`))
