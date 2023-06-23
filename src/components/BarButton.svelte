@@ -6,15 +6,18 @@
   export let label: string = ""
   export let icon: string = ""
   export let tooltip = ""
-  export let active: bool | null = null
+  export let active: boolean | null = null
+  export let href: string | undefined = undefined
+  $: tag = href ? "a" : "button"
 
   const dispatch = createEventDispatcher<{
     click: void
   }>()
 </script>
 
-<button
-  type="button"
+<!-- Fucking Svelte and TypeScript, man. -->
+<svelte:element
+  this={tag}
   class:btn={label != ""}
   class:btn-icon={label == "" && icon != ""}
   class="btn-sm btn-icon-sm hover:bg-surface-100-800-token"
@@ -27,6 +30,10 @@
       active = !active
     }
   }}
+  target={tag == "a" ? "_blank" : undefined}
+  role={tag == "a" ? "button" : undefined}
+  type={tag == "button" ? "button" : undefined}
+  {href}
 >
   <slot name="icon">
     <Symbol name={icon} />
@@ -34,4 +41,4 @@
   <slot name="label">
     {label}
   </slot>
-</button>
+</svelte:element>

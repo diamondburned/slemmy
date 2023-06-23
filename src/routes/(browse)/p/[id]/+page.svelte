@@ -123,8 +123,8 @@
             />
             <BarButton
               icon="open_in_new"
+              href={post.post.ap_id}
               tooltip="Open Post"
-              on:click={() => window.open(post.post.ap_id)}
             />
           </div>
         </AppBar>
