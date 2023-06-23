@@ -6,27 +6,28 @@ export function postThumbnailURL(
   post: Post,
   thumbnail = false,
 ): string | undefined {
-  const thumbnailURL = post.thumbnail_url || post.url
-  if (
-    !thumbnailURL ||
-    !acceptedExts.some((ext) => thumbnailURL.endsWith(ext))
-  ) {
+  const imageURL = post.thumbnail_url || post.url
+  if (!imageURL || !acceptedExts.some((ext) => imageURL.endsWith(ext))) {
     return undefined
   }
 
   if (!thumbnail) {
-    return thumbnailURL
+    return imageURL
   }
 
+  return thumbnailURL(imageURL)
+}
+
+export function thumbnailURL(imageURL: string): string {
   let url: URL
   try {
-    url = new URL(thumbnailURL)
+    url = new URL(imageURL)
   } catch (err) {
     console.warn("invalid thumbnail URL, continuing anyway", err)
-    return thumbnailURL
+    return imageURL
   }
   if (!url.pathname.startsWith("/pictrs")) {
-    return thumbnailURL
+    return imageURL
   }
 
   url.searchParams.set(

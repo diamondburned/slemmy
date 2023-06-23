@@ -37,7 +37,6 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
   constructor(url?: string) {
     super()
     if (!url) {
-      this.readyPromise = Promise.reject("No URL")
       return
     }
 
@@ -46,7 +45,13 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
   }
 
   // ready is a Promise that is resolved once the Websocket is ready.
-  get ready() {
+  get ready(): Promise<void> {
+    if (!this.wsEndpoint) {
+      return Promise.reject("No endpoint")
+    }
+    if (this.closed) {
+      return Promise.reject("Websocket closed")
+    }
     return this.readyPromise
   }
 

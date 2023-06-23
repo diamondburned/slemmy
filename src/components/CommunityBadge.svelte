@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Avatar } from "@skeletonlabs/skeleton"
 
+  import { thumbnailURL } from "#/lib/lemmyutils.js"
   import type { Community } from "lemmy-js-client"
 
   export let community: Community
@@ -12,7 +13,7 @@
   class="inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
-    src={community.icon}
+    src={community.icon ? thumbnailURL(community.icon) : undefined}
     {width}
     class="mr-1 self-center"
     rounded="rounded-full"

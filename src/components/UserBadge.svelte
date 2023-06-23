@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Avatar } from "@skeletonlabs/skeleton"
 
+  import { thumbnailURL } from "#/lib/lemmyutils.js"
   import type { Person } from "lemmy-js-client"
 
   export let user: Person
@@ -12,7 +13,7 @@
   class="inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
-    src={user.avatar}
+    src={user.avatar ? thumbnailURL(user.avatar) : undefined}
     {width}
     initials=""
     class="mr-1 self-center"

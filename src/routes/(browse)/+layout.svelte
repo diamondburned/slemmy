@@ -13,7 +13,7 @@
   import { errorToast } from "#/lib/toasty.js"
   import { ws, profiles, currentProfile } from "#/stores.js"
 
-  import { tick, afterUpdate } from "svelte"
+  import { tick, afterUpdate, onMount } from "svelte"
   import { fade } from "svelte/transition"
   import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
   import { cubicIn, cubicOut } from "svelte/easing"
@@ -65,11 +65,6 @@
         }
       }
     }
-  }
-
-  // Allow us to navigate back and preserve scroll position.
-  if (history.scrollRestoration) {
-    history.scrollRestoration = "auto"
   }
 </script>
 

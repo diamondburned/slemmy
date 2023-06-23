@@ -4,24 +4,42 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content="Lemmy Reader in Svelte" />
+    <meta name="theme-color" content="#F7A8B8" />
     <meta name="darkreader-lock" />
     <meta property="og:title" content="Slemmy" />
     <meta property="og:description" content="Lemmy Reader in Svelte" />
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script>
+    <!-- begin:fonts -->
     <link
+      rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap"
-      rel="stylesheet"
+    />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap"
+      as="style"
     />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&amp;display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0"
-      rel="stylesheet"
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap"
+      as="style"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0&display=block"
+    />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0&display=block"
+      as="style"
+    />
+    <!-- end:fonts -->
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">
