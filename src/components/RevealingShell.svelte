@@ -40,7 +40,7 @@
     slot="pageHeader"
     bind:clientHeight={headerSize.h}
     style="z-index: 1; {hideBar ? `top: -${headerSize.h}px` : 'top: 0'}"
-    class="absolute w-full z-2 transition-all duration-100 ease-in-out"
+    class="absolute w-full z-10 transition-all duration-100 ease-in-out"
   >
     <slot name="pageHeader" />
   </div>

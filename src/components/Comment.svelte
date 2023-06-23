@@ -66,7 +66,7 @@
     </div>
     {#if expanded}
       <div
-        class="comment-body select-text cursor-text z-2 prose prose-nopad my-1"
+        class="comment-body select-text cursor-text z-10 prose prose-nopad my-1"
         on:click|stopPropagation
         transition:slide|local={expandingTransition}
       >
