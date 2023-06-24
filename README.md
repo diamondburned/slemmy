@@ -4,7 +4,7 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d11e1f95-4663-4db2-981d-6b53c45fd44e/deploy-status)](https://app.netlify.com/sites/venerable-narwhal-87bb65/deploys)
 
 <div align="center">
-  <p>Lemmy web app written in Svelte</p>
+  <p>Cute Lemmy web app written in Svelte</p>
   <img src=".github/screenshot1.png" width="600px" />
 </div>
 
