@@ -54,7 +54,7 @@ output="src/lib/lemmyws.types.ts"
 generate > "$temp"
 prettier --write "$temp"
 
-if [[ "$temp" != "$(< output)" ]]; then
+if [[ $temp != $(< "$output") ]]; then
 	mv "$temp" "$output"
 else
 	rm "$temp"
