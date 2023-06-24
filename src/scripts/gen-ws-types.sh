@@ -12,13 +12,17 @@ LEMMY_JS_CLIENT_SRC="https://raw.githubusercontent.com/LemmyNet/lemmy-js-client/
 
 generate() {
 	prefix=lemmy
+	srcHttp=$(curl -s "$LEMMY_JS_CLIENT_SRC/http.ts")
+	if [[ "$srcHttp" == "" ]]; then
+		echo "Failed to fetch $LEMMY_JS_CLIENT_SRC/http.ts, skipping..."
+		return
+	fi
 
 	declare -A requestResponses
 	while read -r request response; do
 		requestResponses["$prefix.$request"]="$prefix.$response"
 	done < <(
-		curl -s "$LEMMY_JS_CLIENT_SRC/http.ts" \
-			| sed -n 's|.*return this.#wrapper<\(.*\), \(.*\)>(.*|\1\t\2|p')
+		echo "$srcHttp" | sed -n 's|.*return this.#wrapper<\(.*\), \(.*\)>(.*|\1\t\2|p')
 
 	declare -a requests
 	while read -r request; do
