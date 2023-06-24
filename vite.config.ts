@@ -2,10 +2,23 @@ import { defineConfig } from "vite"
 import { sveltekit } from "@sveltejs/kit/vite"
 import { VitePWA as vitePWA } from "vite-plugin-pwa"
 import * as path from "path"
+import * as childprocess from "child_process"
 import manifest from "./src/manifest.json"
 
 export default defineConfig({
   plugins: [
+    {
+      name: "autogen",
+      configResolved() {
+        childprocess.spawnSync(
+          path.join(__dirname, "src", "scripts", "gen.js"),
+          [],
+          {
+            stdio: "inherit",
+          },
+        )
+      },
+    },
     sveltekit(),
     // {
     //   name: "force-reload-hmr",

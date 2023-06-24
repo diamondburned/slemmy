@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
-LEMMY_JS_CLIENT_SRC="https://raw.githubusercontent.com/LemmyNet/lemmy-js-client/main/src"
+
+depVersion() {
+	local v
+	v=$(jq -r ".devDependencies.\"$1\"" package.json)
+	v=${v#^}
+	echo "$v"
+}
+
+LEMMY_JS_CLIENT_VERSION=$(depVersion "lemmy-js-client")
+LEMMY_JS_CLIENT_SRC="https://raw.githubusercontent.com/LemmyNet/lemmy-js-client/$LEMMY_JS_CLIENT_VERSION/src"
 
 generate() {
 	prefix=lemmy
