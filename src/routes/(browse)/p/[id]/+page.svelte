@@ -103,7 +103,7 @@
       <ProgressRadial stroke={80} width="w-12" />
     </div>
   {:else}
-    <AppShell slotPageContent="mx-auto">
+    <AppShell slotPageContent="mx-auto w-full">
       <div slot="pageHeader">
         <AppBar>
           <button
