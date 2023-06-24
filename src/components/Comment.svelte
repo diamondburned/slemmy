@@ -30,7 +30,7 @@
 
 <blockquote
   class="
-    comment my-2 w-full
+    comment mx-auto my-2 w-full
     {level > 0 ? `border-l-2 border-${color}-400` : ''}
   "
 >
@@ -39,15 +39,9 @@
   <div class="comment-self w-full">
     <!-- on:click|stopPropagation to allow selecting text -->
     <button
-      class="comment-header text-sm text-left w-full px-2 py-1 ease-out duration-150 hover:transition-none"
+      class="comment-header text-sm text-left w-full px-2 py-1 hover:bg-surface-700 ease-out duration-150 hover:transition-none"
       class:text-surface-400={!expanded}
-      class:cursor-default={children.length == 0}
-      class:hover:bg-surface-700={children.length > 0}
-      on:click|stopPropagation|preventDefault={() => {
-        if (children.length > 0) {
-          expanded = !expanded
-        }
-      }}
+      on:click|stopPropagation|preventDefault={() => (expanded = !expanded)}
     >
       <UserBadge width="w-4" user={comment.creator} />
       <span class="text-surface-400">
@@ -65,7 +59,7 @@
     </button>
     {#if expanded}
       <div
-        class="comment-body mx-2 my-1"
+        class="comment-body mx-2 mb-1"
         on:click|stopPropagation
         transition:slide|local={expandingTransition}
       >

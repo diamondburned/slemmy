@@ -102,7 +102,7 @@
       <ProgressRadial stroke={80} width="w-12" />
     </div>
   {:else}
-    <AppShell slotPageContent="container mx-auto">
+    <AppShell slotPageContent="mx-auto">
       <div slot="pageHeader">
         <AppBar>
           <button
@@ -129,7 +129,7 @@
         </AppBar>
       </div>
 
-      <hgroup class="space-y-4 my-4">
+      <hgroup class="space-y-4 my-4 container">
         <h2 class="text-2xl font-semibold">
           <a
             href={post.post.url}
@@ -190,17 +190,24 @@
         <PostThumbnailLarge post={post.post} />
       </hgroup>
 
-      <Markdown markdown={post?.post.body || ""} />
+      <div class="container">
+        <Markdown markdown={post?.post.body || ""} />
+      </div>
 
       {#if post && post.counts.comments > 0}
-        <hr class="my-4" />
+        <div class="container">
+          <hr class="my-4" />
+        </div>
 
         {#if !comments}
-          <div class="grid my-8 place-items-center">
+          <div class="grid my-8 place-items-center container">
             <ProgressRadial stroke={80} width="w-12" />
           </div>
         {:else}
-          <div class="comments">
+          <div
+            class="comments"
+            style="max-width: var(--max-page-width); margin: 0 calc(var(--max-page-padding) - 0.5rem);"
+          >
             {#each comments as comment}
               <Comment {comment} />
             {/each}

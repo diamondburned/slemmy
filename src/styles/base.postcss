@@ -23,8 +23,14 @@ body {
   }
 }
 
-.container {
+:root {
   --max-page-width: 56rem;
+  --max-page-padding: clamp(0.5rem, 3vw, 2rem);
+}
+
+.container {
   max-width: min(100%, var(--max-page-width)) !important;
-  padding: 0 clamp(0.5rem, 3vw, 2rem);
+  padding: 0 var(--max-page-padding);
+  margin-left: auto;
+  margin-right: auto;
 }
