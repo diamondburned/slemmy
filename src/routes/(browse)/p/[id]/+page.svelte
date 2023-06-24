@@ -195,7 +195,7 @@
       </div>
 
       {#if post && post.counts.comments > 0}
-        <div class="container">
+        <div class="funny-width">
           <hr class="my-4" />
         </div>
 
@@ -204,10 +204,7 @@
             <ProgressRadial stroke={80} width="w-12" />
           </div>
         {:else}
-          <div
-            class="comments"
-            style="max-width: var(--max-page-width); margin: 0 calc(var(--max-page-padding) - 0.5rem);"
-          >
+          <div class="comments funny-width">
             {#each comments as comment}
               <Comment {comment} />
             {/each}
@@ -217,3 +214,11 @@
     </AppShell>
   {/if}
 </div>
+
+<style lang="scss">
+  .funny-width {
+    max-width: var(--max-page-width);
+    padding: 0 calc(var(--max-page-padding) - 0.75rem);
+    margin: 0 auto;
+  }
+</style>

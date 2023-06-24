@@ -39,7 +39,7 @@
   <div class="comment-self w-full">
     <!-- on:click|stopPropagation to allow selecting text -->
     <button
-      class="comment-header text-sm text-left w-full px-2 py-1 hover:bg-surface-700 ease-out duration-150 hover:transition-none"
+      class="comment-header text-sm text-left w-full px-3 py-1 hover:bg-surface-700 ease-out duration-150 hover:transition-none"
       class:text-surface-400={!expanded}
       on:click|stopPropagation|preventDefault={() => (expanded = !expanded)}
     >
@@ -59,7 +59,7 @@
     </button>
     {#if expanded}
       <div
-        class="comment-body mx-2 mb-1"
+        class="comment-body mx-3 mb-1"
         on:click|stopPropagation
         transition:slide|local={expandingTransition}
       >

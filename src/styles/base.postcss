@@ -25,7 +25,10 @@ body {
 
 :root {
   --max-page-width: 56rem;
-  --max-page-padding: clamp(0.5rem, 3vw, 2rem);
+  --max-page-padding: 0.75rem;
+  @media (min-width: 640px) {
+    --max-page-padding: clamp(0.75rem, 3vw, 4rem);
+  }
 }
 
 .container {
