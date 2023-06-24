@@ -36,19 +36,18 @@
 >
   <!-- Special treatment for our first button on:click :) -->
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <button
-    class="comment-self px-2 w-full text-left hover:bg-surface-700 ease-out duration-150 hover:transition-none"
-    class:cursor-default={children.length == 0}
-    on:click|stopPropagation|preventDefault={() => {
-      if (children.length > 0) {
-        expanded = !expanded
-      }
-    }}
-  >
+  <div class="comment-self w-full">
     <!-- on:click|stopPropagation to allow selecting text -->
-    <div
-      class="comment-header text-sm my-1 ease-out duration-150"
+    <button
+      class="comment-header text-sm text-left w-full px-2 py-1 ease-out duration-150 hover:transition-none"
       class:text-surface-400={!expanded}
+      class:cursor-default={children.length == 0}
+      class:hover:bg-surface-700={children.length > 0}
+      on:click|stopPropagation|preventDefault={() => {
+        if (children.length > 0) {
+          expanded = !expanded
+        }
+      }}
     >
       <UserBadge width="w-4" user={comment.creator} />
       <span class="text-surface-400">
@@ -63,17 +62,17 @@
         <span class="mx-1">ꞏ</span>
         <RelativeTimestamp date={comment.comment.published} icon={false} />
       </span>
-    </div>
+    </button>
     {#if expanded}
       <div
-        class="comment-body select-text cursor-text z-10 my-1"
+        class="comment-body mx-2 my-1"
         on:click|stopPropagation
         transition:slide|local={expandingTransition}
       >
         <Markdown markdown={comment.comment.content} />
       </div>
     {/if}
-  </button>
+  </div>
   {#if expanded}
     <div class="pl-2" transition:slide|local={expandingTransition}>
       {#each children as comment}
