@@ -3,9 +3,10 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "vite dev --clearScreen=false",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "npm run generate && vite dev --clearScreen=false",
+    "build": "npm run generate && vite build",
+    "preview": "npm run generate && vite preview",
+    "generate": "src/scripts/gen.js",
     "format": "prettier --plugin-search-dir . --write ."
   },
   "devDependencies": {
