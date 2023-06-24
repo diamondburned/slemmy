@@ -16,7 +16,7 @@ export type ServerEvent = {
 
 export type Event = StatusEvent | ServerEvent
 
-export class LemmyWebsocketClient extends LemmyWebsocket {
+export class LemmyWebsocketClient {
   static timeout = 15000 // ms
   // invalid is a LemmyWebsocketClient that is always closed and returns errors
   // for all operations.
@@ -35,13 +35,10 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
   })
 
   constructor(url?: string) {
-    super()
-    if (!url) {
-      return
+    if (url) {
+      this.wsEndpoint = url.replace("http", "ws") + "/api/v3/ws"
+      this.connect()
     }
-
-    this.wsEndpoint = url.replace("http", "ws") + "/api/v3/ws"
-    this.connect()
   }
 
   // ready is a Promise that is resolved once the Websocket is ready.
@@ -65,12 +62,17 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     return this.ws == null
   }
 
-  lastEvent<T extends UserOperation, Event = types[T][1]>(op: T): Event | null {
+  lastEvent<T extends UserOperation, Event extends types[T][1]>(
+    op: T,
+  ): Event | null {
     return (this.lastEvents.get(op) as Event) ?? null
   }
 
   // send sends a message to the server.
-  async send<T extends UserOperation>(op: T, data: types[T][0]) {
+  async send<T extends UserOperation, Command extends types[T][0]>(
+    op: T,
+    data: Command,
+  ) {
     if (this.closed) {
       throw new Error("Websocket closed")
     }
@@ -82,6 +84,18 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
       } as ServerEvent),
     )
     console.debug("websocket sent op", op, data)
+  }
+
+  // sendForReply sends a message to the server and waits for a reply to the
+  // same Op.
+  async sendForReply<
+    T extends UserOperation,
+    Command extends types[T][0],
+    Event extends types[T][1],
+  >(op: T, data: Command): Promise<Event> {
+    const reply = this.wait<T, Event>(op)
+    await this.send<T, Command>(op, data)
+    return reply
   }
 
   // close closes the Websocket. It does nothing if the Websocket is already
@@ -128,7 +142,9 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
     )
   }
 
-  async wait<T extends UserOperation>(op: T): Promise<types[T][1]> {
+  async wait<T extends UserOperation, Event extends types[T][1]>(
+    op: T,
+  ): Promise<Event> {
     const timeout = timeoutPromise(
       LemmyWebsocketClient.timeout,
       "Timeout waiting for WS event",
@@ -204,26 +220,15 @@ export class LemmyWebsocketClient extends LemmyWebsocket {
       this.event.set({ op: null, _status: "connected" })
     })
 
-    this.ws.addEventListener("error", (ev) => {
-      console.error("websocket error:", ev)
-      this.event.set({ op: null, _status: "disconnected", _error: `${ev}` })
-    })
-
     this.ws.addEventListener("close", (ev) => {
       console.debug("websocket closed:", ev)
 
       this.lastEvents = new Map<UserOperation, ServerEvent["data"]>()
-      this.event.update((ev) => {
-        if (ev.op == null && ev._status == "disconnected") {
-          return ev
-        }
-
-        return {
-          op: null,
-          _status: "disconnected",
-          _error: "Websocket closed",
-        }
-      })
+      this.event.update(() => ({
+        op: null,
+        _status: "disconnected",
+        _error: `websocket closed with code ${ev.code}`,
+      }))
 
       if (!this.closed) {
         backoff.schedule(() => this.reconnect(false, backoff))

@@ -46,29 +46,24 @@
       ? instance
       : `https://${instance}`
 
+    let ws: LemmyWebsocketClient | null = null
     try {
       await fetch(instanceURL, { mode: "no-cors" })
 
-      const ws = new LemmyWebsocketClient(instanceURL)
-      await ws.ready
+      ws = new LemmyWebsocketClient(instanceURL)
 
-      console.log("ready")
-
-      const getSite = ws.wait(UserOperation.GetSite)
-      ws.send(UserOperation.GetSite, {})
-
-      const resp = await getSite
+      const resp = await ws.sendForReply(UserOperation.GetSite, {})
       if (lastInstance == instance) {
         createInstanceIsValid = true
         instanceInfo = resp.site_view.site
       }
-
-      ws.close()
     } catch (err) {
       console.debug(lastInstance, "failed:", err)
       if (lastInstance == instance) {
         createInstanceIsValid = false
       }
+    } finally {
+      if (ws) ws.close()
     }
   })()
 
