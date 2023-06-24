@@ -11,19 +11,20 @@
 
   import { page } from "$app/stores"
   import { errorToast } from "#/lib/toasty.js"
-  import { ws, profiles, currentProfile } from "#/stores.js"
+  import { ws, profile } from "#/stores.js"
 
   import { tick } from "svelte"
   import { fade } from "svelte/transition"
   import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
   import { cubicIn, cubicOut } from "svelte/easing"
 
-  $: instance = $profiles[$currentProfile]?.instance || goto("/profiles")
+  $: instance = $profile?.instance! || goto("/profiles")
+  $: user = $profile?.user
 
   $: event = $ws.event
   $: $ws.ready.catch((err) => errorToast(`WS: ${err}`))
   $: {
-    if ($profiles[$currentProfile] && $event.op == null && $event._error) {
+    if ($profile && $event.op == null && $event._error) {
       errorToast(`WS: ${$event._error}`)
     }
   }
@@ -82,6 +83,21 @@
       {/each}
 
       <svelte:fragment slot="trail">
+        {#if user}
+          <AppRailAnchor
+            target="_blank"
+            href="/u/{user.name}"
+            title={user.display_name || user.name}
+          >
+            <Avatar
+              src={user.avatar}
+              width="w-10"
+              class="m-auto"
+              rounded="rounded-full"
+              initials={user.display_name || user.name}
+            />
+          </AppRailAnchor>
+        {/if}
         <AppRailAnchor
           target="_blank"
           href={instance.url}
@@ -132,7 +148,13 @@
         {/each}
       </div>
       <div class="px-4 py-2">
-        <Avatar class="inline opacity-0" width="w-8" rounded="rounded-full" />
+        <Avatar
+          src={user?.avatar}
+          class="inline {!user && 'opacity-0'}"
+          width="w-8"
+          rounded="rounded-full"
+          initials={user?.display_name || user?.name || ""}
+        />
       </div>
     </TabGroup>
   </svelte:fragment>
