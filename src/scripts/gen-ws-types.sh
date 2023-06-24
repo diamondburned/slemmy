@@ -48,5 +48,14 @@ generate() {
 	echo "export type { a as default }"
 }
 
-generate > src/lib/lemmyws.types.ts
-prettier --write src/lib/lemmyws.types.ts
+temp=$(mktemp --suffix=.ts)
+output="src/lib/lemmyws.types.ts"
+
+generate > "$temp"
+prettier --write "$temp"
+
+if [[ "$temp" != "$(< output)" ]]; then
+	mv "$temp" "$output"
+else
+	rm "$temp"
+fi

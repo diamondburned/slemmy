@@ -40,11 +40,20 @@ async function main() {
     `$1\n${tags.join("\n")}\n$2`,
   )
 
-  await fs.writeFile(htmlPath, index)
+  const tmpDir = await fs.mkdtemp("gen-fonts")
+  const tmpPath = `${tmpDir}/app.html`
 
-  childprocess.spawnSync("prettier", ["--write", htmlPath], {
+  await fs.writeFile(tmpPath, index)
+  childprocess.spawnSync("prettier", ["--write", tmpPath], {
     stdio: "inherit",
   })
+  const tmpFile = await fs.readFile(tmpPath, "utf-8")
+
+  if (index != tmpFile) {
+    await fs.writeFile(htmlPath, tmpFile)
+  }
+
+  await fs.rm(tmpDir, { recursive: true })
 }
 
 main()
