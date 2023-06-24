@@ -10,7 +10,7 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { page } from "$app/stores"
-  import { ws, posts } from "#/stores.js"
+  import { ws, posts, profile } from "#/stores.js"
 
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
@@ -69,6 +69,7 @@
       // TODO: automatic pagination on scroll
       limit: 50,
       max_depth: 8,
+      auth: $profile?.user?.jwt,
     })
     .catch((err) => handleError(err))
 

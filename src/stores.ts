@@ -66,6 +66,13 @@ export const ws = store.derived(
   },
 )
 
+export const profile = store.derived(
+  [profiles, currentProfile],
+  ([profiles, currentProfile]) =>
+    // Make TS detect nullability.
+    profiles[currentProfile] ? profiles[currentProfile] : null,
+)
+
 export const cachedComments = store.writable<Record<number, CommentView>>({})
 
 // subscribeLater is a helper function for subscribing to a store, but only

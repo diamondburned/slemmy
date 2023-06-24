@@ -21,7 +21,7 @@
   import { onMount, tick } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
   import { urlHostname } from "#/lib/lemmyutils.js"
-  import { ws, postsSettings } from "#/stores.js"
+  import { ws, profile, postsSettings } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
 
   let showFilters = false
@@ -78,6 +78,7 @@
           type_: $postsSettings.listing,
           sort: $postsSettings.sort,
           page,
+          auth: $profile?.user?.jwt,
           limit: 10,
         })
         .catch((err) => {

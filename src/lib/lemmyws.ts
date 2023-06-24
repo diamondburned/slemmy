@@ -17,7 +17,6 @@ export type ServerEvent = {
 export type Event = StatusEvent | ServerEvent
 
 export class LemmyWebsocketClient {
-  static timeout = 15000 // ms
   // invalid is a LemmyWebsocketClient that is always closed and returns errors
   // for all operations.
   static invalid = new LemmyWebsocketClient()
@@ -44,7 +43,8 @@ export class LemmyWebsocketClient {
   // ready is a Promise that is resolved once the Websocket is ready.
   get ready(): Promise<void> {
     if (!this.wsEndpoint) {
-      return Promise.reject("No endpoint")
+      // Whatever. This is only for LemmyWebsocketClient.invalid.
+      return Promise.resolve()
     }
     if (this.closed) {
       return Promise.reject("Websocket closed")
@@ -92,10 +92,15 @@ export class LemmyWebsocketClient {
     T extends UserOperation,
     Command extends types[T][0],
     Event extends types[T][1],
-  >(op: T, data: Command): Promise<Event> {
-    const reply = this.wait<T, Event>(op)
+  >(op: T, data: Command, timeout = 5000): Promise<Event> {
+    await this.ready
+    const reply = this.wait<T, Event>(op, timeout)
     await this.send<T, Command>(op, data)
-    return reply
+    try {
+      return await reply
+    } catch (err) {
+      throw new Error(`No ${UserOperation[op]} reply: ${err}`)
+    }
   }
 
   // close closes the Websocket. It does nothing if the Websocket is already
@@ -144,14 +149,12 @@ export class LemmyWebsocketClient {
 
   async wait<T extends UserOperation, Event extends types[T][1]>(
     op: T,
+    timeout = 5000,
   ): Promise<Event> {
-    const timeout = timeoutPromise(
-      LemmyWebsocketClient.timeout,
-      "Timeout waiting for WS event",
-    )
+    const deadline = timeoutPromise(timeout, "Timeout waiting for WS event")
     await Promise.race([timeout, this.ready])
 
-    let event: types[T][1] | undefined
+    let event: Event | undefined
     const opStr = UserOperation[op]
 
     const promise = new Promise<void>((resolve, reject) => {
@@ -166,7 +169,7 @@ export class LemmyWebsocketClient {
         }
 
         if (ev.op == opStr) {
-          event = ev.data as typeof event
+          event = ev.data as Event
           resolve()
           unsub()
           return
@@ -174,7 +177,7 @@ export class LemmyWebsocketClient {
       })
     })
 
-    await Promise.race([promise, timeout])
+    await Promise.race([promise, deadline])
     return event!
   }
 
@@ -245,7 +248,7 @@ export class LemmyWebsocketClient {
     this.readyPromise = new Promise<void>((resolve, reject) => {
       const timeoutHandle = window.setTimeout(
         () => reject("Timeout waiting for WS"),
-        LemmyWebsocketClient.timeout,
+        10000,
       )
 
       let unsub: store.Unsubscriber
