@@ -161,8 +161,8 @@
   <title>Profiles | Slemmy</title>
 </svelte:head>
 
-<main class="m-auto" id="profiles">
-  <h1 class="mx-4 text-3xl text-center">
+<main class="m-auto min-h-full" id="profiles">
+  <h1 class="m-4 text-3xl text-center">
     <img
       src="/favicon.png"
       alt="Slemmy logo"
@@ -171,7 +171,7 @@
     Slemmy
   </h1>
 
-  <section class="card p-4 m-2 sm:m-4">
+  <section class="sm:card max-w-full sm:max-w-md w-full p-4 sm:mx-auto">
     <Stepper
       class="flex flex-col h-full"
       regionContent="flex-1 overflow-hidden"
@@ -201,7 +201,7 @@
         </svelte:fragment>
 
         <ListBox
-          class="profiles py-2 flex-1 rounded-none overflow-x-hidden overflow-y-scroll h-full"
+          class="profiles pt-2 pb-4 flex-1 rounded-none overflow-x-hidden overflow-y-scroll h-full"
           rounded=""
         >
           {#each $profiles as profile, i}
@@ -349,10 +349,7 @@
 
 <style global lang="postcss">
   #profiles {
-    @apply h-full;
-
-    width: 100vw;
-    max-width: 400px;
+    width: 100%;
 
     display: flex;
     flex-direction: column;
