@@ -5,11 +5,16 @@ import * as path from "path"
 import * as childprocess from "child_process"
 import manifest from "./src/manifest.json"
 
+let generated = false
+
 export default defineConfig({
   plugins: [
     {
       name: "autogen",
       configResolved() {
+        if (generated) return
+        generated = true
+
         childprocess.spawnSync(
           path.join(__dirname, "src", "scripts", "gen.js"),
           [],
