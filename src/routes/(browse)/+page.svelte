@@ -63,6 +63,12 @@
   onMount(() => page.subscribe((page) => emitLoadPage(page)))
 
   function emitLoadPage(page: number) {
+    // In case this is the first load that immediately redirects to the
+    // profiles page, exit the function.
+    if ($ws.closed) {
+      return
+    }
+
     console.log("emitLoadPage")
     if (!loading) {
       console.log("emitLoadPage loading")
