@@ -39,10 +39,7 @@ export default defineConfig({
       // https://vite-pwa-org.netlify.app/workbox/generate-sw.html
       // https://vite-pwa-org.netlify.app/workbox/inject-manifest.html
       strategies: "generateSW",
-      devOptions: {
-        enabled: true,
-      },
-      injectRegister: "inline",
+      injectRegister: null,
     }),
   ],
   envPrefix: "APP_",

@@ -2,8 +2,8 @@
   import { AppShell, AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
   import Comment from "#/components/Comment.svelte"
+  import Markdown from "#/components/Markdown.svelte"
   import BarButton from "#/components/BarButton.svelte"
-  import PostThumbnail from "#/components/PostThumbnail.svelte"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
   import CommunityBadge from "#/components/CommunityBadge.svelte"
@@ -14,7 +14,6 @@
 
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
-  import { markdown } from "#/lib/markdown.js"
   import { errorToast, infoToast } from "#/lib/toasty.js"
   import { nestComments } from "#/lib/types.js"
   import { UserOperation } from "lemmy-js-client"
@@ -191,9 +190,7 @@
         <PostThumbnailLarge post={post.post} />
       </hgroup>
 
-      <div class="body prose !text-white">
-        {@html markdown(post?.post.body || "")}
-      </div>
+      <Markdown markdown={post?.post.body || ""} />
 
       {#if post && post.counts.comments > 0}
         <hr class="my-4" />

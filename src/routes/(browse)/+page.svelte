@@ -10,6 +10,7 @@
   import { AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import { slide, fade } from "svelte/transition"
   import Symbol from "#/components/Symbol.svelte"
+  import Markdown from "#/components/Markdown.svelte"
   import BarButton from "#/components/BarButton.svelte"
   import PostThumbnail from "#/components/PostThumbnail.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
@@ -182,7 +183,7 @@
       <ProgressRadial stroke={80} width="w-12" />
     </div>
   {:then}
-    <ol class="list flex flex-col gap-4 py-4">
+    <ol id="post-list" class="list flex flex-col gap-4 py-4">
       {#each $posts as post}
         <li
           class="flex flex-row gap-0 items-center"
@@ -224,6 +225,11 @@
                 {/if}
               {/if}
             </h3>
+
+            <Markdown
+              class="summary !text-sm line-clamp-2 overflow-hidden border-l-4 px-2 border-surface-400"
+              markdown={post.post.body || ""}
+            />
 
             <p class="flex flex-wrap gap-2 mt-1">
               <span class="badge variant-soft inline-flex gap-1 px-3">
@@ -267,3 +273,14 @@
     {/if}
   {/await}
 </RevealingShell>
+
+<style global lang="postcss">
+  #post-list .markdown.summary {
+    --block-margin: 0.25rem;
+    max-height: 6rem;
+  }
+
+  #post-list .markdown.summary img {
+    display: none;
+  }
+</style>

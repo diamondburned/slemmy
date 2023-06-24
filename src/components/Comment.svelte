@@ -1,10 +1,10 @@
 <script lang="ts">
   import Symbol from "./Symbol.svelte"
+  import Markdown from "#/components/Markdown.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
   import RelativeTimestamp from "./RelativeTimestamp.svelte"
 
   import type { NestedCommentView } from "#/lib/types.js"
-  import { markdown } from "#/lib/markdown.js"
   import { cubicInOut as inOut } from "svelte/easing"
   import { slide } from "svelte/transition"
 
@@ -66,11 +66,11 @@
     </div>
     {#if expanded}
       <div
-        class="comment-body select-text cursor-text z-10 prose prose-nopad my-1"
+        class="comment-body select-text cursor-text z-10 my-1"
         on:click|stopPropagation
         transition:slide|local={expandingTransition}
       >
-        {@html markdown(comment.comment.content)}
+        <Markdown markdown={comment.comment.content} />
       </div>
     {/if}
   </button>
