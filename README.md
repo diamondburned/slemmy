@@ -18,7 +18,7 @@
 - [x] Comments feed
   - [ ] Autoload on scroll
   - [ ] Filtering and sorting
-- [ ] Logging in
+- [x] Logging in
   - [ ] Upvoting
   - [ ] Commenting
 
