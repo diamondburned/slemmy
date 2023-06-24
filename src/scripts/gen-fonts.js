@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import * as fs from "fs/promises"
+import * as os from "os"
+import * as path from "path"
 import * as childprocess from "child_process"
 
 const fonts = [
@@ -40,7 +42,7 @@ async function main() {
     `$1\n${tags.join("\n")}\n$2`,
   )
 
-  const tmpDir = await fs.mkdtemp("gen-fonts")
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "gen-fonts-"))
   const tmpPath = `${tmpDir}/app.html`
 
   await fs.writeFile(tmpPath, index)
