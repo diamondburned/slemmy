@@ -151,17 +151,6 @@
             </p>
           {/each}
         </ListBox>
-
-        {#if $profiles.length != 0}
-          <label class="label pb-2">
-            <input
-              type="checkbox"
-              class="checkbox mr-2"
-              bind:checked={$settings.autoLogin}
-            />
-            <span>Automatically log in to this profile</span>
-          </label>
-        {/if}
       </Step>
       <Step
         class="h-full flex flex-col flex-1"
