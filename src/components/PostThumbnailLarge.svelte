@@ -16,7 +16,7 @@
 </script>
 
 {#if thumbnailURL}
-  <div class="rounded m-auto w-full max-w-lg max-h-lg {className}">
+  <div class="rounded m-auto max-w-lg max-h-lg {className}">
     <img
       class="rounded max-w-full max-h-full duration-100 transition-opacity {imageClass}"
       class:absolute={!loaded}
