@@ -19,16 +19,18 @@
   import type { Profile } from "#/lib/types.js"
   import type { Site } from "lemmy-js-client"
 
-  let resetting = true
-  onMount(() =>
-    currentProfile.subscribe(() => {
-      if (resetting) {
-        resetting = false
-        return -1
-      }
+  onMount(() => currentProfile.set(-1))
+  $: {
+    if ($profiles[$currentProfile]) {
       goto("/")
-    }),
-  )
+    }
+  }
+  let resetting = true
+  $: {
+    if (resetting) {
+      resetting = false
+    }
+  }
 
   // Defaults.
   let instance = "beehaw.org"
