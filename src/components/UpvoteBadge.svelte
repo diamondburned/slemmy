@@ -2,7 +2,7 @@
   import type { PostView } from "lemmy-js-client"
   import { UserOperation } from "lemmy-js-client"
   import { client, profile } from "#/stores.js"
-  import { errorToast } from "#/lib/toasty.js"
+  import { errorToast, infoToast } from "#/lib/toasty.js"
 
   import Symbol from "#/components/Symbol.svelte"
 
@@ -19,6 +19,7 @@
 
   async function toggleVoteDelta(delta: number, state: boolean) {
     if (!loggedIn || voting) {
+      infoToast("You must be logged in to vote.")
       return
     }
 
@@ -34,14 +35,7 @@
         auth: $profile?.user?.jwt!,
       })
 
-      if (delta == +1) {
-        post.counts.upvotes += state ? +1 : -1
-      }
-      if (delta == -1) {
-        post.counts.downvotes += state ? +1 : -1
-      }
-
-      post.counts.score = post.counts.upvotes - post.counts.downvotes
+      post.counts.score += state ? delta : -delta
       post.my_vote = score
     } catch (err) {
       errorToast(`${err}`)
