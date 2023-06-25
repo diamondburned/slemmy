@@ -10,8 +10,7 @@
   import Symbol from "#/components/Symbol.svelte"
 
   import { page } from "$app/stores"
-  import { errorToast } from "#/lib/toasty.js"
-  import { ws, profile } from "#/stores.js"
+  import { profile } from "#/stores.js"
 
   import { tick } from "svelte"
   import { fade } from "svelte/transition"
@@ -20,14 +19,6 @@
 
   $: instance = $profile?.instance! || goto("/profiles")
   $: user = $profile?.user
-
-  $: event = $ws.event
-  $: $ws.ready.catch((err) => errorToast(`WS: ${err}`))
-  $: {
-    if ($profile && $event.op == null && $event._error) {
-      errorToast(`WS: ${$event._error}`)
-    }
-  }
 
   // Needed to prevent page blinking on transition.
   let navigating = false

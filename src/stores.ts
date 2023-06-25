@@ -1,6 +1,7 @@
 import * as store from "svelte/store"
 import * as persistent from "#/lib/persistent.js"
 import { LemmyHTTP } from "#/lib/types.js"
+import { LemmyClient } from "#/lib/lemmyclient.js"
 import { LemmyWebsocketClient } from "#/lib/lemmyws.js"
 import type { Profile, Settings } from "#/lib/types.js"
 import type {
@@ -34,35 +35,24 @@ export const postsSettings = persistent.writable<{
  * In-memory/temporary stores
  */
 
-// client is a LemmyHTTP client for the current profile.
-//
-// Deprecated: use ws instead.
-export const client = store.derived(
-  [profiles, currentProfile],
-  ([profiles, currentProfile]) => {
-    return new LemmyHTTP(profiles[currentProfile]?.instance.url ?? "")
-  },
-)
-
 // posts is a cache of posts for the current profile.
 export const posts = store.writable<PostView[]>([])
 currentProfile.subscribe(() => posts.set([]))
 
-let lastWS: LemmyWebsocketClient | null = null
+let lastClient: LemmyClient | null = null
 
-// ws is a LemmyWebsocketClient for the current profile.
-export const ws = store.derived(
+export const client = store.derived(
   [profiles, currentProfile],
   ([profiles, currentProfile]) => {
-    if (lastWS) {
-      lastWS.close()
+    if (lastClient) {
+      lastClient.close()
     }
 
-    console.debug("switching to profile", profiles[currentProfile])
-    lastWS = profiles[currentProfile]
-      ? new LemmyWebsocketClient(profiles[currentProfile].instance.url)
-      : LemmyWebsocketClient.invalid
-    return lastWS
+    const profile = profiles[currentProfile]
+    lastClient = profile
+      ? LemmyClient.auto(profile.instance.url, profile.instance.method)
+      : LemmyClient.dummy
+    return lastClient
   },
 )
 

@@ -1,6 +1,8 @@
 <script lang="ts" context="module">
   import { UserOperation } from "lemmy-js-client"
   import { LemmyWebsocketClient } from "#/lib/lemmyws.js"
+  import { LemmyClient } from "#/lib/lemmyclient.js"
+  import type { LemmyConnectMethod } from "#/lib/lemmyclient.js"
 
   async function createProfile({
     instance,
@@ -20,13 +22,13 @@
     // Fast path: check for valid HTTP.
     await fetch(instanceURL, { mode: "no-cors" })
 
-    let ws: LemmyWebsocketClient | null = null
-    try {
-      ws = new LemmyWebsocketClient(instanceURL)
+    const method = await LemmyClient.detect(instanceURL)
+    const client = LemmyClient.create(instanceURL, method)
 
+    try {
       let user: Profile["user"] | undefined
       if (username && password) {
-        const resp = await ws.sendForReply(UserOperation.Login, {
+        const resp = await client.request(UserOperation.Login, {
           username_or_email: username,
           password,
           // totp_2fa_token: totp || undefined,
@@ -40,7 +42,7 @@
         }
       }
 
-      const resp = await ws.sendForReply(UserOperation.GetSite, {
+      const resp = await client.request(UserOperation.GetSite, {
         auth: user?.jwt,
       })
 
@@ -49,6 +51,7 @@
           url: instanceURL,
           name: resp.site_view.site.name,
           icon: resp.site_view.site.icon,
+          method: method,
         },
         user: user
           ? {
@@ -61,7 +64,7 @@
     } catch (err) {
       throw err
     } finally {
-      if (ws) ws.close()
+      client.close()
     }
   }
 </script>

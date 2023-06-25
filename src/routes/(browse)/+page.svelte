@@ -21,7 +21,7 @@
   import { onMount, tick } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
   import { urlHostname } from "#/lib/lemmyutils.js"
-  import { ws, profile, postsSettings } from "#/stores.js"
+  import { client, profile, postsSettings } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
 
   let showFilters = false
@@ -39,53 +39,39 @@
     }
   })
 
-  onMount(() =>
-    $ws.derive(UserOperation.GetPosts).subscribe(async (ev) => {
-      if (!ev) {
-        return
-      }
+  async function loadPage(page: number) {
+    loading = true
+
+    try {
+      const resp = await $client.request(UserOperation.GetPosts, {
+        type_: $postsSettings.listing,
+        sort: $postsSettings.sort,
+        page,
+        auth: $profile?.user?.jwt,
+        limit: 10,
+      })
 
       // Be a bit more careful: if Lemmy adds a post into the first page, our
       // second page may contain posts from the first page, so we need to filter
       // them out.
-      ev.posts
+      resp.posts
         .filter((got) => !$posts.find((old) => old.post.id == got.post.id))
         .forEach((newPost) => $posts.push(newPost))
 
       $posts = $posts // force update
-      loading = false
-
       checkShouldLoadMore()
-    }),
-  )
+    } catch (err) {
+      errorToast(`Cannot request posts: ${err}`)
+      return
+    } finally {
+      loading = false
+    }
+
+    checkShouldLoadMore()
+  }
 
   // Load page on first mount.
-  onMount(() => page.subscribe((page) => emitLoadPage(page)))
-
-  function emitLoadPage(page: number) {
-    // In case this is the first load that immediately redirects to the
-    // profiles page, exit the function.
-    if ($ws.closed) {
-      return
-    }
-
-    console.log("emitLoadPage")
-    if (!loading) {
-      console.log("emitLoadPage loading")
-      loading = true
-      $ws
-        .send(UserOperation.GetPosts, {
-          type_: $postsSettings.listing,
-          sort: $postsSettings.sort,
-          page,
-          auth: $profile?.user?.jwt,
-          limit: 10,
-        })
-        .catch((err) => {
-          errorToast(`Cannot request posts: ${err}`)
-        })
-    }
-  }
+  onMount(() => page.subscribe((page) => loadPage(page)))
 
   let scrollContainer: HTMLElement
   function checkShouldLoadMore() {
@@ -185,100 +171,94 @@
     {/if}
   </div>
 
-  {#await $ws.ready}
-    <div class="grid h-full place-items-center">
-      <ProgressRadial stroke={80} width="w-12" />
-    </div>
-  {:then}
-    <ol id="post-list" class="list flex flex-col gap-4 py-4">
-      {#each $posts as post}
-        <li
-          class="flex flex-row gap-0 items-center"
-          transition:fade|local={{ duration: 75 }}
-        >
-          <div class="flex-1 flex flex-col gap-1 w-full">
-            <p class="text-sm text-surface-400">
-              <UserBadge user={post.creator} />
-              <span>to</span>
-              <CommunityBadge community={post.community} />
+  <ol id="post-list" class="list flex flex-col gap-4 py-4">
+    {#each $posts as post}
+      <li
+        class="flex flex-row gap-0 items-center"
+        transition:fade|local={{ duration: 75 }}
+      >
+        <div class="flex-1 flex flex-col gap-1 w-full">
+          <p class="text-sm text-surface-400">
+            <UserBadge user={post.creator} />
+            <span>to</span>
+            <CommunityBadge community={post.community} />
 
-              <span class="float-right">
-                {#if post.post.featured_community || post.post.featured_local}
-                  <span class="badge-icon variant-ghost" title="Featured">
-                    <Symbol name="push_pin" />
-                  </span>
-                {/if}
-              </span>
-            </p>
-
-            <h3>
-              <a
-                href={post.post.url || `/p/${post.post.id}`}
-                class="hover:underline"
-                target={post.post.url ? "_blank" : ""}
-              >
-                {post.post.name}
-              </a>
-              {#if post.post.url}
-                <Symbol
-                  name="open_in_new"
-                  size="sm"
-                  class="align-bottom text-surface-400"
-                />
-                {#if urlHostname(post.post.url)}
-                  <span class="text-surface-400 text-xs">
-                    ({urlHostname(post.post.url)})
-                  </span>
-                {/if}
-              {/if}
-            </h3>
-
-            <Markdown
-              class="summary !text-sm line-clamp-2 overflow-hidden border-l-4 px-2 border-surface-400"
-              markdown={post.post.body || ""}
-            />
-
-            <p class="flex flex-wrap gap-2 mt-1">
-              <span class="badge variant-soft inline-flex gap-1 px-3">
-                <Symbol name="expand_less" />
-                {post.counts.upvotes - post.counts.downvotes}
-              </span>
-              <a
-                href="/p/{post.post.id}"
-                class="badge variant-soft hover:variant-filled transition inline-flex gap-1 px-3"
-              >
-                <Symbol name="comment" />
-                {post.counts.comments}
-              </a>
-              <RelativeTimestamp
-                date={post.post.published + "Z"}
-                class="badge variant-soft inline-flex gap-1 px-3"
-              />
-              {#if post.post.nsfw}
-                <span class="badge variant-soft !text-red-400 gap-1 px-3">
-                  NSFW
+            <span class="float-right">
+              {#if post.post.featured_community || post.post.featured_local}
+                <span class="badge-icon variant-ghost" title="Featured">
+                  <Symbol name="push_pin" />
                 </span>
               {/if}
-            </p>
-          </div>
+            </span>
+          </p>
 
-          <PostThumbnail post={post.post} />
-        </li>
-      {/each}
-    </ol>
+          <h3>
+            <a
+              href={post.post.url || `/p/${post.post.id}`}
+              class="hover:underline"
+              target={post.post.url ? "_blank" : ""}
+            >
+              {post.post.name}
+            </a>
+            {#if post.post.url}
+              <Symbol
+                name="open_in_new"
+                size="sm"
+                class="align-bottom text-surface-400"
+              />
+              {#if urlHostname(post.post.url)}
+                <span class="text-surface-400 text-xs">
+                  ({urlHostname(post.post.url)})
+                </span>
+              {/if}
+            {/if}
+          </h3>
 
-    {#if loading}
-      <div
-        class="grid h-full place-items-center"
-        transition:fade|local={{ duration: 50 }}
-      >
-        <p class="inline-flex items-center gap-2 mt-8 mb-16">
-          <ProgressRadial stroke={80} width="w-4" />
-          <span>Fetching more posts...</span>
-        </p>
-      </div>
-    {/if}
-  {/await}
+          <Markdown
+            class="summary !text-sm line-clamp-2 overflow-hidden border-l-4 px-2 border-surface-400"
+            markdown={post.post.body || ""}
+          />
+
+          <p class="flex flex-wrap gap-2 mt-1">
+            <span class="badge variant-soft inline-flex gap-1 px-3">
+              <Symbol name="expand_less" />
+              {post.counts.upvotes - post.counts.downvotes}
+            </span>
+            <a
+              href="/p/{post.post.id}"
+              class="badge variant-soft hover:variant-filled transition inline-flex gap-1 px-3"
+            >
+              <Symbol name="comment" />
+              {post.counts.comments}
+            </a>
+            <RelativeTimestamp
+              date={post.post.published + "Z"}
+              class="badge variant-soft inline-flex gap-1 px-3"
+            />
+            {#if post.post.nsfw}
+              <span class="badge variant-soft !text-red-400 gap-1 px-3">
+                NSFW
+              </span>
+            {/if}
+          </p>
+        </div>
+
+        <PostThumbnail post={post.post} />
+      </li>
+    {/each}
+  </ol>
+
+  {#if loading}
+    <div
+      class="grid h-full place-items-center"
+      transition:fade|local={{ duration: 50 }}
+    >
+      <p class="inline-flex items-center gap-2 mt-8 mb-16">
+        <ProgressRadial stroke={80} width="w-4" />
+        <span>Fetching more posts...</span>
+      </p>
+    </div>
+  {/if}
 </RevealingShell>
 
 <style global lang="postcss">
