@@ -119,17 +119,19 @@
   // TypeScript is not smart enough to know that this is a function.
   // @ts-ignore
   const debouncedCreateProfile = debounce(createProfile, 250)
-  $: (async () => {
+  $: {
     createInstanceIsValid = null
-    try {
-      creatingProfile = await debouncedCreateProfile({ instance })
-    } catch (err) {
-      console.info("cannot validate instance:", err)
-      creatingError = `${err}`
-    } finally {
-      createInstanceIsValid = !!creatingProfile
-    }
-  })()
+    debouncedCreateProfile({ instance })
+      .then((profile: Profile) => {
+        creatingProfile = profile
+        createInstanceIsValid = true
+      })
+      .catch((err: unknown) => {
+        console.info("cannot validate instance:", err)
+        creatingError = `${err}`
+        createInstanceIsValid = false
+      })
+  }
 
   async function applyProfile() {
     if (!creatingProfile) return
