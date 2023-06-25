@@ -16,48 +16,54 @@ async function generate(): Promise<string> {
     string,
     {
       response: string
-      route: string
+      method: string
     }
   >()
-  for (const [_, request, response, route] of httpSrc.matchAll(
-    /return this\.#wrapper<\s*(.*),\s*(.*)\s*>\([^"]*"(\/.*)"[^)]*\)/gm,
+  for (const [_, method, request, response] of httpSrc.matchAll(
+    /(\w+)\(\s*form: (.*)\s*\) {\n.*return this\.#wrapper<\n?.*,\s*(.*)\s*>/gm,
   )) {
-    console.log(request, response, route)
     requestResponses.set(request, {
       response,
-      route,
+      method,
     })
   }
 
-  const wsRequests = new Set<string>()
+  const wsRequests: string[] = []
   for (const [_, request] of wsSrc.matchAll(
     /return wrapper\(UserOperation.(.*),/gm,
   )) {
-    wsRequests.add(request)
+    wsRequests.push(request)
   }
 
   let output = ""
   output += [
     `// Generated using ./src/scripts/gen-ws-types.sh`,
     ``,
-    `import { UserOperation } from "lemmy-js-client"`,
+    `import { LemmyHttp, UserOperation } from "lemmy-js-client"`,
     `import type * as ${prefix} from "lemmy-js-client"`,
-    ``,
-    `type a = {`,
   ].join("\n")
+  output += `\n\n`
 
-  wsRequests.forEach((request) => {
+  output += `function throwUnimplemented(): never { throw new Error("not implemented") }\n\n`
+
+  output += `export type typeMap = {`
+  for (const request of wsRequests) {
     const detail = requestResponses.get(request)
     const data = [
       `${prefix}.${request}`,
-      detail ? `${prefix}.${detail.response}` : "unknown",
-      detail ? `"${detail.route}"` : "never",
+      detail ? `${prefix}.${detail.response}` : "never",
     ]
     output += `[UserOperation.${request}]: [${data.join(", ")}],`
-  })
-
+  }
   output += `}\n\n`
-  output += `export type { a as default }`
+
+  output += `export const clientRouteMap = (client: LemmyHttp) => ({`
+  for (const request of wsRequests) {
+    const detail = requestResponses.get(request)
+    output += `\n[UserOperation.${request}]: `
+    output += detail ? `client.${detail.method},` : `throwUnimplemented,`
+  }
+  output += `\n})`
 
   return prettier(output, "ts")
 }
@@ -93,7 +99,7 @@ async function depVersion(dep: string): Promise<string> {
 
 let exit = 0
 
-const output = "src/lib/lemmyws.types.ts"
+const output = "src/lib/lemmy.generated.ts"
 try {
   const out = await generate()
   const outFile = await fs.open(output, "w")
