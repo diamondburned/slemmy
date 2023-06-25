@@ -16,6 +16,7 @@
   import { fade } from "svelte/transition"
   import { goto, beforeNavigate, afterNavigate } from "$app/navigation"
   import { cubicIn, cubicOut } from "svelte/easing"
+  import { thumbnailURL } from "#/lib/lemmyutils.js"
 
   $: instance = $profile?.instance! || goto("/profiles")
   $: user = $profile?.user
@@ -81,7 +82,7 @@
             title={user.display_name || user.name}
           >
             <Avatar
-              src={user.avatar}
+              src={thumbnailURL(user.avatar)}
               width="w-10"
               class="m-auto"
               rounded="rounded-full"
@@ -95,7 +96,7 @@
           title={instance.name}
         >
           <Avatar
-            src={instance.icon}
+            src={thumbnailURL(instance.icon)}
             width="w-10"
             class="m-auto"
             rounded="rounded-full"
@@ -117,7 +118,7 @@
     >
       <div class="px-4 py-2">
         <Avatar
-          src={instance.icon}
+          src={thumbnailURL(instance.icon)}
           class="inline"
           width="w-8"
           rounded="rounded-full"
@@ -140,7 +141,7 @@
       </div>
       <div class="px-4 py-2">
         <Avatar
-          src={user?.avatar}
+          src={thumbnailURL(user?.avatar)}
           class="inline {!user && 'opacity-0'}"
           width="w-8"
           rounded="rounded-full"
