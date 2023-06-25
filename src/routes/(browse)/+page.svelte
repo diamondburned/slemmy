@@ -23,6 +23,7 @@
   import { errorToast } from "#/lib/toasty.js"
   import { urlHostname } from "#/lib/lemmyutils.js"
   import { client, profile, postsSettings } from "#/stores.js"
+  import { subscribeLater } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
 
   let showFilters = false
@@ -74,8 +75,12 @@
     }
   }
 
-  // Load page on first mount.
-  onMount(() => page.subscribe((page) => loadPage(page)))
+  onMount(() => {
+    subscribeLater(page, (page) => loadPage(page))
+    if ($posts.length == 0) {
+      loadPage(1)
+    }
+  })
 
   let scrollContainer: HTMLElement
   function checkShouldLoadMore() {
