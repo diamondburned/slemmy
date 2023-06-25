@@ -18,7 +18,15 @@ export function postThumbnailURL(
   return thumbnailURL(imageURL)
 }
 
-export function thumbnailURL(imageURL: string): string {
+export function thumbnailURL(imageURL: string): string
+export function thumbnailURL(imageURL: undefined): undefined
+export function thumbnailURL(imageURL: string | undefined): string | undefined
+
+export function thumbnailURL(imageURL: string | undefined): string | undefined {
+  if (!imageURL) {
+    return
+  }
+
   let url: URL
   try {
     url = new URL(imageURL)

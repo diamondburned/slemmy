@@ -23,6 +23,6 @@ export function infoToast(message: string, { autohide } = { autohide: true }) {
   toastStore.trigger({
     message,
     autohide,
-    background: "variant-filled-info",
+    background: "variant-filled",
   })
 }

@@ -13,7 +13,7 @@
   class="inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
-    src={user.avatar ? thumbnailURL(user.avatar) : undefined}
+    src={thumbnailURL(user.avatar)}
     {width}
     initials=""
     class="mr-1 self-center"

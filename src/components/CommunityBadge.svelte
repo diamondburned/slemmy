@@ -13,7 +13,7 @@
   class="inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
-    src={community.icon ? thumbnailURL(community.icon) : undefined}
+    src={thumbnailURL(community.icon)}
     {width}
     class="mr-1 self-center"
     rounded="rounded-full"

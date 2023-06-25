@@ -3,12 +3,15 @@
 
   import Symbol from "#/components/Symbol.svelte"
 
-  export let label: string = ""
-  export let icon: string = ""
+  export let label: string | undefined = undefined
+  export let icon: string | undefined = undefined
   export let tooltip = ""
   export let active: boolean | null = null
   export let href: string | undefined = undefined
   $: tag = href ? "a" : "button"
+
+  let className = ""
+  export { className as class }
 
   const dispatch = createEventDispatcher<{
     click: void
@@ -18,9 +21,9 @@
 <!-- Fucking Svelte and TypeScript, man. -->
 <svelte:element
   this={tag}
-  class:btn={label != ""}
-  class:btn-icon={label == "" && icon != ""}
-  class="btn-sm btn-icon-sm hover:bg-surface-100-800-token"
+  class:btn={label != undefined}
+  class:btn-icon={label == undefined && icon != undefined}
+  class="{className} btn btn-sm btn-icon-sm hover:bg-surface-100-800-token"
   title={tooltip}
   class:!variant-filled={active}
   class:!variant-outlined={!active}
@@ -36,9 +39,11 @@
   {href}
 >
   <slot name="icon">
-    <Symbol name={icon} />
+    {#if icon}
+      <Symbol name={icon} />
+    {/if}
   </slot>
   <slot name="label">
-    {label}
+    {label || ""}
   </slot>
 </svelte:element>

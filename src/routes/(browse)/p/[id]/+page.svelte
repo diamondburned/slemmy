@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { AppShell, AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
+  import {
+    AppShell,
+    AppBar,
+    Avatar,
+    ProgressRadial,
+  } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
   import Comment from "#/components/Comment.svelte"
   import Markdown from "#/components/Markdown.svelte"
@@ -11,11 +16,12 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { page } from "$app/stores"
-  import { client, posts, profile } from "#/stores.js"
+  import { client, posts, profile as profile_ } from "#/stores.js"
 
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
   import { errorToast, infoToast } from "#/lib/toasty.js"
+  import { thumbnailURL } from "#/lib/lemmyutils.js"
   import { nestComments } from "#/lib/types.js"
   import { UserOperation } from "lemmy-js-client"
   import type { PostView, ListingType, CommentSortType } from "lemmy-js-client"
@@ -29,6 +35,7 @@
   let sort: CommentSortType
   let comments: NestedCommentView[] | undefined
 
+  $: profile = $profile_! // deal with Svelte being bad
   $: listing = (query.get("listing") as ListingType) || "All"
   $: sort = (query.get("sort") as CommentSortType) || "Top"
 
@@ -53,7 +60,7 @@
       // TODO: automatic pagination on scroll
       limit: 50,
       max_depth: 8,
-      auth: $profile?.user?.jwt,
+      auth: profile.user?.jwt,
     })
     comments = nestComments(resp.comments)
   }
@@ -117,15 +124,46 @@
           </button>
 
           <div slot="trail" class="space-x-1">
+            {#if !post.post.ap_id.startsWith(profile.instance.url)}
+              <BarButton
+                icon=""
+                href={post.post.ap_id}
+                class="relative"
+                tooltip="Open original post"
+              >
+                <svelte:fragment slot="icon">
+                  <Symbol name="open_in_new" />
+                  <Avatar
+                    src={thumbnailURL(post.community.icon)}
+                    width="w-4"
+                    class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
+                    rounded="rounded-full"
+                    initials={post.community.name || ""}
+                  />
+                </svelte:fragment>
+              </BarButton>
+            {/if}
             <BarButton
-              icon="link"
-              tooltip="Copy Post Link"
+              icon=""
+              href="{profile.instance.url}/post/{post.post.id}"
+              class="relative"
+              tooltip="Open in {profile.instance.name || 'current instance'}"
+            >
+              <svelte:fragment slot="icon">
+                <Symbol name="open_in_new" />
+                <Avatar
+                  src={thumbnailURL(profile.instance.icon)}
+                  width="w-4"
+                  class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
+                  rounded="rounded-full"
+                  initials={profile.instance.name || ""}
+                />
+              </svelte:fragment>
+            </BarButton>
+            <BarButton
+              icon="share"
+              tooltip="Copy post link"
               on:click={() => copyLink()}
-            />
-            <BarButton
-              icon="open_in_new"
-              href={post.post.ap_id}
-              tooltip="Open Post"
             />
           </div>
         </AppBar>
@@ -162,7 +200,7 @@
           <RelativeTimestamp
             date={post.post.published}
             style="long"
-            class="btn variant-soft pointer-events-none "
+            class="btn variant-soft pointer-events-none"
           >
             <svelte:fragment slot="icon">
               <Symbol
@@ -174,8 +212,9 @@
             </svelte:fragment>
           </RelativeTimestamp>
           {#if post.post.nsfw}
-            <span class="mx-2">ꞏ</span>
-            <span class="text-red-400">NSFW</span>
+            <span class="btn variant-soft pointer-events-none !text-red-400">
+              NSFW
+            </span>
           {/if}
         </div>
         <PostThumbnailLarge post={post.post} />
