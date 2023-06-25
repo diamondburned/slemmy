@@ -17,6 +17,7 @@
     {width}
     class="mr-1 self-center"
     rounded="rounded-full"
+    initials={community.name}
   />
   {community.title}
 </a>
