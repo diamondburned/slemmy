@@ -157,16 +157,10 @@ export class LemmyWebsocketClient {
     let event: Event | undefined
     const opStr = UserOperation[op]
 
-    const promise = new Promise<void>((resolve, reject) => {
-      let unsub: store.Unsubscriber | null = null
+    let unsub: store.Unsubscriber | null = null
+    const promise = new Promise<void>((resolve) => {
       unsub = this.event.subscribe((ev) => {
         if (!unsub) return // Ignore current event
-
-        if (ev.op == null) {
-          reject(ev._error || "Websocket closed")
-          unsub()
-          return
-        }
 
         if (ev.op == opStr) {
           event = ev.data as Event
@@ -178,6 +172,7 @@ export class LemmyWebsocketClient {
     })
 
     await Promise.race([promise, deadline])
+    if (unsub) (unsub as store.Unsubscriber)()
     return event!
   }
 
@@ -200,6 +195,7 @@ export class LemmyWebsocketClient {
       this.ws = new WebSocket(this.wsEndpoint)
     } catch (err) {
       this.readyPromise = Promise.reject(err)
+      this.promiseResolved = true
       return
     }
 
@@ -234,6 +230,7 @@ export class LemmyWebsocketClient {
       }))
 
       if (!this.closed) {
+        this.resetReadyPromise()
         backoff.schedule(() => this.reconnect(false, backoff))
       }
     })
