@@ -8,6 +8,7 @@
 
   export let date: Date | number | string
   export let icon = true
+  export let style: "long" | "short" = "short"
 
   let date_: Date
   const tzlessRegex = /^\d+-\d+-\d+T\d+:\d+:\d+(?:\.\d+)?$/
@@ -33,8 +34,8 @@
 <time datetime={date_.toISOString()} title={absolute(date_)} class={className}>
   {#if icon}
     <slot name="icon">
-      <Symbol name="schedule" inline />
+      <Symbol name="schedule" />
     </slot>
   {/if}
-  {relative(date_, "short")}
+  {relative(date_, style)}
 </time>

@@ -6,6 +6,7 @@
   import BarButton from "#/components/BarButton.svelte"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
+  import UpvoteBadge from "#/components/UpvoteBadge.svelte"
   import CommunityBadge from "#/components/CommunityBadge.svelte"
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
@@ -147,29 +148,18 @@
           <UserBadge width="w-[1.5rem]" user={post.creator} />
           <span class="mx-1 text-surface-400">to</span>
           <CommunityBadge width="w-[1.5rem]" community={post.community} />
-
-          <span
-            class="sm:border-r-2 border-current text-2xl mx-2 align-middle leading-0"
-          />
-          <br class="sm:hidden mb-3" />
-
-          <span>
-            <Symbol
-              name="expand_less"
-              inline
-              margin="mr-1"
-              size=""
-              class="!align-middle"
-            />
-            {post.counts.upvotes - post.counts.downvotes}
-          </span>
-          <span class="mx-2">ꞏ</span>
-          <span>
+        </p>
+        <div class="flex flex-row flex-wrap gap-2">
+          <UpvoteBadge bind:post class="btn" />
+          <span class="btn variant-soft pointer-events-none">
             <Symbol name="comment" inline margin="mr-1" class="!align-middle" />
             {post.counts.comments}
           </span>
-          <span class="mx-2">ꞏ</span>
-          <RelativeTimestamp date={post.post.published}>
+          <RelativeTimestamp
+            date={post.post.published}
+            style="long"
+            class="btn variant-soft pointer-events-none "
+          >
             <svelte:fragment slot="icon">
               <Symbol
                 name="schedule"
@@ -183,7 +173,7 @@
             <span class="mx-2">ꞏ</span>
             <span class="text-red-400">NSFW</span>
           {/if}
-        </p>
+        </div>
         <PostThumbnailLarge post={post.post} />
       </hgroup>
 
@@ -201,7 +191,7 @@
             <ProgressRadial stroke={80} width="w-12" />
           </div>
         {:else}
-          <div class="comments funny-width">
+          <div class="comments funny-width mb-4">
             {#each comments as comment}
               <Comment {comment} />
             {/each}
@@ -216,6 +206,7 @@
   .funny-width {
     max-width: var(--max-page-width);
     padding: 0 calc(var(--max-page-padding) - 0.75rem);
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 </style>

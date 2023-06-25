@@ -286,6 +286,8 @@ export class LemmyWebsocketClient {
 }
 
 class exponentialBackoff {
+  static readonly maxTimeout = 30000
+
   private attempt = 0
   constructor(private timeout: number = 1000) {}
 
@@ -297,7 +299,10 @@ class exponentialBackoff {
     const rand = Math.random()
     const jitter = 1 + rand * 0.2
 
-    this.timeout *= jitter
+    this.timeout = Math.min(
+      this.timeout * jitter,
+      exponentialBackoff.maxTimeout,
+    )
     return timeout
   }
 

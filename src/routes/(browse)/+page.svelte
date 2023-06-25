@@ -12,6 +12,7 @@
   import Symbol from "#/components/Symbol.svelte"
   import Markdown from "#/components/Markdown.svelte"
   import BarButton from "#/components/BarButton.svelte"
+  import UpvoteBadge from "#/components/UpvoteBadge.svelte"
   import PostThumbnail from "#/components/PostThumbnail.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
   import CommunityBadge from "#/components/CommunityBadge.svelte"
@@ -221,20 +222,17 @@
           />
 
           <p class="flex flex-wrap gap-2 mt-1">
-            <span class="badge variant-soft inline-flex gap-1 px-3">
-              <Symbol name="expand_less" />
-              {post.counts.upvotes - post.counts.downvotes}
-            </span>
+            <UpvoteBadge bind:post />
             <a
               href="/p/{post.post.id}"
-              class="badge variant-soft hover:variant-filled transition inline-flex gap-1 px-3"
+              class="btn btn-sm variant-soft transition inline-flex gap-1 px-3"
             >
               <Symbol name="comment" />
               {post.counts.comments}
             </a>
             <RelativeTimestamp
               date={post.post.published + "Z"}
-              class="badge variant-soft inline-flex gap-1 px-3"
+              class="btn btn-sm variant-soft pointer-events-none inline-flex gap-1 px-3"
             />
             {#if post.post.nsfw}
               <span class="badge variant-soft !text-red-400 gap-1 px-3">
