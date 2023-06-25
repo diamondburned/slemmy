@@ -1,7 +1,7 @@
 import { LemmyWebsocket } from "lemmy-js-client/dist/websocket.js"
 import { UserOperation } from "lemmy-js-client"
 import * as store from "svelte/store"
-import type types from "#/lib/lemmyws.types.js"
+import type { typeMap } from "#/lib/lemmy.generated.js"
 
 export type StatusEvent = {
   op: null
@@ -62,14 +62,14 @@ export class LemmyWebsocketClient {
     return this.ws == null
   }
 
-  lastEvent<T extends UserOperation, Event extends types[T][1]>(
+  lastEvent<T extends UserOperation, Event extends typeMap[T][1]>(
     op: T,
   ): Event | null {
     return (this.lastEvents.get(op) as Event) ?? null
   }
 
   // send sends a message to the server.
-  async send<T extends UserOperation, Command extends types[T][0]>(
+  async send<T extends UserOperation, Command extends typeMap[T][0]>(
     op: T,
     data: Command,
   ) {
@@ -90,8 +90,8 @@ export class LemmyWebsocketClient {
   // same Op.
   async sendForReply<
     T extends UserOperation,
-    Command extends types[T][0],
-    Event extends types[T][1],
+    Command extends typeMap[T][0],
+    Event extends typeMap[T][1],
   >(op: T, data: Command, timeout = 5000): Promise<Event> {
     await this.ready
     const reply = this.wait<T, Event>(op, timeout)
@@ -114,7 +114,7 @@ export class LemmyWebsocketClient {
 
   // derive returns a new readable store that contains the latest version of an
   // event.
-  derive<T extends UserOperation, Event extends types[T][1]>(
+  derive<T extends UserOperation, Event extends typeMap[T][1]>(
     op: T,
     {
       reset,
@@ -147,7 +147,7 @@ export class LemmyWebsocketClient {
     )
   }
 
-  async wait<T extends UserOperation, Event extends types[T][1]>(
+  async wait<T extends UserOperation, Event extends typeMap[T][1]>(
     op: T,
     timeout = 5000,
   ): Promise<Event> {
