@@ -181,98 +181,107 @@
     {/if}
   </div>
 
-  {#if loading}
-    <div
-      class="grid h-full place-items-center"
-      transition:fade|local={{ duration: 50 }}
-    >
-      <p class="inline-flex items-center gap-2 mt-8 mb-16">
-        <ProgressRadial stroke={80} width="w-4" />
-        <span>Fetching more posts...</span>
-      </p>
-    </div>
-  {:else}
-    <ol id="post-list" class="list flex flex-col gap-4 py-4">
-      {#if $posts.length == 0}
-        <p class="text-center text-surface-400">No posts found.</p>
-      {/if}
+  <ol id="post-list" class="list flex flex-col gap-4 py-4">
+    {#each $posts as post}
+      <li
+        class="flex flex-row gap-0 items-center"
+        transition:fade|local={{ duration: 75 }}
+      >
+        <div class="flex-1 flex flex-col gap-1 w-full">
+          <p class="text-sm text-surface-400">
+            <UserBadge user={post.creator} />
+            <span>to</span>
+            <CommunityBadge community={post.community} />
 
-      {#each $posts as post}
-        <li
-          class="flex flex-row gap-0 items-center"
-          transition:fade|local={{ duration: 75 }}
-        >
-          <div class="flex-1 flex flex-col gap-1 w-full">
-            <p class="text-sm text-surface-400">
-              <UserBadge user={post.creator} />
-              <span>to</span>
-              <CommunityBadge community={post.community} />
-
-              <span class="float-right">
-                {#if post.post.featured_community || post.post.featured_local}
-                  <span class="badge-icon variant-ghost" title="Featured">
-                    <Symbol name="push_pin" />
-                  </span>
-                {/if}
-              </span>
-            </p>
-
-            <h3>
-              <a
-                href={post.post.url || `/p/${post.post.id}`}
-                class="hover:underline"
-                target={post.post.url ? "_blank" : ""}
-              >
-                {post.post.name}
-              </a>
-              {#if post.post.url}
-                <Symbol
-                  name="open_in_new"
-                  size="sm"
-                  class="align-bottom text-surface-400"
-                />
-                {#if urlHostname(post.post.url)}
-                  <span class="text-surface-400 text-xs">
-                    ({urlHostname(post.post.url)})
-                  </span>
-                {/if}
-              {/if}
-            </h3>
-
-            <Markdown
-              class="summary !text-sm line-clamp-2 overflow-hidden border-l-4 px-2 border-surface-400"
-              markdown={post.post.body || ""}
-            />
-
-            <p class="flex flex-wrap gap-2 mt-1">
-              <UpvoteBadge bind:post />
-              <a
-                href="/p/{post.post.id}"
-                class="btn btn-sm variant-soft transition inline-flex gap-1 px-3"
-              >
-                <Symbol name="comment" />
-                {post.counts.comments}
-              </a>
-              <RelativeTimestamp
-                date={post.post.published + "Z"}
-                class="btn btn-sm variant-soft pointer-events-none inline-flex gap-1 px-3"
-              />
-              {#if post.post.nsfw}
-                <span class="badge variant-soft !text-red-400 gap-1 px-3">
-                  NSFW
+            <span class="float-right">
+              {#if post.post.featured_community || post.post.featured_local}
+                <span class="badge-icon variant-ghost" title="Featured">
+                  <Symbol name="push_pin" />
                 </span>
               {/if}
-            </p>
-          </div>
+            </span>
+          </p>
 
-          <PostThumbnail post={post.post} />
-        </li>
-      {/each}
-    </ol>
+          <h3>
+            <a
+              href={post.post.url || `/p/${post.post.id}`}
+              class="hover:underline"
+              target={post.post.url ? "_blank" : ""}
+            >
+              {post.post.name}
+            </a>
+            {#if post.post.url}
+              <Symbol
+                name="open_in_new"
+                size="sm"
+                class="align-bottom text-surface-400"
+              />
+              {#if urlHostname(post.post.url)}
+                <span class="text-surface-400 text-xs">
+                  ({urlHostname(post.post.url)})
+                </span>
+              {/if}
+            {/if}
+          </h3>
+
+          <Markdown
+            class="summary !text-sm line-clamp-2 overflow-hidden border-l-4 px-2 border-surface-400"
+            markdown={post.post.body || ""}
+          />
+
+          <p class="flex flex-wrap gap-2 mt-1">
+            <UpvoteBadge bind:post />
+            <a
+              href="/p/{post.post.id}"
+              class="btn btn-sm variant-soft transition inline-flex gap-1 px-3"
+            >
+              <Symbol name="comment" />
+              {post.counts.comments}
+            </a>
+            <RelativeTimestamp
+              date={post.post.published + "Z"}
+              class="btn btn-sm variant-soft pointer-events-none inline-flex gap-1 px-3"
+            />
+            {#if post.post.nsfw}
+              <span class="badge variant-soft !text-red-400 gap-1 px-3">
+                NSFW
+              </span>
+            {/if}
+          </p>
+        </div>
+
+        <PostThumbnail post={post.post} />
+      </li>
+    {/each}
+  </ol>
+
+  {#if loading || $posts.length == 0}
+    <div
+      class="grid h-full place-items-center my-8"
+      transition:fade|local={{ duration: 50 }}
+    >
+      {#if loading}
+        <p class="inline-flex items-center gap-2">
+          <ProgressRadial stroke={80} width="w-4" />
+          <span>Fetching more posts...</span>
+        </p>
+      {:else if $posts.length == 0}
+        <p
+          class="text-center text-surface-400"
+          transition:fade|local={{ duration: 50 }}
+        >
+          No posts found.
+        </p>
+      {/if}
+    </div>
   {/if}
 </RevealingShell>
 
 <style global lang="postcss">
+  #post-list:empty {
+    display: none;
+  }
+
   #post-list .markdown.summary {
     --block-margin: 0.25rem;
     max-height: 6rem;
