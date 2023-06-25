@@ -78,6 +78,7 @@
     ListBoxItem,
     Stepper,
     Step,
+    ProgressRadial,
   } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
 
@@ -111,6 +112,7 @@
 
   let createInstanceIsValid: boolean | null = null
   let creatingProfile: Profile | null = null
+  let creatingError: string | null = null
   let deleteMode = false
   let loggingIn = false
 
@@ -118,20 +120,14 @@
   // @ts-ignore
   const debouncedCreateProfile = debounce(createProfile, 250)
   $: (async () => {
-    const lastInstance = instance
     createInstanceIsValid = null
-    creatingProfile = null
-
-    let profile: Profile | null = null
     try {
-      profile = await debouncedCreateProfile({ instance })
+      creatingProfile = await debouncedCreateProfile({ instance })
     } catch (err) {
       console.info("cannot validate instance:", err)
-    }
-
-    if (lastInstance == instance) {
-      createInstanceIsValid = !!profile
-      creatingProfile = profile
+      creatingError = `${err}`
+    } finally {
+      createInstanceIsValid = !!creatingProfile
     }
   })()
 
@@ -300,7 +296,19 @@
                 />
               {/if}
               {#if createInstanceIsValid === false}
-                <Symbol name="close" inline class="text-red-500 float-right" />
+                <Symbol
+                  name="close"
+                  inline
+                  class="text-red-500 float-right"
+                  tooltip={creatingError || ""}
+                />
+              {/if}
+              {#if createInstanceIsValid === null}
+                <ProgressRadial
+                  class="float-right"
+                  width="w-[1.25rem]"
+                  stroke={100}
+                />
               {/if}
             </span>
             <input
