@@ -1,236 +1,392 @@
 // Generated using ./src/scripts/gen-ws-types.sh
 
-import { UserOperation } from "lemmy-js-client";
-import type * as lemmy from "lemmy-js-client";
+import { UserOperation } from "lemmy-js-client"
+import type * as lemmy from "lemmy-js-client"
 
 type a = {
-  [UserOperation.Login]: [lemmy.Login, lemmy.LoginResponse];
-  [UserOperation.UserJoin]: [lemmy.UserJoin, unknown];
-  [UserOperation.PostJoin]: [lemmy.PostJoin, unknown];
-  [UserOperation.CommunityJoin]: [lemmy.CommunityJoin, unknown];
-  [UserOperation.Register]: [lemmy.Register, lemmy.LoginResponse];
-  [UserOperation.GetCaptcha]: [lemmy.GetCaptcha, lemmy.GetCaptchaResponse];
+  [UserOperation.Login]: [lemmy.Login, lemmy.LoginResponse, "/user/login"]
+  [UserOperation.UserJoin]: [lemmy.UserJoin, unknown, never]
+  [UserOperation.PostJoin]: [lemmy.PostJoin, unknown, never]
+  [UserOperation.CommunityJoin]: [lemmy.CommunityJoin, unknown, never]
+  [UserOperation.Register]: [
+    lemmy.Register,
+    lemmy.LoginResponse,
+    "/user/register",
+  ]
+  [UserOperation.GetCaptcha]: [
+    lemmy.GetCaptcha,
+    lemmy.GetCaptchaResponse,
+    "/user/get_captcha",
+  ]
   [UserOperation.CreateCommunity]: [
     lemmy.CreateCommunity,
-    lemmy.CommunityResponse
-  ];
-  [UserOperation.EditCommunity]: [lemmy.EditCommunity, lemmy.CommunityResponse];
+    lemmy.CommunityResponse,
+    "/community",
+  ]
+  [UserOperation.EditCommunity]: [
+    lemmy.EditCommunity,
+    lemmy.CommunityResponse,
+    "/community",
+  ]
   [UserOperation.DeleteCommunity]: [
     lemmy.DeleteCommunity,
-    lemmy.CommunityResponse
-  ];
+    lemmy.CommunityResponse,
+    "/community/delete",
+  ]
   [UserOperation.RemoveCommunity]: [
     lemmy.RemoveCommunity,
-    lemmy.CommunityResponse
-  ];
+    lemmy.CommunityResponse,
+    "/community/remove",
+  ]
   [UserOperation.FollowCommunity]: [
     lemmy.FollowCommunity,
-    lemmy.CommunityResponse
-  ];
+    lemmy.CommunityResponse,
+    "/community/follow",
+  ]
   [UserOperation.ListCommunities]: [
     lemmy.ListCommunities,
-    lemmy.ListCommunitiesResponse
-  ];
-  [UserOperation.CreatePost]: [lemmy.CreatePost, lemmy.PostResponse];
-  [UserOperation.GetPost]: [lemmy.GetPost, lemmy.GetPostResponse];
+    lemmy.ListCommunitiesResponse,
+    "/community/list",
+  ]
+  [UserOperation.CreatePost]: [lemmy.CreatePost, lemmy.PostResponse, "/post"]
+  [UserOperation.GetPost]: [lemmy.GetPost, lemmy.GetPostResponse, "/post"]
   [UserOperation.GetCommunity]: [
     lemmy.GetCommunity,
-    lemmy.GetCommunityResponse
-  ];
-  [UserOperation.CreateComment]: [lemmy.CreateComment, lemmy.CommentResponse];
-  [UserOperation.EditComment]: [lemmy.EditComment, lemmy.CommentResponse];
-  [UserOperation.DeleteComment]: [lemmy.DeleteComment, lemmy.CommentResponse];
-  [UserOperation.RemoveComment]: [lemmy.RemoveComment, lemmy.CommentResponse];
+    lemmy.GetCommunityResponse,
+    "/community",
+  ]
+  [UserOperation.CreateComment]: [
+    lemmy.CreateComment,
+    lemmy.CommentResponse,
+    "/comment",
+  ]
+  [UserOperation.EditComment]: [
+    lemmy.EditComment,
+    lemmy.CommentResponse,
+    "/comment",
+  ]
+  [UserOperation.DeleteComment]: [
+    lemmy.DeleteComment,
+    lemmy.CommentResponse,
+    "/comment/delete",
+  ]
+  [UserOperation.RemoveComment]: [
+    lemmy.RemoveComment,
+    lemmy.CommentResponse,
+    "/comment/remove",
+  ]
   [UserOperation.MarkCommentReplyAsRead]: [
     lemmy.MarkCommentReplyAsRead,
-    lemmy.CommentReplyResponse
-  ];
+    lemmy.CommentReplyResponse,
+    "/comment/mark_as_read",
+  ]
   [UserOperation.CreateCommentLike]: [
     lemmy.CreateCommentLike,
-    lemmy.CommentResponse
-  ];
-  [UserOperation.SaveComment]: [lemmy.SaveComment, lemmy.CommentResponse];
+    lemmy.CommentResponse,
+    "/comment/like",
+  ]
+  [UserOperation.SaveComment]: [
+    lemmy.SaveComment,
+    lemmy.CommentResponse,
+    "/comment/save",
+  ]
   [UserOperation.CreateCommentReport]: [
     lemmy.CreateCommentReport,
-    lemmy.CommentReportResponse
-  ];
+    lemmy.CommentReportResponse,
+    "/comment/report",
+  ]
   [UserOperation.ResolveCommentReport]: [
     lemmy.ResolveCommentReport,
-    lemmy.CommentReportResponse
-  ];
+    lemmy.CommentReportResponse,
+    "/comment/report/resolve",
+  ]
   [UserOperation.ListCommentReports]: [
     lemmy.ListCommentReports,
-    lemmy.ListCommentReportsResponse
-  ];
-  [UserOperation.GetPosts]: [lemmy.GetPosts, lemmy.GetPostsResponse];
-  [UserOperation.GetComments]: [lemmy.GetComments, lemmy.GetCommentsResponse];
-  [UserOperation.GetComment]: [lemmy.GetComment, lemmy.CommentResponse];
-  [UserOperation.CreatePostLike]: [lemmy.CreatePostLike, lemmy.PostResponse];
-  [UserOperation.EditPost]: [lemmy.EditPost, lemmy.PostResponse];
-  [UserOperation.DeletePost]: [lemmy.DeletePost, lemmy.PostResponse];
-  [UserOperation.RemovePost]: [lemmy.RemovePost, lemmy.PostResponse];
-  [UserOperation.LockPost]: [lemmy.LockPost, lemmy.PostResponse];
-  [UserOperation.FeaturePost]: [lemmy.FeaturePost, lemmy.PostResponse];
-  [UserOperation.MarkPostAsRead]: [lemmy.MarkPostAsRead, lemmy.PostResponse];
-  [UserOperation.SavePost]: [lemmy.SavePost, lemmy.PostResponse];
+    lemmy.ListCommentReportsResponse,
+    "/comment/report/list",
+  ]
+  [UserOperation.GetPosts]: [
+    lemmy.GetPosts,
+    lemmy.GetPostsResponse,
+    "/post/list",
+  ]
+  [UserOperation.GetComments]: [
+    lemmy.GetComments,
+    lemmy.GetCommentsResponse,
+    "/comment/list",
+  ]
+  [UserOperation.GetComment]: [
+    lemmy.GetComment,
+    lemmy.CommentResponse,
+    "/comment",
+  ]
+  [UserOperation.CreatePostLike]: [
+    lemmy.CreatePostLike,
+    lemmy.PostResponse,
+    "/post/like",
+  ]
+  [UserOperation.EditPost]: [lemmy.EditPost, lemmy.PostResponse, "/post"]
+  [UserOperation.DeletePost]: [
+    lemmy.DeletePost,
+    lemmy.PostResponse,
+    "/post/delete",
+  ]
+  [UserOperation.RemovePost]: [
+    lemmy.RemovePost,
+    lemmy.PostResponse,
+    "/post/remove",
+  ]
+  [UserOperation.LockPost]: [lemmy.LockPost, lemmy.PostResponse, "/post/lock"]
+  [UserOperation.FeaturePost]: [
+    lemmy.FeaturePost,
+    lemmy.PostResponse,
+    "/post/feature",
+  ]
+  [UserOperation.MarkPostAsRead]: [
+    lemmy.MarkPostAsRead,
+    lemmy.PostResponse,
+    "/post/mark_as_read",
+  ]
+  [UserOperation.SavePost]: [lemmy.SavePost, lemmy.PostResponse, "/post/save"]
   [UserOperation.CreatePostReport]: [
     lemmy.CreatePostReport,
-    lemmy.PostReportResponse
-  ];
+    lemmy.PostReportResponse,
+    "/post/report",
+  ]
   [UserOperation.ResolvePostReport]: [
     lemmy.ResolvePostReport,
-    lemmy.PostReportResponse
-  ];
+    lemmy.PostReportResponse,
+    "/post/report/resolve",
+  ]
   [UserOperation.ListPostReports]: [
     lemmy.ListPostReports,
-    lemmy.ListPostReportsResponse
-  ];
+    lemmy.ListPostReportsResponse,
+    "/post/report/list",
+  ]
   [UserOperation.GetSiteMetadata]: [
     lemmy.GetSiteMetadata,
-    lemmy.GetSiteMetadataResponse
-  ];
+    lemmy.GetSiteMetadataResponse,
+    "/post/site_metadata",
+  ]
   [UserOperation.BanFromCommunity]: [
     lemmy.BanFromCommunity,
-    lemmy.BanFromCommunityResponse
-  ];
+    lemmy.BanFromCommunityResponse,
+    "/community/ban_user",
+  ]
   [UserOperation.AddModToCommunity]: [
     lemmy.AddModToCommunity,
-    lemmy.AddModToCommunityResponse
-  ];
+    lemmy.AddModToCommunityResponse,
+    "/community/mod",
+  ]
   [UserOperation.TransferCommunity]: [
     lemmy.TransferCommunity,
-    lemmy.GetCommunityResponse
-  ];
-  [UserOperation.LeaveAdmin]: [lemmy.LeaveAdmin, lemmy.GetSiteResponse];
-  [UserOperation.BanPerson]: [lemmy.BanPerson, lemmy.BanPersonResponse];
+    lemmy.GetCommunityResponse,
+    "/community/transfer",
+  ]
+  [UserOperation.LeaveAdmin]: [
+    lemmy.LeaveAdmin,
+    lemmy.GetSiteResponse,
+    "/user/leave_admin",
+  ]
+  [UserOperation.BanPerson]: [
+    lemmy.BanPerson,
+    lemmy.BanPersonResponse,
+    "/user/ban",
+  ]
   [UserOperation.GetBannedPersons]: [
     lemmy.GetBannedPersons,
-    lemmy.BannedPersonsResponse
-  ];
-  [UserOperation.AddAdmin]: [lemmy.AddAdmin, lemmy.AddAdminResponse];
+    lemmy.BannedPersonsResponse,
+    "/user/banned",
+  ]
+  [UserOperation.AddAdmin]: [
+    lemmy.AddAdmin,
+    lemmy.AddAdminResponse,
+    "/admin/add",
+  ]
   [UserOperation.GetUnreadRegistrationApplicationCount]: [
     lemmy.GetUnreadRegistrationApplicationCount,
-    unknown
-  ];
+    lemmy.GetUnreadRegistrationApplicationCountResponse,
+    "/admin/registration_application/count",
+  ]
   [UserOperation.ListRegistrationApplications]: [
     lemmy.ListRegistrationApplications,
-    unknown
-  ];
+    lemmy.ListRegistrationApplicationsResponse,
+    "/admin/registration_application/list",
+  ]
   [UserOperation.ApproveRegistrationApplication]: [
     lemmy.ApproveRegistrationApplication,
-    unknown
-  ];
+    lemmy.RegistrationApplicationResponse,
+    "/admin/registration_application/approve",
+  ]
   [UserOperation.GetPersonDetails]: [
     lemmy.GetPersonDetails,
-    lemmy.GetPersonDetailsResponse
-  ];
-  [UserOperation.GetReplies]: [lemmy.GetReplies, lemmy.GetRepliesResponse];
+    lemmy.GetPersonDetailsResponse,
+    "/user",
+  ]
+  [UserOperation.GetReplies]: [
+    lemmy.GetReplies,
+    lemmy.GetRepliesResponse,
+    "/user/replies",
+  ]
   [UserOperation.GetPersonMentions]: [
     lemmy.GetPersonMentions,
-    lemmy.GetPersonMentionsResponse
-  ];
+    lemmy.GetPersonMentionsResponse,
+    "/user/mention",
+  ]
   [UserOperation.MarkPersonMentionAsRead]: [
     lemmy.MarkPersonMentionAsRead,
-    lemmy.PersonMentionResponse
-  ];
-  [UserOperation.GetModlog]: [lemmy.GetModlog, lemmy.GetModlogResponse];
-  [UserOperation.CreateSite]: [lemmy.CreateSite, lemmy.SiteResponse];
-  [UserOperation.EditSite]: [lemmy.EditSite, lemmy.SiteResponse];
-  [UserOperation.GetSite]: [lemmy.GetSite, lemmy.GetSiteResponse];
-  [UserOperation.Search]: [lemmy.Search, lemmy.SearchResponse];
+    lemmy.PersonMentionResponse,
+    "/user/mention/mark_as_read",
+  ]
+  [UserOperation.GetModlog]: [
+    lemmy.GetModlog,
+    lemmy.GetModlogResponse,
+    "/modlog",
+  ]
+  [UserOperation.CreateSite]: [lemmy.CreateSite, lemmy.SiteResponse, "/site"]
+  [UserOperation.EditSite]: [lemmy.EditSite, lemmy.SiteResponse, "/site"]
+  [UserOperation.GetSite]: [lemmy.GetSite, lemmy.GetSiteResponse, "/site"]
+  [UserOperation.Search]: [lemmy.Search, lemmy.SearchResponse, "/search"]
   [UserOperation.ResolveObject]: [
     lemmy.ResolveObject,
-    lemmy.ResolveObjectResponse
-  ];
+    lemmy.ResolveObjectResponse,
+    "/resolve_object",
+  ]
   [UserOperation.MarkAllAsRead]: [
     lemmy.MarkAllAsRead,
-    lemmy.GetRepliesResponse
-  ];
+    lemmy.GetRepliesResponse,
+    "/user/mark_all_as_read",
+  ]
   [UserOperation.SaveUserSettings]: [
     lemmy.SaveUserSettings,
-    lemmy.LoginResponse
-  ];
-  [UserOperation.ChangePassword]: [lemmy.ChangePassword, lemmy.LoginResponse];
+    lemmy.LoginResponse,
+    "/user/save_user_settings",
+  ]
+  [UserOperation.ChangePassword]: [
+    lemmy.ChangePassword,
+    lemmy.LoginResponse,
+    "/user/change_password",
+  ]
   [UserOperation.GetReportCount]: [
     lemmy.GetReportCount,
-    lemmy.GetReportCountResponse
-  ];
+    lemmy.GetReportCountResponse,
+    "/user/report_count",
+  ]
   [UserOperation.GetUnreadCount]: [
     lemmy.GetUnreadCount,
-    lemmy.GetUnreadCountResponse
-  ];
-  [UserOperation.VerifyEmail]: [lemmy.VerifyEmail, lemmy.VerifyEmailResponse];
+    lemmy.GetUnreadCountResponse,
+    "/user/unread_count",
+  ]
+  [UserOperation.VerifyEmail]: [
+    lemmy.VerifyEmail,
+    lemmy.VerifyEmailResponse,
+    "/user/verify_email",
+  ]
   [UserOperation.DeleteAccount]: [
     lemmy.DeleteAccount,
-    lemmy.DeleteAccountResponse
-  ];
+    lemmy.DeleteAccountResponse,
+    "/user/delete_account",
+  ]
   [UserOperation.PasswordReset]: [
     lemmy.PasswordReset,
-    lemmy.PasswordResetResponse
-  ];
+    lemmy.PasswordResetResponse,
+    "/user/password_reset",
+  ]
   [UserOperation.PasswordChangeAfterReset]: [
     lemmy.PasswordChangeAfterReset,
-    lemmy.LoginResponse
-  ];
+    lemmy.LoginResponse,
+    "/user/password_change",
+  ]
   [UserOperation.CreatePrivateMessage]: [
     lemmy.CreatePrivateMessage,
-    lemmy.PrivateMessageResponse
-  ];
+    lemmy.PrivateMessageResponse,
+    "/private_message",
+  ]
   [UserOperation.EditPrivateMessage]: [
     lemmy.EditPrivateMessage,
-    lemmy.PrivateMessageResponse
-  ];
+    lemmy.PrivateMessageResponse,
+    "/private_message",
+  ]
   [UserOperation.DeletePrivateMessage]: [
     lemmy.DeletePrivateMessage,
-    lemmy.PrivateMessageResponse
-  ];
+    lemmy.PrivateMessageResponse,
+    "/private_message/delete",
+  ]
   [UserOperation.MarkPrivateMessageAsRead]: [
     lemmy.MarkPrivateMessageAsRead,
-    lemmy.PrivateMessageResponse
-  ];
+    lemmy.PrivateMessageResponse,
+    "/private_message/mark_as_read",
+  ]
   [UserOperation.GetPrivateMessages]: [
     lemmy.GetPrivateMessages,
-    lemmy.PrivateMessagesResponse
-  ];
+    lemmy.PrivateMessagesResponse,
+    "/private_message/list",
+  ]
   [UserOperation.CreatePrivateMessageReport]: [
     lemmy.CreatePrivateMessageReport,
-    unknown
-  ];
+    lemmy.PrivateMessageReportResponse,
+    "/private_message/report",
+  ]
   [UserOperation.ResolvePrivateMessageReport]: [
     lemmy.ResolvePrivateMessageReport,
-    unknown
-  ];
+    lemmy.PrivateMessageReportResponse,
+    "/private_message/report/resolve",
+  ]
   [UserOperation.ListPrivateMessageReports]: [
     lemmy.ListPrivateMessageReports,
-    unknown
-  ];
-  [UserOperation.BlockPerson]: [lemmy.BlockPerson, lemmy.BlockPersonResponse];
+    lemmy.ListPrivateMessageReportsResponse,
+    "/private_message/report/list",
+  ]
+  [UserOperation.BlockPerson]: [
+    lemmy.BlockPerson,
+    lemmy.BlockPersonResponse,
+    "/user/block",
+  ]
   [UserOperation.BlockCommunity]: [
     lemmy.BlockCommunity,
-    lemmy.BlockCommunityResponse
-  ];
-  [UserOperation.PurgePerson]: [lemmy.PurgePerson, lemmy.PurgeItemResponse];
+    lemmy.BlockCommunityResponse,
+    "/community/block",
+  ]
+  [UserOperation.PurgePerson]: [
+    lemmy.PurgePerson,
+    lemmy.PurgeItemResponse,
+    "/admin/purge/person",
+  ]
   [UserOperation.PurgeCommunity]: [
     lemmy.PurgeCommunity,
-    lemmy.PurgeItemResponse
-  ];
-  [UserOperation.PurgePost]: [lemmy.PurgePost, lemmy.PurgeItemResponse];
-  [UserOperation.PurgeComment]: [lemmy.PurgeComment, lemmy.PurgeItemResponse];
+    lemmy.PurgeItemResponse,
+    "/admin/purge/community",
+  ]
+  [UserOperation.PurgePost]: [
+    lemmy.PurgePost,
+    lemmy.PurgeItemResponse,
+    "/admin/purge/post",
+  ]
+  [UserOperation.PurgeComment]: [
+    lemmy.PurgeComment,
+    lemmy.PurgeItemResponse,
+    "/admin/purge/comment",
+  ]
   [UserOperation.CreateCustomEmoji]: [
     lemmy.CreateCustomEmoji,
-    lemmy.CustomEmojiResponse
-  ];
+    lemmy.CustomEmojiResponse,
+    "/custom_emoji",
+  ]
   [UserOperation.EditCustomEmoji]: [
     lemmy.EditCustomEmoji,
-    lemmy.CustomEmojiResponse
-  ];
+    lemmy.CustomEmojiResponse,
+    "/custom_emoji",
+  ]
   [UserOperation.DeleteCustomEmoji]: [
     lemmy.DeleteCustomEmoji,
-    lemmy.DeleteCustomEmojiResponse
-  ];
+    lemmy.DeleteCustomEmojiResponse,
+    "/custom_emoji/delete",
+  ]
   [UserOperation.GetFederatedInstances]: [
     lemmy.GetFederatedInstances,
-    lemmy.GetFederatedInstancesResponse
-  ];
-};
-export type { a as default };
+    lemmy.GetFederatedInstancesResponse,
+    "/federated_instances",
+  ]
+}
+
+export type { a as default }
