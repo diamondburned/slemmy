@@ -61,6 +61,10 @@
   $: (async () => {
     try {
       await initPost()
+    } catch (err) {
+      handleError(err, true)
+    }
+    try {
       await initComments()
     } catch (err) {
       handleError(err)
@@ -70,10 +74,10 @@
   // It's kind of impossible to guard a possible race condition where a previous
   // user change may arrive after the latest one.
 
-  function handleError(err: unknown) {
+  function handleError(err: unknown, fatal = false) {
     console.log("Fetch error on route /p:", err)
     errorToast(`${err}`)
-    goto("/")
+    if (fatal) goto("/")
   }
 
   function goBack() {
