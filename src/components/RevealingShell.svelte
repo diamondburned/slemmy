@@ -11,21 +11,30 @@
   }>()
 
   export let scrollContainer: HTMLElement
+  export let lockHeaderHeight = false
+  let lockingHeight = false
 
-  let headerSize = { w: 0, h: 0 }
+  let headerHeight = 0
   let headerPadding: HTMLElement
-  $: headerPadding && (headerPadding.style.height = `${headerSize.h}px`)
+  $: {
+    if (headerPadding && headerHeight) {
+      if (!lockHeaderHeight || !lockingHeight) {
+        headerPadding.style.height = `${headerHeight}px`
+        lockingHeight = true
+      }
+    }
+  }
 
   let hideBar = false
   function handlePostsScroll(event: ScrollDeltaEvent) {
     const { scrollTop } = event.target as HTMLElement
-    if (scrollTop < 5) {
+    if (scrollTop < 10) {
       hideBar = false
       return
     }
-    if (event.detail.y < 0) {
+    if (event.detail.y < -10) {
       hideBar = false
-    } else if (event.detail.y > 0) {
+    } else if (event.detail.y > +10) {
       hideBar = true
     }
   }
@@ -38,8 +47,8 @@
 >
   <div
     slot="pageHeader"
-    bind:clientHeight={headerSize.h}
-    style="z-index: 1; {hideBar ? `top: -${headerSize.h}px` : 'top: 0'}"
+    bind:clientHeight={headerHeight}
+    style="z-index: 1; {hideBar ? `top: -${headerHeight}px` : 'top: 0'}"
     class="absolute w-full z-10 transition-all duration-100 ease-in-out"
   >
     <slot name="pageHeader" />

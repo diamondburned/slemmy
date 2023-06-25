@@ -8,7 +8,7 @@
 
 <script lang="ts">
   import { AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
-  import { slide, fade } from "svelte/transition"
+  import { slide, fade, fly } from "svelte/transition"
   import Symbol from "#/components/Symbol.svelte"
   import Markdown from "#/components/Markdown.svelte"
   import BarButton from "#/components/BarButton.svelte"
@@ -108,6 +108,7 @@
 
 <RevealingShell
   bind:scrollContainer
+  lockHeaderHeight={true}
   on:scroll={() => {
     $lastScrollTop = scrollContainer.scrollTop
     checkShouldLoadMore()
@@ -133,7 +134,7 @@
     {#if showFilters}
       <div
         class="flex flex-col sm:flex-row gap-4 px-4 pb-4 bg-surface-100-800-token"
-        transition:slide|local={{ duration: 100 }}
+        transition:fly|local={{ duration: 100, y: -10 }}
       >
         <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
           <div class="input-group-shim" title="Filter">
