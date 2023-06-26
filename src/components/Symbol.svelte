@@ -5,6 +5,7 @@
   export let large = false
   export let inline = false
   export let margin = ""
+  export let style = ""
 
   let className = ""
   export { className as class }
@@ -20,6 +21,7 @@
   class:margin={!!margin}
   class:inline
   title={tooltip || undefined}
+  {style}
 >
   {name.replaceAll("-", "_")}
 </span>

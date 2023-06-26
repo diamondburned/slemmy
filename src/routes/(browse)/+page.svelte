@@ -191,7 +191,7 @@
         <div class="flex-1 flex flex-col gap-1 w-full">
           <p class="text-sm text-surface-400">
             <UserBadge user={post.creator} />
-            <span>to</span>
+            <span class="mx-0.5">to</span>
             <CommunityBadge community={post.community} />
 
             <span class="float-right">

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Avatar } from "@skeletonlabs/skeleton"
+  import Symbol from "#/components/Symbol.svelte"
 
   import { thumbnailURL } from "#/lib/lemmyutils.js"
   import type { Person } from "lemmy-js-client"
@@ -10,7 +11,7 @@
 
 <a
   href="/u/{user.id}"
-  class="inline-flex items-baseline hover:underline hover:text-white truncate"
+  class="inline-flex items-baseline hover:text-white truncate"
 >
   <Avatar
     src={thumbnailURL(user.avatar)}
@@ -19,5 +20,19 @@
     class="mr-1 self-center"
     rounded="rounded-full"
   />
-  {user.display_name || user.name}
+  <span class="name">{user.display_name || user.name}</span>
+  {#if user.admin}
+    <Symbol
+      tooltip="Admin"
+      name="verified_user"
+      class="text-red-400 opacity-80 self-center no-underline"
+      style="font-size: 1.15em; width: 0.9em;"
+    />
+  {/if}
 </a>
+
+<style>
+  a:hover .name {
+    text-decoration: underline;
+  }
+</style>
