@@ -41,14 +41,14 @@
     }
   })
 
-  async function loadPage(page: number) {
+  async function loadPage(p: number) {
     loading = true
 
     try {
       const resp = await $client.request(UserOperation.GetPosts, {
         type_: $postsSettings.listing,
         sort: $postsSettings.sort,
-        page,
+        page: p,
         auth: $profile?.user?.jwt,
         limit: 10,
       })
@@ -60,6 +60,7 @@
         .filter((got) => !$posts.find((old) => old.post.id == got.post.id))
         .forEach((newPost) => $posts.push(newPost))
 
+      $page = Math.max($page, p)
       $posts = $posts // force update
       loading = false
 
@@ -76,7 +77,6 @@
   }
 
   onMount(() => {
-    subscribeLater(page, (page) => loadPage(page))
     if ($posts.length == 0) {
       loadPage(1)
     }
@@ -100,7 +100,7 @@
       ($posts.length > 0 && clientHeight >= scrollHeight)
 
     if (loadMore) {
-      $page++
+      loadPage($page + 1)
     }
   }
 
@@ -108,6 +108,7 @@
     console.debug("resetting posts")
     $posts = []
     $page = 1
+    loadPage(1)
   }
 </script>
 
