@@ -55,3 +55,30 @@ export function urlHostname(url: string): string | undefined {
     return undefined
   }
 }
+
+const userActorIDRe = /:\/\/(.*)\/u\/(\S*)$/
+const communityActorIDRe = /:\/\/(.*)\/c\/(\S*)$/
+
+// parseUserActorID parses `https://lemmy.ml/u/username` into
+// `username@lemmy.ml`.
+export function parseUserActorID(actorID: string): string | null {
+  const match = actorID.match(userActorIDRe)
+  if (!match) {
+    return null
+  }
+
+  const [, instance, username] = match
+  return `${username}@${instance}`
+}
+
+// parseCommunityActorID parses `https://lemmy.ml/c/community` into
+// `community@lemmy.ml`.
+export function parseCommunityActorID(actorID: string): string | null {
+  const match = actorID.match(communityActorIDRe)
+  if (!match) {
+    return null
+  }
+
+  const [, instance, community] = match
+  return `${community}@${instance}`
+}

@@ -2,15 +2,17 @@
   import { Avatar } from "@skeletonlabs/skeleton"
   import Symbol from "#/components/Symbol.svelte"
 
-  import { thumbnailURL } from "#/lib/lemmyutils.js"
+  import { thumbnailURL, parseUserActorID } from "#/lib/lemmyutils.js"
   import type { Person } from "lemmy-js-client"
 
   export let user: Person
   export let width = "w-4"
+
+  $: id = parseUserActorID(user.actor_id)
 </script>
 
 <a
-  href="/u/{user.id}"
+  href={id ? `/u/${id}` : undefined}
   class="inline-flex items-baseline hover:text-white truncate"
 >
   <Avatar

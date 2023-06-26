@@ -1,15 +1,17 @@
 <script lang="ts">
   import { Avatar } from "@skeletonlabs/skeleton"
 
-  import { thumbnailURL } from "#/lib/lemmyutils.js"
+  import { thumbnailURL, parseCommunityActorID } from "#/lib/lemmyutils.js"
   import type { Community } from "lemmy-js-client"
 
   export let community: Community
   export let width = "w-4"
+
+  $: id = parseCommunityActorID(community.actor_id)
 </script>
 
 <a
-  href="/c/{community.name}"
+  href={id ? `/c/${id}` : undefined}
   class="inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
