@@ -47,7 +47,7 @@ export class LemmyWebsocketClient {
       return Promise.resolve()
     }
     if (this.closed) {
-      return Promise.reject("Websocket closed")
+      return Promise.reject("Websocket permanently closed")
     }
     return this.readyPromise
   }
@@ -74,7 +74,7 @@ export class LemmyWebsocketClient {
     data: Command,
   ) {
     if (this.closed) {
-      throw new Error("Websocket closed")
+      throw new Error("Websocket permanently closed")
     }
     await this.ready
     this.ws!.send(
@@ -110,41 +110,6 @@ export class LemmyWebsocketClient {
       this.ws.close()
       this.ws = null
     }
-  }
-
-  // derive returns a new readable store that contains the latest version of an
-  // event.
-  derive<T extends UserOperation, Event extends typeMap[T][1]>(
-    op: T,
-    {
-      reset,
-      filter,
-      initial,
-    }: {
-      reset?: (_: LemmyWebsocketClient) => void
-      filter?: (_: Event) => boolean
-      initial?: Event | null
-    } = {},
-  ): store.Readable<Event | null> {
-    filter = filter ?? (() => true)
-    initial = initial ?? null
-
-    const opStr = UserOperation[op]
-    return store.derived(
-      this.event,
-      (ev) => {
-        if (ev.op == null) {
-          initial = null
-        } else if (ev.op == opStr && filter!(ev.data as Event)) {
-          initial = ev.data as typeof initial
-        }
-        if (this.connected && initial == null && reset) {
-          reset(this)
-        }
-        return initial ?? null
-      },
-      initial,
-    )
   }
 
   async wait<T extends UserOperation, Event extends typeMap[T][1]>(
@@ -243,12 +208,9 @@ export class LemmyWebsocketClient {
 
     this.promiseResolved = false
     this.readyPromise = new Promise<void>((resolve, reject) => {
-      const timeoutHandle = window.setTimeout(
-        () => reject("Timeout waiting for WS"),
-        10000,
-      )
-
       let unsub: store.Unsubscriber
+      let timeoutHandle: number
+      let lastError: string | undefined
 
       const cleanup = () => {
         unsub()
@@ -256,26 +218,17 @@ export class LemmyWebsocketClient {
         this.promiseResolved = true
       }
 
+      timeoutHandle = window.setTimeout(() => {
+        reject(lastError ? `WS error: ${lastError}` : "Timeout waiting for WS")
+        cleanup()
+      }, 10000)
+
       unsub = this.event.subscribe((ev) => {
         if (!unsub) return
 
-        if (ev.op != null) {
+        if (ev.op != null || ev._status == "connected") {
           cleanup()
           resolve()
-          return
-        }
-
-        switch (ev._status) {
-          case "connected": {
-            cleanup()
-            resolve()
-            break
-          }
-          case "disconnected": {
-            cleanup()
-            reject(ev._error || "Unexpected WS error")
-            break
-          }
         }
       })
     })
