@@ -7,6 +7,7 @@ import type { Profile, Settings } from "#/lib/types.js"
 import type {
   PostView,
   CommentView,
+  CommentSortType,
   SortType,
   ListingType,
 } from "lemmy-js-client"
@@ -29,6 +30,12 @@ export const postsSettings = persistent.writable<{
 }>("slemmy-posts-settings", {
   sort: "Active",
   listing: "Local",
+})
+
+export const commentsSettings = persistent.writable<{
+  sort: CommentSortType
+}>("slemmy-comments-settings", {
+  sort: "Hot",
 })
 
 /*

@@ -16,7 +16,12 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
 
   import { page } from "$app/stores"
-  import { client, posts, profile as profile_ } from "#/stores.js"
+  import {
+    client,
+    posts,
+    commentsSettings,
+    profile as profile_,
+  } from "#/stores.js"
 
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
@@ -30,14 +35,10 @@
   const query = $page.url.searchParams
   const postID = parseInt($page.params.id)
 
-  let listing: ListingType
   let post: PostView
-  let sort: CommentSortType
   let comments: NestedCommentView[] | undefined
 
   $: profile = $profile_! // deal with Svelte being bad
-  $: listing = (query.get("listing") as ListingType) || "All"
-  $: sort = (query.get("sort") as CommentSortType) || "Top"
 
   async function initPost() {
     const cached = $posts.find((p) => p.post.id == postID)
@@ -55,14 +56,19 @@
   async function initComments() {
     const resp = await $client.request(UserOperation.GetComments, {
       post_id: postID,
-      sort,
-      type_: listing,
+      type_: "All",
+      sort: $commentsSettings.sort,
       // TODO: automatic pagination on scroll
       limit: 50,
       max_depth: 8,
       auth: profile.user?.jwt,
     })
     comments = nestComments(resp.comments)
+  }
+
+  async function resetComments() {
+    comments = undefined
+    await initComments()
   }
 
   $: (async () => {
@@ -72,7 +78,7 @@
       handleError(err, true)
     }
     try {
-      await initComments()
+      await resetComments()
     } catch (err) {
       handleError(err)
     }
@@ -227,6 +233,27 @@
       {#if post && post.counts.comments > 0}
         <div class="funny-width">
           <hr class="my-4" />
+        </div>
+
+        <div class="container flex flex-row justify-between align-center">
+          <h4 class="text-bold text-lg">Comments</h4>
+          <div
+            class="float-right w-32 input-group input-group-divider grid-cols-[auto_1fr_auto]"
+          >
+            <div class="input-group-shim !pl-3 !pr-2" title="Sort">
+              <Symbol name="sort" tooltip="Sort" />
+            </div>
+            <select
+              class="px-2 py-1"
+              bind:value={$commentsSettings.sort}
+              on:change={() => resetComments()}
+            >
+              <option value="Hot">Hot</option>
+              <option value="New">New</option>
+              <option value="Top">Top</option>
+              <option value="Old">Old</option>
+            </select>
+          </div>
         </div>
 
         {#if !comments}

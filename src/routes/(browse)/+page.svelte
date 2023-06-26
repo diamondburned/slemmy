@@ -147,7 +147,7 @@
         transition:fly|local={{ duration: 100, y: -10 }}
       >
         <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-          <div class="input-group-shim" title="Filter">
+          <div class="input-group-shim !pl-3 !pr-2" title="Filter">
             <Symbol name="filter_alt" tooltip="Filter" />
           </div>
           <select
@@ -161,7 +161,7 @@
           </select>
         </div>
         <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-          <div class="input-group-shim" title="Sort">
+          <div class="input-group-shim !pl-3 !pr-2" title="Sort">
             <Symbol name="sort" tooltip="Sort" />
           </div>
           <select
