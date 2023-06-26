@@ -23,8 +23,10 @@ async function main() {
     tags.push(`<link rel="preconnect" href="${preconnect}">`)
   }
   for (const font of fonts) {
-    tags.push(`<link rel="stylesheet" href="${font}">`)
-    tags.push(`<link rel="preload" href="${font}" as="style">`)
+    tags.push(
+      `<link rel="preload" href="${font}" as="style">`,
+      `<link rel="stylesheet" href="${font}" media="print" onload="this.media='all'">`,
+    )
     // try {
     //   const css = await (await fetch(font)).text()
     //   const urlRegex = /url\((.*\.(?:ttf|woff))\)/gm
