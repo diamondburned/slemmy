@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "Slemmy",
-  "short_name": "Lemmy Reader in Svelte",
+  "short_name": "Slemmy",
   "description": "A Lemmy Reader app written in Svelte, working on both desktop and mobile.",
-  "theme_color": "#F7A8B8",
+  "theme_color": "#252426",
   "background_color": "#252426",
   "icons": [
     {
