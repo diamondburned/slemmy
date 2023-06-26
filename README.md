@@ -19,7 +19,7 @@
   - [ ] Autoload on scroll
   - [ ] Filtering and sorting
 - [x] Logging in
-  - [ ] Upvoting
+  - [x] Upvoting
   - [ ] Commenting
 
 ## Rants
