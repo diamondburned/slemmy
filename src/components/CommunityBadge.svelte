@@ -7,12 +7,15 @@
   export let community: Community
   export let width = "w-4"
 
+  let className = ""
+  export { className as class }
+
   $: id = parseCommunityActorID(community.actor_id)
 </script>
 
 <a
   href={id ? `/c/${id}` : undefined}
-  class="inline-flex items-baseline hover:underline hover:text-white truncate"
+  class="{className} inline-flex items-baseline hover:underline hover:text-white truncate"
 >
   <Avatar
     src={thumbnailURL(community.icon)}

@@ -8,12 +8,15 @@
   export let user: Person
   export let width = "w-4"
 
+  let className = ""
+  export { className as class }
+
   $: id = parseUserActorID(user.actor_id)
 </script>
 
 <a
   href={id ? `/u/${id}` : undefined}
-  class="inline-flex items-baseline hover:text-white truncate"
+  class="{className} inline-flex items-baseline hover:text-white truncate"
 >
   <Avatar
     src={thumbnailURL(user.avatar)}

@@ -2,6 +2,7 @@
   import Symbol from "./Symbol.svelte"
   import Markdown from "#/components/Markdown.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
+  import UpvoteBadge from "./UpvoteBadge.svelte"
   import RelativeTimestamp from "./RelativeTimestamp.svelte"
 
   import type { NestedCommentView } from "#/lib/types.js"
@@ -43,18 +44,25 @@
       class:text-surface-400={!expanded}
       on:click|stopPropagation|preventDefault={() => (expanded = !expanded)}
     >
-      <UserBadge width="w-4" user={comment.creator} />
+      <UserBadge width="w-4" user={comment.creator} class="pr-2" />
       <span class="text-surface-400">
-        <span class="mx-1">ꞏ</span>
-        <button
-          class="hover:font-bold hover:text-primary-400 transition"
-          on:click|preventDefault|stopPropagation={() => {}}
-        >
-          <Symbol name="expand_less" inline />
-          {comment.counts.upvotes - comment.counts.downvotes}
-        </button>
-        <span class="mx-1">ꞏ</span>
-        <RelativeTimestamp date={comment.comment.published} icon={false} />
+        <span>ꞏ</span>
+        <UpvoteBadge
+          bind:comment
+          class="text-surface-400 pl-1 pr-2 hover:font-bold hover:text-white"
+          style="none"
+          classes={{
+            div: "align-bottom",
+            upvoted: "!text-success-400 font-bold",
+            downvoted: "!text-error-400 font-bold",
+          }}
+        />
+        <span>ꞏ</span>
+        <RelativeTimestamp
+          date={comment.comment.published}
+          icon={false}
+          class="px-2"
+        />
       </span>
     </button>
     {#if expanded}
