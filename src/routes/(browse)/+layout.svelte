@@ -33,9 +33,9 @@
 
   const tiles = [
     { name: "Posts", icon: "home", path: "/" },
-    { name: "Search", icon: "explore", path: "/search" },
-    { name: "Profiles", icon: "people", path: "/profiles" },
-    { name: "Settings", icon: "settings", path: "/settings" },
+    { name: "Search", icon: "explore", path: "/search", disabled: true },
+    { name: "Settings", icon: "settings", path: "/settings", disabled: true },
+    { name: "Switch Profile", icon: "switch_account", path: "/profiles" },
   ]
 
   let currentTileIx: number = -1
@@ -54,6 +54,8 @@
       }
     }
   }
+
+  const diasbledClass = "opacity-50 cursor-not-allowed pointer-events-none"
 </script>
 
 <AppShell slotPageContent="h-full overflow-">
@@ -66,7 +68,7 @@
           name={tile.name.toLowerCase()}
           title={tile.name}
           value={i}
-          class=""
+          class={tile.disabled ? diasbledClass : ""}
           on:click={() => goto(tile.path)}
           bind:group={currentTileIx}
         >
@@ -130,6 +132,7 @@
             name={tile.name.toLowerCase()}
             title={tile.name}
             value={i}
+            class={tile.disabled ? diasbledClass : ""}
             on:click={() => goto(tile.path)}
             bind:group={currentTileIx}
           >
