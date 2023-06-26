@@ -9,11 +9,18 @@
     {
       "src": "/favicon.png",
       "sizes": "89x89",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/favicon.png",
-      "sizes": "89x89",
+      "src": "/favicon-452.png",
+      "sizes": "452x452",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-748.png",
+      "sizes": "748x748",
       "type": "image/png",
       "purpose": "any maskable"
     }
