@@ -10,6 +10,7 @@
 
   &.prose {
     @apply leading-6;
+    font-size: 1em; /* reset prose's font-size */
 
     * {
       @apply !text-current !break-words;
@@ -91,6 +92,12 @@
     code::before,
     code::after {
       content: none !important;
+    }
+  }
+
+  &.prose.inline {
+    * {
+      @apply !inline !break-words;
     }
   }
 }

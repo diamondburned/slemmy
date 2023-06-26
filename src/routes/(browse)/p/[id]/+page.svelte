@@ -26,7 +26,7 @@
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
   import { errorToast, infoToast } from "#/lib/toasty.js"
-  import { thumbnailURL } from "#/lib/lemmyutils.js"
+  import { thumbnailURL, urlHostname } from "#/lib/lemmyutils.js"
   import { nestComments } from "#/lib/types.js"
   import { UserOperation } from "lemmy-js-client"
   import type { PostView, ListingType, CommentSortType } from "lemmy-js-client"
@@ -176,13 +176,13 @@
       </div>
 
       <hgroup class="space-y-4 my-4 container">
-        <h2 class="text-2xl font-semibold">
+        <h2 class="text-2xl">
           <a
             href={post.post.url}
-            class={post.post.url ? "hover:underline" : ""}
-            target="_blank"
+            class="font-semibold {post.post.url ? 'hover:underline' : ''}"
+            target={post.post.url ? "_blank" : ""}
           >
-            {post.post.name}
+            <Markdown markdown={post.post.name} inline />
           </a>
           {#if post.post.url}
             <Symbol
@@ -190,6 +190,11 @@
               size="lg"
               class="align-middle text-surface-400"
             />
+            {#if urlHostname(post.post.url)}
+              <span class="text-surface-400 text-lg">
+                ({urlHostname(post.post.url)})
+              </span>
+            {/if}
           {/if}
         </h2>
         <p>

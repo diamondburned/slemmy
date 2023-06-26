@@ -206,10 +206,10 @@
           <h3>
             <a
               href={post.post.url || `/p/${post.post.id}`}
-              class="hover:underline"
+              class="hover:underline font-semibold"
               target={post.post.url ? "_blank" : ""}
             >
-              {post.post.name}
+              <Markdown markdown={post.post.name} inline />
             </a>
             {#if post.post.url}
               <Symbol
@@ -225,10 +225,12 @@
             {/if}
           </h3>
 
-          <Markdown
-            class="summary !text-sm line-clamp-2 overflow-hidden border-l-4 px-2 border-surface-400"
-            markdown={post.post.body || ""}
-          />
+          {#if post.post.body}
+            <Markdown
+              class="summary !text-sm line-clamp-2 overflow-hidden border-l-4 px-2 border-surface-400"
+              markdown={post.post.body}
+            />
+          {/if}
 
           <p class="flex flex-wrap gap-2 mt-1">
             <UpvoteBadge bind:post />

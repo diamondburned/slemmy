@@ -56,6 +56,7 @@
 <script lang="ts">
   export let markdown: string
   export let style: string = ""
+  export let inline = false
 
   let className = ""
   export { className as class }
@@ -65,6 +66,6 @@
   Tailwind is fucking dogshit. The styles for this element are at
   src/styles/markdown.postcss for that reason.
 -->
-<div class="markdown prose prose-nopad {className}" {style}>
+<div class="markdown prose prose-nopad {className}" class:inline {style}>
   {@html markdownToHTML(markdown)}
 </div>
