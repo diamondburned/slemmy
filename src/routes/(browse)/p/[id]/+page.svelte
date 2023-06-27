@@ -167,7 +167,7 @@
               </svelte:fragment>
             </BarButton>
             <BarButton
-              icon="share"
+              icon="link"
               tooltip="Copy post link"
               on:click={() => copyLink()}
             />
