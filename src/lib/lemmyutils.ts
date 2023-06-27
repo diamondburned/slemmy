@@ -24,6 +24,11 @@ export function thumbnailURL(imageURL: string, opts?: ThumbnailOpts): string
 export function thumbnailURL(
   imageURL: string | undefined,
   opts?: ThumbnailOpts,
+): string | undefined
+
+export function thumbnailURL(
+  imageURL: string | undefined,
+  opts?: ThumbnailOpts,
 ): string | undefined {
   if (!imageURL) {
     return
