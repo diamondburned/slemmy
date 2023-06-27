@@ -31,7 +31,7 @@
   } = {}
 
   let klass = ""
-  export { className as class }
+  export { klass as class }
 
   $: item = post || (comment as PostOrComment)
   $: button = style == "button"
@@ -89,6 +89,8 @@
     class:btn-sm={button}
     class:variant-soft={button && !upvoted}
     class:variant-filled-success={button && upvoted}
+    class:hover:text-white={!button}
+    class:hover:font-bold={!button}
     class:rounded-r-none={canDownvote}
     class:border-r-1={canDownvote}
     class:upvoted={classes.upvoted || ""}
@@ -105,6 +107,8 @@
       class:btn-sm={button}
       class:variant-soft={button && !downvoted}
       class:variant-filled-error={button && downvoted}
+      class:hover:text-white={!button}
+      class:hover:font-bold={!button}
       class:downvoted={classes.downvoted || ""}
       disabled={voting}
       on:click={() => toggleVoteDelta(-1, downvoted)}

@@ -7,6 +7,7 @@
 
   import type { NestedCommentView } from "#/lib/types.js"
   import { cubicInOut as inOut } from "svelte/easing"
+  import { infoToast } from "#/lib/toasty.js"
   import { slide } from "svelte/transition"
 
   export let level = 0
@@ -27,6 +28,11 @@
 
   let expanded = true
   const expandingTransition = { duration: 200, easing: inOut }
+
+  function copyCommentLink() {
+    navigator.clipboard.writeText(comment.comment.ap_id)
+    infoToast("Copied post link to clipboard!")
+  }
 </script>
 
 <blockquote
@@ -49,7 +55,7 @@
         <span>ꞏ</span>
         <UpvoteBadge
           bind:comment
-          class="text-surface-400 pl-1 pr-2 hover:font-bold hover:text-white"
+          class="text-surface-400 !pl-1 !pr-2 hover:font-bold hover:text-white"
           style="none"
           classes={{
             div: "align-bottom",
@@ -57,6 +63,13 @@
             downvoted: "!text-error-400 font-bold",
           }}
         />
+        <span>ꞏ</span>
+        <button
+          class="px-2 hover:text-white hover:font-bold"
+          on:click|preventDefault|stopPropagation={() => copyCommentLink()}
+        >
+          <Symbol name="link" class="!align-top" />
+        </button>
         <span>ꞏ</span>
         <RelativeTimestamp
           date={comment.comment.published}
