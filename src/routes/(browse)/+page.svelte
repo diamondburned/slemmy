@@ -246,7 +246,7 @@
               class="btn btn-sm variant-soft pointer-events-none inline-flex gap-1 px-3"
             />
             {#if post.post.nsfw}
-              <span class="badge variant-soft !text-red-400 gap-1 px-3">
+              <span class="btn btn-sm variant-soft !text-red-400 gap-1 px-3">
                 NSFW
               </span>
             {/if}
