@@ -172,7 +172,7 @@
     Slemmy
   </h1>
 
-  <section class="sm:card max-w-full sm:max-w-md w-full p-4 sm:mx-auto">
+  <section class="sm:card max-w-full sm:max-w-md w-full mb-4 p-4 sm:mx-auto">
     <Stepper
       class="flex flex-col h-full"
       regionContent="flex-1 overflow-hidden"
