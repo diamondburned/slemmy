@@ -114,7 +114,7 @@ export class LemmyWebsocketClient {
 
   async wait<T extends UserOperation, Event extends typeMap[T][1]>(
     op: T,
-    timeout = 5000,
+    timeout = 10000,
   ): Promise<Event> {
     const deadline = timeoutPromise(timeout, "Timeout waiting for WS event")
     await Promise.race([timeout, this.ready])
