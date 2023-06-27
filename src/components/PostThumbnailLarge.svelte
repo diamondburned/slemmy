@@ -5,7 +5,10 @@
   import { ProgressRadial } from "@skeletonlabs/skeleton"
 
   export let post: Post
-  $: thumbnailURL = postThumbnailURL(post)
+  $: thumbnailURL = postThumbnailURL(post, {
+    size: 2048,
+    format: "webp",
+  })
 
   let className = ""
   export { className as class }
@@ -16,14 +19,13 @@
 </script>
 
 {#if thumbnailURL}
-  <div class="rounded m-auto max-w-lg max-h-lg {className}">
+  <div class="rounded w-full h-full {className}">
     <img
-      class="rounded max-w-full max-h-full duration-100 transition-opacity {imageClass}"
+      class="rounded w-full h-full object-contain m-auto duration-100 transition-opacity {imageClass}"
       class:absolute={!loaded}
       class:opacity-0={!loaded}
       on:load={() => (loaded = true)}
-      loading="lazy"
-      src={post.thumbnail_url}
+      src={thumbnailURL}
       alt="Post thumbnail"
     />
     {#if !loaded}

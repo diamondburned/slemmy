@@ -5,7 +5,7 @@
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
 
   export let post: Post
-  $: thumbnailURL = postThumbnailURL(post, true)
+  $: thumbnailURL = postThumbnailURL(post)
 
   function openModal() {
     modalStore.trigger({

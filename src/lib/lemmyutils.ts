@@ -4,25 +4,27 @@ const acceptedExts = ["jpg", "jpeg", "png", "gif", "webp"]
 
 export function postThumbnailURL(
   post: Post,
-  thumbnail = false,
+  opts?: ThumbnailOpts,
 ): string | undefined {
   const imageURL = post.thumbnail_url || post.url
   if (!imageURL || !acceptedExts.some((ext) => imageURL.endsWith(ext))) {
     return undefined
   }
 
-  if (!thumbnail) {
-    return imageURL
-  }
-
-  return thumbnailURL(imageURL)
+  return thumbnailURL(imageURL, opts)
 }
 
-export function thumbnailURL(imageURL: string): string
-export function thumbnailURL(imageURL: undefined): undefined
-export function thumbnailURL(imageURL: string | undefined): string | undefined
+export type ThumbnailOpts = {
+  size?: number // default: 256
+  hidpi?: boolean // default: true
+  format?: "webp" | "jpg" | "png" // default: webp
+}
 
-export function thumbnailURL(imageURL: string | undefined): string | undefined {
+export function thumbnailURL(imageURL: string, opts?: ThumbnailOpts): string
+export function thumbnailURL(
+  imageURL: string | undefined,
+  opts?: ThumbnailOpts,
+): string | undefined {
   if (!imageURL) {
     return
   }
@@ -34,17 +36,26 @@ export function thumbnailURL(imageURL: string | undefined): string | undefined {
     console.warn("invalid thumbnail URL, continuing anyway", err)
     return imageURL
   }
-  if (!url.pathname.startsWith("/pictrs")) {
+  if (!url.pathname.startsWith("/pictrs/image/")) {
     return imageURL
   }
 
   url.searchParams.set(
     "format",
     // WebP is animated so we don't want to use it for GIFs.
-    url.pathname.endsWith(".gif") ? "jpg" : "webp",
+    opts?.format || (url.pathname.endsWith(".gif") ? "jpg" : "webp"),
   )
-  url.searchParams.set("thumbnail", "256")
+
+  const size =
+    (opts?.size ? roundUpToPowerOf2(opts.size) : 256) *
+    (opts?.hidpi ? window.devicePixelRatio : 1)
+  url.searchParams.set("thumbnail", `${size}`)
+
   return url.toString()
+}
+
+function roundUpToPowerOf2(x: number): number {
+  return 2 ** Math.ceil(Math.log2(x))
 }
 
 export function urlHostname(url: string): string | undefined {
