@@ -140,11 +140,11 @@
                 <svelte:fragment slot="icon">
                   <Symbol name="open_in_new" />
                   <Avatar
-                    src={thumbnailURL(post.community.icon)}
+                    src="https://upload.wikimedia.org/wikipedia/commons/9/93/Fediverse_logo_proposal.svg"
                     width="w-4"
                     class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
                     rounded="rounded-full"
-                    initials={post.community.name || ""}
+                    background=""
                   />
                 </svelte:fragment>
               </BarButton>
@@ -163,12 +163,13 @@
                   class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
                   rounded="rounded-full"
                   initials={profile.instance.name || ""}
+                  background=""
                 />
               </svelte:fragment>
             </BarButton>
             <BarButton
               icon="link"
-              tooltip="Copy post link"
+              tooltip="Copy original post link"
               on:click={() => copyLink()}
             />
           </div>
