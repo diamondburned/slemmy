@@ -60,8 +60,11 @@ async function generate(): Promise<string> {
   output += `export const clientRouteMap = (client: LemmyHttp) => ({`
   for (const request of wsRequests) {
     const detail = requestResponses.get(request)
-    output += `\n[UserOperation.${request}]: `
-    output += detail ? `client.${detail.method},` : `throwUnimplemented,`
+    output +=
+      "\n" +
+      `[UserOperation.${request}]: (req: lemmy.${request}) =>` +
+      (detail ? `client.${detail.method}(req)` : `throwUnimplemented()`) +
+      `,`
   }
   output += `\n})`
 

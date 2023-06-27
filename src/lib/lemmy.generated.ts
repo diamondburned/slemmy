@@ -233,95 +233,163 @@ export type typeMap = {
 }
 
 export const clientRouteMap = (client: LemmyHttp) => ({
-  [UserOperation.Login]: client.login,
-  [UserOperation.UserJoin]: throwUnimplemented,
-  [UserOperation.PostJoin]: throwUnimplemented,
-  [UserOperation.CommunityJoin]: throwUnimplemented,
-  [UserOperation.Register]: client.register,
-  [UserOperation.GetCaptcha]: client.getCaptcha,
-  [UserOperation.CreateCommunity]: client.createCommunity,
-  [UserOperation.EditCommunity]: client.editCommunity,
-  [UserOperation.DeleteCommunity]: client.deleteCommunity,
-  [UserOperation.RemoveCommunity]: client.removeCommunity,
-  [UserOperation.FollowCommunity]: client.followCommunity,
-  [UserOperation.ListCommunities]: client.listCommunities,
-  [UserOperation.CreatePost]: client.createPost,
-  [UserOperation.GetPost]: client.getPost,
-  [UserOperation.GetCommunity]: client.getCommunity,
-  [UserOperation.CreateComment]: client.createComment,
-  [UserOperation.EditComment]: client.editComment,
-  [UserOperation.DeleteComment]: client.deleteComment,
-  [UserOperation.RemoveComment]: client.removeComment,
-  [UserOperation.MarkCommentReplyAsRead]: client.markCommentReplyAsRead,
-  [UserOperation.CreateCommentLike]: client.likeComment,
-  [UserOperation.SaveComment]: client.saveComment,
-  [UserOperation.CreateCommentReport]: client.createCommentReport,
-  [UserOperation.ResolveCommentReport]: client.resolveCommentReport,
-  [UserOperation.ListCommentReports]: client.listCommentReports,
-  [UserOperation.GetPosts]: client.getPosts,
-  [UserOperation.GetComments]: client.getComments,
-  [UserOperation.GetComment]: client.getComment,
-  [UserOperation.CreatePostLike]: client.likePost,
-  [UserOperation.EditPost]: client.editPost,
-  [UserOperation.DeletePost]: client.deletePost,
-  [UserOperation.RemovePost]: client.removePost,
-  [UserOperation.LockPost]: client.lockPost,
-  [UserOperation.FeaturePost]: client.featurePost,
-  [UserOperation.MarkPostAsRead]: client.markPostAsRead,
-  [UserOperation.SavePost]: client.savePost,
-  [UserOperation.CreatePostReport]: client.createPostReport,
-  [UserOperation.ResolvePostReport]: client.resolvePostReport,
-  [UserOperation.ListPostReports]: client.listPostReports,
-  [UserOperation.GetSiteMetadata]: client.getSiteMetadata,
-  [UserOperation.BanFromCommunity]: client.banFromCommunity,
-  [UserOperation.AddModToCommunity]: client.addModToCommunity,
-  [UserOperation.TransferCommunity]: client.transferCommunity,
-  [UserOperation.LeaveAdmin]: client.leaveAdmin,
-  [UserOperation.BanPerson]: client.banPerson,
-  [UserOperation.GetBannedPersons]: client.getBannedPersons,
-  [UserOperation.AddAdmin]: client.addAdmin,
-  [UserOperation.GetUnreadRegistrationApplicationCount]:
-    client.getUnreadRegistrationApplicationCount,
-  [UserOperation.ListRegistrationApplications]:
-    client.listRegistrationApplications,
-  [UserOperation.ApproveRegistrationApplication]:
-    client.approveRegistrationApplication,
-  [UserOperation.GetPersonDetails]: client.getPersonDetails,
-  [UserOperation.GetReplies]: client.getReplies,
-  [UserOperation.GetPersonMentions]: client.getPersonMentions,
-  [UserOperation.MarkPersonMentionAsRead]: client.markPersonMentionAsRead,
-  [UserOperation.GetModlog]: client.getModlog,
-  [UserOperation.CreateSite]: client.createSite,
-  [UserOperation.EditSite]: client.editSite,
-  [UserOperation.GetSite]: client.getSite,
-  [UserOperation.Search]: client.search,
-  [UserOperation.ResolveObject]: client.resolveObject,
-  [UserOperation.MarkAllAsRead]: client.markAllAsRead,
-  [UserOperation.SaveUserSettings]: client.saveUserSettings,
-  [UserOperation.ChangePassword]: client.changePassword,
-  [UserOperation.GetReportCount]: client.getReportCount,
-  [UserOperation.GetUnreadCount]: client.getUnreadCount,
-  [UserOperation.VerifyEmail]: client.verifyEmail,
-  [UserOperation.DeleteAccount]: client.deleteAccount,
-  [UserOperation.PasswordReset]: client.passwordReset,
-  [UserOperation.PasswordChangeAfterReset]: client.passwordChangeAfterReset,
-  [UserOperation.CreatePrivateMessage]: client.createPrivateMessage,
-  [UserOperation.EditPrivateMessage]: client.editPrivateMessage,
-  [UserOperation.DeletePrivateMessage]: client.deletePrivateMessage,
-  [UserOperation.MarkPrivateMessageAsRead]: client.markPrivateMessageAsRead,
-  [UserOperation.GetPrivateMessages]: client.getPrivateMessages,
-  [UserOperation.CreatePrivateMessageReport]: client.createPrivateMessageReport,
-  [UserOperation.ResolvePrivateMessageReport]:
-    client.resolvePrivateMessageReport,
-  [UserOperation.ListPrivateMessageReports]: client.listPrivateMessageReports,
-  [UserOperation.BlockPerson]: client.blockPerson,
-  [UserOperation.BlockCommunity]: client.blockCommunity,
-  [UserOperation.PurgePerson]: client.purgePerson,
-  [UserOperation.PurgeCommunity]: client.purgeCommunity,
-  [UserOperation.PurgePost]: client.purgePost,
-  [UserOperation.PurgeComment]: client.purgeComment,
-  [UserOperation.CreateCustomEmoji]: client.createCustomEmoji,
-  [UserOperation.EditCustomEmoji]: client.editCustomEmoji,
-  [UserOperation.DeleteCustomEmoji]: client.deleteCustomEmoji,
-  [UserOperation.GetFederatedInstances]: client.getFederatedInstances,
+  [UserOperation.Login]: (req: lemmy.Login) => client.login(req),
+  [UserOperation.UserJoin]: (req: lemmy.UserJoin) => throwUnimplemented(),
+  [UserOperation.PostJoin]: (req: lemmy.PostJoin) => throwUnimplemented(),
+  [UserOperation.CommunityJoin]: (req: lemmy.CommunityJoin) =>
+    throwUnimplemented(),
+  [UserOperation.Register]: (req: lemmy.Register) => client.register(req),
+  [UserOperation.GetCaptcha]: (req: lemmy.GetCaptcha) => client.getCaptcha(req),
+  [UserOperation.CreateCommunity]: (req: lemmy.CreateCommunity) =>
+    client.createCommunity(req),
+  [UserOperation.EditCommunity]: (req: lemmy.EditCommunity) =>
+    client.editCommunity(req),
+  [UserOperation.DeleteCommunity]: (req: lemmy.DeleteCommunity) =>
+    client.deleteCommunity(req),
+  [UserOperation.RemoveCommunity]: (req: lemmy.RemoveCommunity) =>
+    client.removeCommunity(req),
+  [UserOperation.FollowCommunity]: (req: lemmy.FollowCommunity) =>
+    client.followCommunity(req),
+  [UserOperation.ListCommunities]: (req: lemmy.ListCommunities) =>
+    client.listCommunities(req),
+  [UserOperation.CreatePost]: (req: lemmy.CreatePost) => client.createPost(req),
+  [UserOperation.GetPost]: (req: lemmy.GetPost) => client.getPost(req),
+  [UserOperation.GetCommunity]: (req: lemmy.GetCommunity) =>
+    client.getCommunity(req),
+  [UserOperation.CreateComment]: (req: lemmy.CreateComment) =>
+    client.createComment(req),
+  [UserOperation.EditComment]: (req: lemmy.EditComment) =>
+    client.editComment(req),
+  [UserOperation.DeleteComment]: (req: lemmy.DeleteComment) =>
+    client.deleteComment(req),
+  [UserOperation.RemoveComment]: (req: lemmy.RemoveComment) =>
+    client.removeComment(req),
+  [UserOperation.MarkCommentReplyAsRead]: (req: lemmy.MarkCommentReplyAsRead) =>
+    client.markCommentReplyAsRead(req),
+  [UserOperation.CreateCommentLike]: (req: lemmy.CreateCommentLike) =>
+    client.likeComment(req),
+  [UserOperation.SaveComment]: (req: lemmy.SaveComment) =>
+    client.saveComment(req),
+  [UserOperation.CreateCommentReport]: (req: lemmy.CreateCommentReport) =>
+    client.createCommentReport(req),
+  [UserOperation.ResolveCommentReport]: (req: lemmy.ResolveCommentReport) =>
+    client.resolveCommentReport(req),
+  [UserOperation.ListCommentReports]: (req: lemmy.ListCommentReports) =>
+    client.listCommentReports(req),
+  [UserOperation.GetPosts]: (req: lemmy.GetPosts) => client.getPosts(req),
+  [UserOperation.GetComments]: (req: lemmy.GetComments) =>
+    client.getComments(req),
+  [UserOperation.GetComment]: (req: lemmy.GetComment) => client.getComment(req),
+  [UserOperation.CreatePostLike]: (req: lemmy.CreatePostLike) =>
+    client.likePost(req),
+  [UserOperation.EditPost]: (req: lemmy.EditPost) => client.editPost(req),
+  [UserOperation.DeletePost]: (req: lemmy.DeletePost) => client.deletePost(req),
+  [UserOperation.RemovePost]: (req: lemmy.RemovePost) => client.removePost(req),
+  [UserOperation.LockPost]: (req: lemmy.LockPost) => client.lockPost(req),
+  [UserOperation.FeaturePost]: (req: lemmy.FeaturePost) =>
+    client.featurePost(req),
+  [UserOperation.MarkPostAsRead]: (req: lemmy.MarkPostAsRead) =>
+    client.markPostAsRead(req),
+  [UserOperation.SavePost]: (req: lemmy.SavePost) => client.savePost(req),
+  [UserOperation.CreatePostReport]: (req: lemmy.CreatePostReport) =>
+    client.createPostReport(req),
+  [UserOperation.ResolvePostReport]: (req: lemmy.ResolvePostReport) =>
+    client.resolvePostReport(req),
+  [UserOperation.ListPostReports]: (req: lemmy.ListPostReports) =>
+    client.listPostReports(req),
+  [UserOperation.GetSiteMetadata]: (req: lemmy.GetSiteMetadata) =>
+    client.getSiteMetadata(req),
+  [UserOperation.BanFromCommunity]: (req: lemmy.BanFromCommunity) =>
+    client.banFromCommunity(req),
+  [UserOperation.AddModToCommunity]: (req: lemmy.AddModToCommunity) =>
+    client.addModToCommunity(req),
+  [UserOperation.TransferCommunity]: (req: lemmy.TransferCommunity) =>
+    client.transferCommunity(req),
+  [UserOperation.LeaveAdmin]: (req: lemmy.LeaveAdmin) => client.leaveAdmin(req),
+  [UserOperation.BanPerson]: (req: lemmy.BanPerson) => client.banPerson(req),
+  [UserOperation.GetBannedPersons]: (req: lemmy.GetBannedPersons) =>
+    client.getBannedPersons(req),
+  [UserOperation.AddAdmin]: (req: lemmy.AddAdmin) => client.addAdmin(req),
+  [UserOperation.GetUnreadRegistrationApplicationCount]: (
+    req: lemmy.GetUnreadRegistrationApplicationCount,
+  ) => client.getUnreadRegistrationApplicationCount(req),
+  [UserOperation.ListRegistrationApplications]: (
+    req: lemmy.ListRegistrationApplications,
+  ) => client.listRegistrationApplications(req),
+  [UserOperation.ApproveRegistrationApplication]: (
+    req: lemmy.ApproveRegistrationApplication,
+  ) => client.approveRegistrationApplication(req),
+  [UserOperation.GetPersonDetails]: (req: lemmy.GetPersonDetails) =>
+    client.getPersonDetails(req),
+  [UserOperation.GetReplies]: (req: lemmy.GetReplies) => client.getReplies(req),
+  [UserOperation.GetPersonMentions]: (req: lemmy.GetPersonMentions) =>
+    client.getPersonMentions(req),
+  [UserOperation.MarkPersonMentionAsRead]: (
+    req: lemmy.MarkPersonMentionAsRead,
+  ) => client.markPersonMentionAsRead(req),
+  [UserOperation.GetModlog]: (req: lemmy.GetModlog) => client.getModlog(req),
+  [UserOperation.CreateSite]: (req: lemmy.CreateSite) => client.createSite(req),
+  [UserOperation.EditSite]: (req: lemmy.EditSite) => client.editSite(req),
+  [UserOperation.GetSite]: (req: lemmy.GetSite) => client.getSite(req),
+  [UserOperation.Search]: (req: lemmy.Search) => client.search(req),
+  [UserOperation.ResolveObject]: (req: lemmy.ResolveObject) =>
+    client.resolveObject(req),
+  [UserOperation.MarkAllAsRead]: (req: lemmy.MarkAllAsRead) =>
+    client.markAllAsRead(req),
+  [UserOperation.SaveUserSettings]: (req: lemmy.SaveUserSettings) =>
+    client.saveUserSettings(req),
+  [UserOperation.ChangePassword]: (req: lemmy.ChangePassword) =>
+    client.changePassword(req),
+  [UserOperation.GetReportCount]: (req: lemmy.GetReportCount) =>
+    client.getReportCount(req),
+  [UserOperation.GetUnreadCount]: (req: lemmy.GetUnreadCount) =>
+    client.getUnreadCount(req),
+  [UserOperation.VerifyEmail]: (req: lemmy.VerifyEmail) =>
+    client.verifyEmail(req),
+  [UserOperation.DeleteAccount]: (req: lemmy.DeleteAccount) =>
+    client.deleteAccount(req),
+  [UserOperation.PasswordReset]: (req: lemmy.PasswordReset) =>
+    client.passwordReset(req),
+  [UserOperation.PasswordChangeAfterReset]: (
+    req: lemmy.PasswordChangeAfterReset,
+  ) => client.passwordChangeAfterReset(req),
+  [UserOperation.CreatePrivateMessage]: (req: lemmy.CreatePrivateMessage) =>
+    client.createPrivateMessage(req),
+  [UserOperation.EditPrivateMessage]: (req: lemmy.EditPrivateMessage) =>
+    client.editPrivateMessage(req),
+  [UserOperation.DeletePrivateMessage]: (req: lemmy.DeletePrivateMessage) =>
+    client.deletePrivateMessage(req),
+  [UserOperation.MarkPrivateMessageAsRead]: (
+    req: lemmy.MarkPrivateMessageAsRead,
+  ) => client.markPrivateMessageAsRead(req),
+  [UserOperation.GetPrivateMessages]: (req: lemmy.GetPrivateMessages) =>
+    client.getPrivateMessages(req),
+  [UserOperation.CreatePrivateMessageReport]: (
+    req: lemmy.CreatePrivateMessageReport,
+  ) => client.createPrivateMessageReport(req),
+  [UserOperation.ResolvePrivateMessageReport]: (
+    req: lemmy.ResolvePrivateMessageReport,
+  ) => client.resolvePrivateMessageReport(req),
+  [UserOperation.ListPrivateMessageReports]: (
+    req: lemmy.ListPrivateMessageReports,
+  ) => client.listPrivateMessageReports(req),
+  [UserOperation.BlockPerson]: (req: lemmy.BlockPerson) =>
+    client.blockPerson(req),
+  [UserOperation.BlockCommunity]: (req: lemmy.BlockCommunity) =>
+    client.blockCommunity(req),
+  [UserOperation.PurgePerson]: (req: lemmy.PurgePerson) =>
+    client.purgePerson(req),
+  [UserOperation.PurgeCommunity]: (req: lemmy.PurgeCommunity) =>
+    client.purgeCommunity(req),
+  [UserOperation.PurgePost]: (req: lemmy.PurgePost) => client.purgePost(req),
+  [UserOperation.PurgeComment]: (req: lemmy.PurgeComment) =>
+    client.purgeComment(req),
+  [UserOperation.CreateCustomEmoji]: (req: lemmy.CreateCustomEmoji) =>
+    client.createCustomEmoji(req),
+  [UserOperation.EditCustomEmoji]: (req: lemmy.EditCustomEmoji) =>
+    client.editCustomEmoji(req),
+  [UserOperation.DeleteCustomEmoji]: (req: lemmy.DeleteCustomEmoji) =>
+    client.deleteCustomEmoji(req),
+  [UserOperation.GetFederatedInstances]: (req: lemmy.GetFederatedInstances) =>
+    client.getFederatedInstances(req),
 })
