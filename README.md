@@ -5,7 +5,7 @@
 
 <div align="center">
   <p>Cute Lemmy web app written in Svelte</p>
-  <img src=".github/screenshot1.png" width="600px" />
+  <img src=".github/screenshot3.png" width="600px" />
 </div>
 
 ## Features
