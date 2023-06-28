@@ -5,15 +5,11 @@
     Avatar,
     ProgressRadial,
   } from "@skeletonlabs/skeleton"
+  import Post from "#/components/Post.svelte"
   import Symbol from "#/components/Symbol.svelte"
   import Comment from "#/components/Comment.svelte"
-  import Markdown from "#/components/Markdown.svelte"
   import BarButton from "#/components/BarButton.svelte"
-  import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
-  import UserBadge from "#/components/UserBadge.svelte"
-  import UpvoteBadge from "#/components/UpvoteBadge.svelte"
-  import CommunityBadge from "#/components/CommunityBadge.svelte"
-  import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
+  import CommentComposer from "#/components/CommentComposer.svelte"
 
   import { page } from "$app/stores"
   import {
@@ -26,13 +22,13 @@
   import { swipe } from "svelte-gestures"
   import { goto } from "$app/navigation"
   import { errorToast, infoToast } from "#/lib/toasty.js"
-  import { thumbnailURL, urlHostname } from "#/lib/lemmyutils.js"
+  import { thumbnailURL } from "#/lib/lemmyutils.js"
   import { nestComments } from "#/lib/types.js"
+  import { modalStore } from "@skeletonlabs/skeleton"
   import { UserOperation } from "lemmy-js-client"
-  import type { PostView, ListingType, CommentSortType } from "lemmy-js-client"
+  import type { PostView } from "lemmy-js-client"
   import type { NestedCommentView } from "#/lib/types.js"
 
-  const query = $page.url.searchParams
   const postID = parseInt($page.params.id)
 
   let post: PostView
@@ -101,6 +97,19 @@
     navigator.clipboard.writeText(post.post.ap_id)
     infoToast("Copied post link to clipboard!")
   }
+
+  function makeComment() {
+    modalStore.trigger({
+      type: "component",
+      component: {
+        ref: CommentComposer,
+        props: {
+          post,
+          refresh: () => resetComments(),
+        },
+      },
+    })
+  }
 </script>
 
 <svelte:head>
@@ -130,6 +139,11 @@
           </button>
 
           <div slot="trail" class="space-x-1">
+            <BarButton
+              icon="add_comment"
+              tooltip="Write a comment"
+              on:click={() => makeComment()}
+            />
             {#if !post.post.ap_id.startsWith(profile.instance.url)}
               <BarButton
                 icon=""
@@ -176,65 +190,7 @@
         </AppBar>
       </div>
 
-      <hgroup class="space-y-4 my-4 container">
-        <h2 class="text-2xl">
-          <a
-            href={post.post.url}
-            class="font-semibold {post.post.url ? 'hover:underline' : ''}"
-            target={post.post.url ? "_blank" : ""}
-          >
-            <Markdown markdown={post.post.name} inline />
-          </a>
-          {#if post.post.url}
-            <Symbol
-              name="open_in_new"
-              size="lg"
-              class="align-middle text-surface-400"
-            />
-            {#if urlHostname(post.post.url)}
-              <span class="text-surface-400 text-lg">
-                ({urlHostname(post.post.url)})
-              </span>
-            {/if}
-          {/if}
-        </h2>
-        <p>
-          <UserBadge width="w-[1.5rem]" user={post.creator} />
-          <span class="mx-1 text-surface-400">to</span>
-          <CommunityBadge width="w-[1.5rem]" community={post.community} />
-        </p>
-        <div class="flex flex-row flex-wrap gap-2">
-          <UpvoteBadge bind:post class="btn" />
-          <span class="btn variant-soft pointer-events-none">
-            <Symbol name="comment" inline margin="mr-1" class="!align-middle" />
-            {post.counts.comments}
-          </span>
-          <RelativeTimestamp
-            date={post.post.published}
-            style="long"
-            class="btn variant-soft pointer-events-none"
-          >
-            <svelte:fragment slot="icon">
-              <Symbol
-                name="schedule"
-                inline
-                margin="mr-1"
-                class="!align-middle"
-              />
-            </svelte:fragment>
-          </RelativeTimestamp>
-          {#if post.post.nsfw}
-            <span class="btn variant-soft pointer-events-none !text-red-400">
-              NSFW
-            </span>
-          {/if}
-        </div>
-        <PostThumbnailLarge post={post.post} />
-      </hgroup>
-
-      <div class="container">
-        <Markdown markdown={post?.post.body || ""} />
-      </div>
+      <Post {post} />
 
       {#if post && post.counts.comments > 0}
         <div class="funny-width">
@@ -269,7 +225,7 @@
         {:else}
           <div class="comments funny-width mb-4">
             {#each comments as comment}
-              <Comment {comment} />
+              <Comment {post} {comment} refresh={() => resetComments()} />
             {/each}
           </div>
         {/if}

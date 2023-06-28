@@ -1,0 +1,76 @@
+.EasyMDEContainer {
+  @apply !w-full !h-full !flex !flex-col;
+
+  .CodeMirror,
+  .editor-toolbar {
+    @apply !border-0;
+  }
+
+  .CodeMirror {
+    @apply !p-2 !flex-1 !bg-surface-600 !text-current !rounded-lg !overflow-hidden;
+
+    .cm-spell-error {
+      background: transparent !important;
+      text-decoration: underline wavy rgb(var(--color-error-400)) !important;
+    }
+
+    .CodeMirror-cursor {
+      @apply !border-current;
+    }
+
+    .CodeMirror-selected {
+      @apply !bg-primary-900;
+    }
+
+    .CodeMirror-line {
+      @apply px-1;
+    }
+  }
+
+  .editor-preview {
+    @apply prose !bg-surface-800 !pt-0 !border-2 !border-surface-600 !rounded-lg;
+
+    &::before {
+      @apply text-sm text-surface-400 leading-8;
+      content: "Preview Mode";
+    }
+
+    pre {
+      @apply !bg-transparent !rounded !py-4 !px-8;
+    }
+  }
+
+  .editor-statusbar {
+    @apply !text-sm !px-2;
+
+    .autosave,
+    .cursor {
+      @apply !hidden;
+    }
+  }
+
+  .editor-toolbar,
+  .editor-toolbar.fullscreen {
+    @apply !px-0 !py-2 !bg-transparent;
+
+    button {
+      @apply !px-3 !bg-transparent transition duration-75 hover:!bg-surface-600 !border-0;
+
+      &.active {
+        @apply !bg-primary-900;
+      }
+    }
+
+    i.separator {
+      @apply border-l-2 border-r-0 border-surface-600 mx-1;
+    }
+  }
+
+  .editor-toolbar.fullscreen {
+    @apply !bg-surface-800 !px-3 !pt-4;
+  }
+
+  .CodeMirror-fullscreen {
+    @apply !rounded-none !shadow-none !border-0 !px-4 !py-2 !bg-surface-600;
+  }
+}

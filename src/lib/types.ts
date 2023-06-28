@@ -24,7 +24,7 @@ export type Settings = {
 }
 
 // NestedCommentView is a CommentView with a children field.
-export type NestedCommentView = CommentView & { children: NestedCommentView[] }
+export type NestedCommentView = CommentView & { children?: NestedCommentView[] }
 
 export function nestComments(flattened: CommentView[]): NestedCommentView[] {
   const topLevels: NestedCommentView[] = []
@@ -36,7 +36,8 @@ export function nestComments(flattened: CommentView[]): NestedCommentView[] {
       .map((x) => parseInt(x))
       .slice(0, -1) // remove last element, which is the comment ID itself
 
-    const comment: NestedCommentView = { ...flattenedComment, children: [] }
+    // This might not be the safest way to do this, but YOLO.
+    const comment: NestedCommentView = flattenedComment
     byID.set(comment.comment.id, comment)
 
     const parentID = paths[paths.length - 1]
@@ -47,6 +48,9 @@ export function nestComments(flattened: CommentView[]): NestedCommentView[] {
 
     const parent = byID.get(parentID)
     if (parent) {
+      if (!parent.children) {
+        parent.children = []
+      }
       parent.children.push(comment)
     }
   }
