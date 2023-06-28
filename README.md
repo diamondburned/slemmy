@@ -17,10 +17,10 @@
   - [x] Filtering and sorting
 - [x] Comments feed
   - [ ] Autoload on scroll
-  - [ ] Filtering and sorting
+  - [x] Filtering and sorting
 - [x] Logging in
   - [x] Upvoting
-  - [ ] Commenting
+  - [x] Commenting
 
 ## Rants
 
