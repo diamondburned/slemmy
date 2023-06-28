@@ -233,7 +233,7 @@
           {/if}
 
           <p class="flex flex-wrap gap-2 mt-1">
-            <UpvoteBadge bind:post />
+            <UpvoteBadge bind:post class="btn-sm" />
             <a
               href="/p/{post.post.id}"
               class="btn btn-sm variant-soft transition inline-flex gap-1 px-3"

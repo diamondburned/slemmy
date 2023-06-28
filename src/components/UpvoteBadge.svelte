@@ -86,7 +86,6 @@
   <button
     class="{klass} {upvotedClasses} inline-flex gap-1 px-3 !border-surface-400"
     class:btn={button}
-    class:btn-sm={button}
     class:variant-soft={button && !upvoted}
     class:variant-filled-success={button && upvoted}
     class:hover:text-white={!button}
