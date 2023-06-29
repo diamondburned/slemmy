@@ -358,6 +358,26 @@
       </Step>
     </Stepper>
   </section>
+
+  <footer class="absolute w-full opacity-80 bottom-0">
+    <div
+      class="container my-4 flex flex-col sm:flex-row items-center justify-between"
+    >
+      <p class="markdown prose !m-0 !text-sm">
+        Made with ❤️ and 🏳️‍⚧️ by
+        <a href="https://libdb.so" target="_blank">Diamond</a>
+      </p>
+      <p class="markdown prose !m-0 !text-sm">
+        <a class="link" href="https://libdb.so/slemmy" target="_blank">
+          Source code
+        </a>
+        is licensed under the
+        <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" target="_blank">
+          AGPLv3
+        </a>
+      </p>
+    </div>
+  </footer>
 </main>
 
 <style global lang="postcss">
