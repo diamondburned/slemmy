@@ -8,6 +8,21 @@
   <img src=".github/screenshot3.png" width="600px" />
 </div>
 
+## **Hey!!**
+
+**Please upvote these issues on the Lemmy repo!**
+
+- [#3109: CORS support for external web clients?](https://github.com/LemmyNet/lemmy/issues/3109)
+- [#3301: Allow cross-origin requests](https://github.com/LemmyNet/lemmy/pull/3301)
+
+Without these issues being resolved, Slemmy **will not work** with Lemmy v0.18+!
+If you want to use Slemmy, show your support for these issues!
+
+> **Note**: A workaround that I can potentially implement is to use a proxy
+> server to bypass CORS. This is what other web clients do. However, it has
+> numerous security implications and would require maintenance on my part.
+> This is a Lemmy issue, so please upvote the issues above!
+
 ## Features
 
 - [x] WS support
