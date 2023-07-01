@@ -260,7 +260,7 @@
 
   {#if loading || $posts.length == 0}
     <div
-      class="grid h-full place-items-center my-8"
+      class="grid place-items-center my-8"
       transition:fade|local={{ duration: 50 }}
     >
       {#if loading}
