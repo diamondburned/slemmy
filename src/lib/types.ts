@@ -1,13 +1,11 @@
 import { LemmyHttp } from "lemmy-js-client"
 import type { CommentView } from "lemmy-js-client"
-import type { LemmyConnectMethod } from "#/lib/lemmyclient.js"
 
 export type Profile = {
   instance: {
     url: string
     name?: string
     icon?: string
-    method?: LemmyConnectMethod
   }
   user?: {
     name: string

@@ -87,13 +87,8 @@ export class LemmyAutoClient implements LemmyClient {
 
   private client: Promise<LemmyClient>
 
-  constructor(instanceURL: string, preferred?: LemmyConnectMethod) {
+  constructor(instanceURL: string) {
     this.instanceHost = mustHostname(instanceURL)
-
-    if (preferred) {
-      this.client = Promise.resolve(LemmyClient.create(instanceURL, preferred))
-      return
-    }
 
     this.client = new Promise(async (resolve, reject) => {
       try {
@@ -138,11 +133,8 @@ export class LemmyDummyClient implements LemmyClient {
 export class LemmyClient {
   static dummy = new LemmyDummyClient()
 
-  static auto(
-    instanceURL: string,
-    preferred?: LemmyConnectMethod,
-  ): LemmyAutoClient {
-    return new LemmyAutoClient(instanceURL, preferred)
+  static auto(instanceURL: string): LemmyAutoClient {
+    return new LemmyAutoClient(instanceURL)
   }
 
   static create(
@@ -166,13 +158,6 @@ export class LemmyClient {
       return "http"
     } catch (_) {}
 
-    try {
-      const ws = new internalWSClient(instanceURL)
-      await ws.ready
-      ws.close()
-      return "ws"
-    } catch (_) {}
-
-    throw new Error("instance doesn't support CORS-enabled HTTP or WebSockets")
+    return "ws"
   }
 }

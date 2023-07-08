@@ -57,7 +57,7 @@ export const client = store.derived(
 
     const profile = profiles[currentProfile]
     lastClient = profile
-      ? LemmyClient.auto(profile.instance.url, profile.instance.method)
+      ? LemmyClient.auto(profile.instance.url)
       : LemmyClient.dummy
     return lastClient
   },
