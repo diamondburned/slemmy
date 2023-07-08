@@ -20,7 +20,7 @@
   export let replyingTo: CommentView | undefined = undefined
 
   // refresh is called when a comment is created to refresh the comments list.
-  export let refresh: (_: void) => void | undefined = undefined
+  export let refresh: ((_: void) => void) | undefined = undefined
 
   export let parent: Modal // used only by Skeleton
 
