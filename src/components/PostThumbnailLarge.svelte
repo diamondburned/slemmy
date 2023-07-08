@@ -5,10 +5,7 @@
   import { ProgressRadial } from "@skeletonlabs/skeleton"
 
   export let post: Post
-  $: thumbnailURL = postThumbnailURL(post, {
-    size: 2048,
-    format: "webp",
-  })
+  $: thumbnailURL = post.thumbnail_url
 
   let className = ""
   export { className as class }
