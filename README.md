@@ -21,6 +21,8 @@
 - [x] Logging in
   - [x] Upvoting
   - [x] Commenting
+- [ ] Community feed
+- [ ] User info popup/page
 
 ## Rants
 
