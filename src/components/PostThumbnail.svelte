@@ -9,7 +9,6 @@
 
   export let post: Post
   $: fullThumbnailURL = postThumbnailURL(post, { original: true })
-  $: webpThumbnailURL = postThumbnailURL(post)
   $: jpegThumbnailURL = postThumbnailURL(post, { format: "jpg" })
 
   let failed = false
@@ -49,8 +48,7 @@
       <div class="absolute top-0 nsfw-overlay h-full w-full" />
     {/if}
     <picture class:opacity-0={post.nsfw}>
-      <source srcset={webpThumbnailURL} type="image/webp" />
-      <source srcset={jpegThumbnailURL} type="image/jpeg" />
+      <source srcset={jpegThumbnailURL} />
       <img
         loading="lazy"
         class="h-full w-full object-contain"
