@@ -46,15 +46,14 @@
     on:click={() => openModal()}
   >
     {#if post.nsfw}
-      <div class="absolute top-0 nsfw-overlay z-10 h-full w-full" />
+      <div class="absolute top-0 nsfw-overlay h-full w-full" />
     {/if}
-    <picture>
+    <picture class:opacity-0={post.nsfw}>
       <source srcset={webpThumbnailURL} type="image/webp" />
       <source srcset={jpegThumbnailURL} type="image/jpeg" />
       <img
         loading="lazy"
         class="h-full w-full object-contain"
-        class:hidden={post.nsfw || failed}
         src={fullThumbnailURL}
         alt=" "
         bind:this={image}
@@ -71,9 +70,8 @@
 <style>
   img,
   div.nsfw-overlay {
-    height: calc(100% + 1px);
     border-radius: 0;
-    backdrop-filter: blur(15px) brightness(0.5) contrast(0.65);
+    backdrop-filter: blur(10px) brightness(0.5) contrast(0.65);
   }
 
   button {
