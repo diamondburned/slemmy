@@ -20,7 +20,6 @@
   } from "#/stores.js"
 
   import { swipe } from "svelte-gestures"
-  import { goto } from "$app/navigation"
   import { errorToast, infoToast } from "#/lib/toasty.js"
   import { thumbnailURL } from "#/lib/lemmyutils.js"
   import { nestComments } from "#/lib/types.js"
@@ -71,7 +70,7 @@
     try {
       await initPost()
     } catch (err) {
-      handleError(err, true)
+      handleError(err)
     }
     try {
       await resetComments()
@@ -83,10 +82,9 @@
   // It's kind of impossible to guard a possible race condition where a previous
   // user change may arrive after the latest one.
 
-  function handleError(err: unknown, fatal = false) {
+  function handleError(err: unknown) {
     console.log("Fetch error on route /p:", err)
     errorToast(`${err}`)
-    if (fatal) goto("/")
   }
 
   function goBack() {
