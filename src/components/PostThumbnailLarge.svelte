@@ -3,30 +3,43 @@
   import { postThumbnailURL } from "#/lib/lemmyutils.js"
 
   import { ProgressRadial } from "@skeletonlabs/skeleton"
+  import PostThumbnail from "./PostThumbnail.svelte"
 
   export let post: Post
-  $: thumbnailURL = post.thumbnail_url
+  export let prefetchedURL: string | undefined = undefined
+
+  $: fullThumbnailURL = postThumbnailURL(post, { original: true })
+  $: loadingThumbnailURL = prefetchedURL || fullThumbnailURL
 
   let className = ""
   export { className as class }
   export let imageClass = ""
+  $: imageClassDefault =
+    "rounded w-full h-full object-contain m-auto duration-100 transition-opacity"
 
   let loaded = false
-  let imageElement: HTMLImageElement
 </script>
 
-{#if thumbnailURL}
-  <div class="rounded w-full h-full {className}">
+{#if fullThumbnailURL}
+  <div class="rounded w-full h-full relative {className}">
+    {#if prefetchedURL}
+      <img
+        class="{imageClassDefault} {imageClass}"
+        src={prefetchedURL}
+        alt=" "
+      />
+    {/if}
     <img
-      class="rounded w-full h-full object-contain m-auto duration-100 transition-opacity {imageClass}"
-      class:absolute={!loaded}
-      class:opacity-0={!loaded}
+      class="{imageClassDefault} {imageClass} absolute top-0 z-10"
+      class:!fixed={!loaded}
+      class:!opacity-0={!loaded}
       on:load={() => (loaded = true)}
-      src={thumbnailURL}
-      alt="Post thumbnail"
+      on:error={() => (loaded = true)}
+      src={fullThumbnailURL}
+      alt=" "
     />
     {#if !loaded}
-      <div class="grid h-full place-items-center">
+      <div class="grid h-full w-full place-items-center absolute top-0 z-10">
         <ProgressRadial stroke={80} width="w-12" />
       </div>
     {/if}

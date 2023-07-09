@@ -18,6 +18,7 @@ export type ThumbnailOpts = {
   size?: number // default: 256
   hidpi?: boolean // default: true
   format?: "webp" | "jpg" | "png" // default: webp
+  original?: boolean // default: false
 }
 
 export function thumbnailURL(imageURL: string, opts?: ThumbnailOpts): string
@@ -32,6 +33,10 @@ export function thumbnailURL(
 ): string | undefined {
   if (!imageURL) {
     return
+  }
+
+  if (opts?.original) {
+    return imageURL
   }
 
   let url: URL
