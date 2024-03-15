@@ -242,7 +242,7 @@
               {post.counts.comments}
             </a>
             <RelativeTimestamp
-              date={post.post.published + "Z"}
+              date={post.post.published}
               class="btn btn-sm variant-soft pointer-events-none inline-flex gap-1 px-3"
             />
             {#if post.post.nsfw}
