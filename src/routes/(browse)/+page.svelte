@@ -23,7 +23,6 @@
   import { errorToast } from "#/lib/toasty.js"
   import { urlHostname } from "#/lib/lemmyutils.js"
   import { client, profile, postsSettings } from "#/stores.js"
-  import { subscribeLater } from "#/stores.js"
   import { UserOperation } from "lemmy-js-client"
 
   let showFilters = false
@@ -94,6 +93,9 @@
     const loadMore =
       // scrolledDown, true if we've scrolled down enough to fetch more posts.
       scrollTop + clientHeight + scrollThreshold >= scrollHeight ||
+      // rare case: this function will return true if we have no posts and
+      // forever load more pages, so prevent that.
+      $posts.length == 0 ||
       // postsAllFit, true if we've fetched some posts but all posts fit on
       // the screen. This is a special case because we need to fetch more
       // posts even though we're not scrolled down.
