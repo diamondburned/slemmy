@@ -8,6 +8,7 @@
   import Post from "#/components/Post.svelte"
   import Symbol from "#/components/Symbol.svelte"
   import Comment from "#/components/Comment.svelte"
+  import Loading from "#/components/Loading.svelte"
   import BarButton from "#/components/BarButton.svelte"
   import CommentComposer from "#/components/CommentComposer.svelte"
 
@@ -111,9 +112,7 @@
 </svelte:head>
 
 {#if !post}
-  <div class="grid h-full place-items-center">
-    <ProgressRadial stroke={80} width="w-12" />
-  </div>
+  <Loading fullscreen />
 {:else}
   <AppShell slotPageContent="mx-auto w-full">
     <div slot="pageHeader">
@@ -143,7 +142,7 @@
               <svelte:fragment slot="icon">
                 <Symbol name="open_in_new" />
                 <Avatar
-                  src="https://upload.wikimedia.org/wikipedia/commons/9/93/Fediverse_logo_proposal.svg"
+                  src="/fediverse.svg"
                   width="w-4"
                   class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
                   rounded="rounded-full"
@@ -208,9 +207,7 @@
       </div>
 
       {#if !comments}
-        <div class="grid my-8 place-items-center container">
-          <ProgressRadial stroke={80} width="w-12" />
-        </div>
+        <Loading />
       {:else}
         <div class="comments funny-width mb-4">
           {#each comments as comment}
