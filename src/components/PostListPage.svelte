@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import * as store from "svelte/store"
   import type { PostView } from "lemmy-js-client"
+  import type { Profile } from "#/lib/types.js"
 
   export type PostsCache = {
     posts: store.Writable<PostView[]>
@@ -10,18 +11,11 @@
 
   // communityPosts is a cache for the posts of a community.
   // An empty name means the global posts.
-  export const communityPosts: Record<string, PostsCache> = {}
+  const communityPosts = store.writable<Record<string, PostsCache>>({})
 
-  function getPostsCache(name: string): PostsCache {
-    if (!communityPosts[name]) {
-      communityPosts[name] = {
-        posts: store.writable<PostView[]>([]),
-        page: store.writable(1),
-        lastScrollTop: store.writable(0),
-      }
-    }
-    return communityPosts[name]
-  }
+  // Be careful when persisting this list: we track the current profile, and if
+  // it differs from the current one, then we wipe the list.
+  let currentProfile: Profile | null = null
 </script>
 
 <script lang="ts">
@@ -43,7 +37,25 @@
   export let title = ""
   export let communityName = ""
 
-  $: ({ posts, page, lastScrollTop } = getPostsCache(communityName))
+  $: {
+    if ($profile != currentProfile) {
+      currentProfile = $profile
+      communityPosts.set({})
+    }
+  }
+
+  function getPostsCache(name: string): PostsCache {
+    if (!$communityPosts[name]) {
+      $communityPosts[name] = {
+        posts: store.writable<PostView[]>([]),
+        page: store.writable(1),
+        lastScrollTop: store.writable(0),
+      }
+    }
+    return $communityPosts[name]
+  }
+  $: postsCache = $communityPosts[communityName] || getPostsCache(communityName)
+  $: ({ posts, page, lastScrollTop } = postsCache)
 
   onMount(async () => {
     await tick()
