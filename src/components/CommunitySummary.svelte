@@ -1,6 +1,7 @@
 <script lang="ts">
   import { thumbnailURL, urlHostname } from "#/lib/lemmyutils.js"
   import { slide } from "svelte/transition"
+  import { client, profile } from "#/stores.js"
   import * as humanize from "#/lib/humanize.js"
 
   import { Avatar } from "@skeletonlabs/skeleton"
@@ -10,12 +11,36 @@
   import BarButton from "./BarButton.svelte"
   import Badge from "./Badge.svelte"
   import Symbol from "./Symbol.svelte"
+  import { errorToast } from "#/lib/toasty.js"
 
   export let communityView: CommunityView
   export let communityName = communityView.community.name
-  $: ({ community, counts } = communityView)
+  $: ({ community, counts, subscribed } = communityView)
+  $: loggedIn = !!$profile?.user
 
   let expanded = false
+  let subscribing = false
+
+  async function toggleSubscribe() {
+    if (!loggedIn) {
+      errorToast("You must be logged in to subscribe.")
+      return
+    }
+
+    try {
+      subscribing = true
+      const resp = await $client!.followCommunity({
+        community_id: community.id,
+        follow: subscribed == "NotSubscribed",
+        auth: $profile!.user!.jwt,
+      })
+      communityView = resp.community_view
+    } catch (err) {
+      errorToast(`Error subscribing to community: ${err}`)
+    } finally {
+      subscribing = false
+    }
+  }
 </script>
 
 <div>
@@ -43,21 +68,36 @@
             <Badge class="!ml-1 !align-middle !text-red-400">NSFW</Badge>
           {/if}
         </h1>
-        <a
-          href={community.actor_id}
-          class="text-surface-400 no-underline hover:underline"
-          target="_blank"
-        >
-          {communityName}
-        </a>
+        <span class="text-surface-400">{communityName}</span>
       </hgroup>
     </div>
 
     <div class="self-center">
+      <div
+        class="contents"
+        class:text-green-400={subscribed == "Subscribed"}
+        class:text-yellow-400={subscribed == "Pending"}
+      >
+        <BarButton
+          icon={{
+            NotSubscribed: "add",
+            Subscribed: "done",
+            Pending: "hourglass",
+          }[subscribed]}
+          tooltip={{
+            NotSubscribed: "Subscribe",
+            Subscribed: "Unsubscribe",
+            Pending: "Subscription pending",
+          }[subscribed]}
+          on:click={() => toggleSubscribe()}
+          disabled={!loggedIn || subscribing}
+        />
+      </div>
+
       <BarButton
         tooltip="Show more"
         icon={expanded ? "expand_less" : "expand_more"}
-        on:click={() => (expanded = !expanded)}
+        bind:active={expanded}
       />
     </div>
   </div>

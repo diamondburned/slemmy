@@ -8,6 +8,7 @@
   export let tooltip = ""
   export let active: boolean | null = null
   export let href: string | undefined = undefined
+  export let disabled = false
   $: tag = href ? "a" : "button"
 
   let className = ""
@@ -37,6 +38,7 @@
   role={tag == "a" ? "button" : undefined}
   type={tag == "button" ? "button" : undefined}
   {href}
+  {disabled}
 >
   <slot name="icon">
     {#if icon}

@@ -2,6 +2,7 @@
   export let name: string
   export let size: string | undefined = undefined
   export let tooltip = ""
+  export let hidden = false
   export let large = false
   export let inline = false
   export let margin = ""
@@ -16,6 +17,7 @@
     material-symbols-rounded symbol
     {className} {margin} {size != undefined ? `text-${size}` : ''}
   "
+  class:hidden
   class:large
   class:sized={size != undefined}
   class:margin={!!margin}
