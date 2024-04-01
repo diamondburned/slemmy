@@ -1,9 +1,12 @@
 <script lang="ts">
   import PostListPage from "#/components/PostListPage.svelte"
+  import { profile } from "#/stores"
 </script>
 
 <svelte:head>
   <title>Frontpage | Slemmy</title>
 </svelte:head>
 
-<PostListPage title="Frontpage" />
+{#if $profile}
+  <PostListPage title="Frontpage" />
+{/if}
