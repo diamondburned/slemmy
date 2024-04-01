@@ -33,6 +33,7 @@
   let comments: NestedCommentView[] | undefined
 
   $: profile = $profile_! // deal with Svelte being bad
+  $: postTitle = post?.post.name || `Post ${postID}`
 
   async function initPost() {
     const cached = $posts.find((p) => p.post.id == postID)
@@ -81,7 +82,7 @@
 
   function handleError(err: unknown) {
     console.log("Fetch error on route /p:", err)
-    errorToast(`Error fetching post: ${err})
+    errorToast(`Error fetching post: ${err}`)
   }
 
   function goBack() {
@@ -108,7 +109,7 @@
 </script>
 
 <svelte:head>
-  <title>{post?.post.name || `Post ${postID}`} | Slemmy</title>
+  <title>{postTitle} | Slemmy</title>
 </svelte:head>
 
 {#if !post}
