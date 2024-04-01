@@ -21,7 +21,7 @@
 <ol class="{className} list flex flex-col gap-4 py-4">
   {#each posts as post}
     <li
-      class="flex flex-row gap-0 items-center"
+      class="flex flex-row gap-0 items-center relative"
       transition:fade|local={{ duration: 75 }}
     >
       <div class="flex-1 flex flex-col gap-1 w-full">
@@ -29,14 +29,6 @@
           <UserBadge user={post.creator} />
           <span class="mx-0.5">to</span>
           <CommunityBadge community={post.community} />
-
-          <span class="float-right">
-            {#if post.post.featured_community || post.post.featured_local}
-              <span class="badge-icon variant-ghost" title="Featured">
-                <Symbol name="push_pin" />
-              </span>
-            {/if}
-          </span>
         </p>
 
         <h3>
@@ -90,6 +82,14 @@
       </div>
 
       <PostThumbnail post={post.post} />
+
+      <span class="float-right absolute top-0 right-0">
+        {#if post.post.featured_community || post.post.featured_local}
+          <span class="badge-icon variant-ghost" title="Featured">
+            <Symbol name="push_pin" />
+          </span>
+        {/if}
+      </span>
     </li>
   {/each}
 </ol>

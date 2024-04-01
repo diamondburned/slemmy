@@ -32,6 +32,7 @@
       .render(parsed)
       .replaceAll(/<a /g, '<a target="_blank" rel="noopener noreferrer" ')
       .replaceAll(/<img /g, '<img loading="lazy" alt="Post image" ')
+      .trim()
   }
 
   function walk(node: commonmark.Node, f: (_: commonmark.Node) => void) {

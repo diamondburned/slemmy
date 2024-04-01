@@ -120,8 +120,10 @@
       <AppBar>
         <button
           slot="lead"
-          class="text-surface-400 hover:text-current"
+          class="text-surface-400"
+          class:hover:text-current={history.length > 1}
           on:click={() => goBack()}
+          disabled={history.length < 2}
         >
           <Symbol inline name="arrow_back_ios" class="w-5" />
           Back
