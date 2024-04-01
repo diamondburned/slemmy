@@ -9,6 +9,7 @@
   import { errorToast } from "#/lib/toasty.js"
   import Loading from "#/components/Loading.svelte"
   import { goto } from "$app/navigation"
+  import BackButton from "#/components/BackButton.svelte"
 
   const communityName = $page.params.cname
 
@@ -41,8 +42,10 @@
   <title>{communityTitle} | Slemmy</title>
 </svelte:head>
 
-<PostListPage title={communityTitle} {communityName}>
-  <div slot="headerButtonsStart" class="contents" />
+<PostListPage {communityName}>
+  <svelte:fragment slot="headerLead">
+    <BackButton />
+  </svelte:fragment>
 
   <div slot="mainHeader" class="border-b border-surface-600 md:mb-2">
     {#if !communityView}

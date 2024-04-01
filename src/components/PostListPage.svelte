@@ -141,9 +141,13 @@
 >
   <div slot="pageHeader">
     <AppBar slotLead="items-baseline">
-      <h1 slot="lead" class="text-xl font-bold line-clamp-1">
-        {title}
-      </h1>
+      <svelte:fragment slot="lead">
+        <slot name="headerLead">
+          <h1 class="text-xl font-bold line-clamp-1">
+            {title}
+          </h1>
+        </slot>
+      </svelte:fragment>
 
       <div slot="trail" class="space-x-1">
         <slot name="headerButtonsStart" />

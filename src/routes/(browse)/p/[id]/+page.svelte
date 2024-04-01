@@ -26,6 +26,7 @@
   import { modalStore } from "@skeletonlabs/skeleton"
   import type { PostView } from "lemmy-js-client"
   import type { NestedCommentView } from "#/lib/types.js"
+  import BackButton from "#/components/BackButton.svelte"
 
   const postID = parseInt($page.params.id)
 
@@ -85,10 +86,6 @@
     errorToast(`Error fetching post: ${err}`)
   }
 
-  function goBack() {
-    history.back()
-  }
-
   function copyLink() {
     navigator.clipboard.writeText(post.post.ap_id)
     infoToast("Copied post link to clipboard!")
@@ -118,16 +115,9 @@
   <AppShell slotPageContent="mx-auto w-full">
     <div slot="pageHeader">
       <AppBar>
-        <button
-          slot="lead"
-          class="text-surface-400"
-          class:hover:text-current={history.length > 1}
-          on:click={() => goBack()}
-          disabled={history.length < 2}
-        >
-          <Symbol inline name="arrow_back_ios" class="w-5" />
-          Back
-        </button>
+        <svelte:fragment slot="lead">
+          <BackButton />
+        </svelte:fragment>
 
         <div slot="trail" class="space-x-1">
           <BarButton
