@@ -32,7 +32,7 @@
   })
 
   const tiles = [
-    { name: "Posts", icon: "home", path: "/" },
+    { name: "Frontpage", icon: "home", path: "/" },
     { name: "Search", icon: "explore", path: "/search", disabled: true },
     { name: "Settings", icon: "settings", path: "/settings", disabled: true },
     { name: "Switch Profile", icon: "switch_account", path: "/profiles" },

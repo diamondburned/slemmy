@@ -141,7 +141,9 @@
 >
   <div slot="pageHeader">
     <AppBar slotLead="items-baseline">
-      <h1 slot="lead" class="text-xl font-bold">{title}</h1>
+      <h1 slot="lead" class="text-xl font-bold line-clamp-1">
+        {title}
+      </h1>
 
       <div slot="trail" class="space-x-1">
         <slot name="headerButtonsStart" />

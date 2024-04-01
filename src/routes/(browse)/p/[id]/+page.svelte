@@ -81,7 +81,7 @@
 
   function handleError(err: unknown) {
     console.log("Fetch error on route /p:", err)
-    errorToast(`${err}`)
+    errorToast(`Error fetching post: ${err})
   }
 
   function goBack() {

@@ -131,7 +131,7 @@
       $profiles = [...$profiles, creatingProfile]
       $currentProfile = $profiles.length - 1
     } catch (err) {
-      errorToast(`${err}`)
+      errorToast(`Login error: ${err}`)
     } finally {
       loggingIn = false
     }

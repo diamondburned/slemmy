@@ -8,9 +8,7 @@
   import { client } from "#/stores.js"
   import { errorToast } from "#/lib/toasty.js"
   import Loading from "#/components/Loading.svelte"
-  import BarButton from "#/components/BarButton.svelte"
-  import Symbol from "#/components/Symbol.svelte"
-  import { Avatar } from "@skeletonlabs/skeleton"
+  import { goto } from "$app/navigation"
 
   const communityName = $page.params.cname
 
@@ -18,16 +16,25 @@
   $: communityTitle = community?.title || communityName
   $: community = communityView?.community
 
-  onMount(async () => {
+  async function load() {
     communityView = null
     try {
       const resp = await $client!.getCommunity({ name: communityName })
       communityView = resp.community_view
     } catch (err) {
       console.error("Error fetching community", err)
-      errorToast("Error fetching this community")
+      errorToast(`Error fetching community: ${err}`)
     }
-  })
+  }
+
+  // Remove the ! from the community name via a redirection.
+  // Only load the page if not.
+  if (communityName.startsWith("!")) {
+    const pathname = $page.url.pathname.replace(/^\/c\/!/, "/c/")
+    goto(pathname)
+  } else {
+    onMount(load)
+  }
 </script>
 
 <svelte:head>
@@ -35,26 +42,9 @@
 </svelte:head>
 
 <PostListPage title={communityTitle} {communityName}>
-  <div slot="headerButtonsStart" class="contents">
-    <BarButton
-      icon=""
-      href={community?.actor_id}
-      class="relative"
-      tooltip="Open original post"
-    >
-      <svelte:fragment slot="icon">
-        <Symbol name="open_in_new" />
-        <Avatar
-          src="/fediverse.svg"
-          width="w-4"
-          class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
-          background=""
-        />
-      </svelte:fragment>
-    </BarButton>
-  </div>
+  <div slot="headerButtonsStart" class="contents" />
 
-  <div slot="mainHeader" class="border-b border-surface-600 mb-2">
+  <div slot="mainHeader" class="border-b border-surface-600 md:mb-2">
     {#if !communityView}
       <Loading />
     {:else}

@@ -4,6 +4,8 @@
   export let variant = "variant-soft"
 </script>
 
-<span class="{className} btn btn-sm {variant} text-400 gap-1 px-3">
+<span
+  class="{className} btn btn-sm {variant} text-400 gap-1 px-3 cursor-default"
+>
   <slot />
 </span>
