@@ -1,6 +1,5 @@
 <script lang="ts" context="module">
   import { UserOperation } from "lemmy-js-client"
-  import { LemmyWebsocketClient } from "#/lib/lemmyws.js"
   import { LemmyClient } from "#/lib/lemmyclient.js"
   import type { LemmyConnectMethod } from "#/lib/lemmyclient.js"
 
@@ -19,58 +18,45 @@
       ? instance
       : `https://${instance}`
 
-    // Fast path: check for valid HTTP.
-    await fetch(instanceURL, { mode: "no-cors" })
+    let client = new LemmyClient(instanceURL)
 
-    const method = await LemmyClient.detect(instanceURL)
-    const client = LemmyClient.create(instanceURL, method)
-
-    try {
-      let user: Profile["user"] | undefined
-      if (username && password) {
-        const resp = await client.request(UserOperation.Login, {
-          username_or_email: username,
-          password,
-          // totp_2fa_token: totp || undefined,
-        })
-        if (!resp.jwt) {
-          throw new Error("No account found")
-        }
-        user = {
-          name: username,
-          jwt: resp.jwt,
-        }
-      }
-
-      const resp = await client.request(UserOperation.GetSite, {
-        auth: user?.jwt,
+    let user: Profile["user"] | undefined
+    if (username && password) {
+      const resp = await client.login({
+        username_or_email: username,
+        password,
+        totp_2fa_token: totp,
       })
-
-      return {
-        instance: {
-          url: instanceURL,
-          name: resp.site_view.site.name,
-          icon: resp.site_view.site.icon,
-          method: method,
-        },
-        user: user
-          ? {
-              ...user,
-              avatar: resp.my_user?.local_user_view.person.avatar,
-              display_name: resp.my_user?.local_user_view.person.display_name,
-            }
-          : undefined,
+      if (!resp.jwt) {
+        throw new Error("No account found")
       }
-    } catch (err) {
-      throw err
-    } finally {
-      client.close()
+      user = {
+        name: username,
+        jwt: resp.jwt,
+      }
+      client = new LemmyClient(instanceURL, resp.jwt)
+    }
+
+    const site = await client.getSite()
+    return {
+      instance: {
+        url: instanceURL,
+        name: site.site_view.site.name,
+        icon: site.site_view.site.icon,
+      },
+      user: user
+        ? {
+            ...user,
+            avatar: site.my_user?.local_user_view.person.avatar,
+            display_name: site.my_user?.local_user_view.person.display_name,
+          }
+        : undefined,
     }
   }
 </script>
 
 <script lang="ts">
-  import { profiles, settings, currentProfile } from "#/stores.js"
+  import { profiles, currentProfile } from "#/stores.js"
 
   import {
     Avatar,
@@ -83,13 +69,12 @@
   import Symbol from "#/components/Symbol.svelte"
 
   import { goto } from "$app/navigation"
-  import { slide, fade, fly } from "svelte/transition"
+  import { slide, fly } from "svelte/transition"
   import { onMount } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
   import { thumbnailURL, urlHostname } from "#/lib/lemmyutils.js"
   import debounce from "awesome-debounce-promise"
   import type { Profile } from "#/lib/types.js"
-  import type { Site } from "lemmy-js-client"
 
   onMount(() => currentProfile.set(-1))
   $: {

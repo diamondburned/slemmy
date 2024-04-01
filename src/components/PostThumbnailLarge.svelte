@@ -3,13 +3,11 @@
   import { postThumbnailURL } from "#/lib/lemmyutils.js"
 
   import { ProgressRadial } from "@skeletonlabs/skeleton"
-  import PostThumbnail from "./PostThumbnail.svelte"
 
   export let post: Post
   export let prefetchedURL: string | undefined = undefined
 
   $: fullThumbnailURL = postThumbnailURL(post, { original: true })
-  $: loadingThumbnailURL = prefetchedURL || fullThumbnailURL
 
   let className = ""
   export { className as class }

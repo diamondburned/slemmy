@@ -23,7 +23,6 @@
   import { errorToast } from "#/lib/toasty.js"
   import { urlHostname } from "#/lib/lemmyutils.js"
   import { client, profile, postsSettings } from "#/stores.js"
-  import { UserOperation } from "lemmy-js-client"
 
   let showFilters = false
   let loading = false
@@ -44,7 +43,7 @@
     loading = true
 
     try {
-      const resp = await $client.request(UserOperation.GetPosts, {
+      const resp = await $client!.getPosts({
         type_: $postsSettings.listing,
         sort: $postsSettings.sort,
         page: p,

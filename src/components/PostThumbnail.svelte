@@ -4,9 +4,6 @@
   import { postThumbnailURL } from "#/lib/lemmyutils.js"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
 
-  import { onMount } from "svelte"
-  import * as store from "svelte/store"
-
   export let post: Post
   $: fullThumbnailURL = postThumbnailURL(post, { original: true })
   $: jpegThumbnailURL = postThumbnailURL(post, { format: "jpg" })

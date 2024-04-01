@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AppShell, toastStore } from "@skeletonlabs/skeleton"
+  import { AppShell } from "@skeletonlabs/skeleton"
 
   import { createEventDispatcher } from "svelte"
   import { scrollDelta } from "#/lib/events.js"

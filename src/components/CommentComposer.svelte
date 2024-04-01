@@ -4,23 +4,18 @@
   import { errorToast } from "#/lib/toasty.js"
   import { client, profile } from "#/stores.js"
   import { createEventDispatcher, onMount } from "svelte"
-  import {
-    UserOperation,
-    type PostView,
-    type CommentView,
-  } from "lemmy-js-client"
   import markdownEditor from "easymde"
   import type { Modal } from "@skeletonlabs/skeleton"
+  import type { PostView, CommentView } from "lemmy-js-client"
 
   import Comment from "#/components/Comment.svelte"
   import Post from "#/components/Post.svelte"
-  import type { NestedCommentView } from "#/lib/types.js"
 
   export let post: PostView
   export let replyingTo: CommentView | undefined = undefined
 
   // refresh is called when a comment is created to refresh the comments list.
-  export let refresh: ((_: void) => void) | undefined = undefined
+  export let refresh: (_: void) => void = () => {}
 
   export let parent: Modal // used only by Skeleton
 
@@ -67,7 +62,7 @@
 
     loading = true
     try {
-      const resp = await $client.request(UserOperation.CreateComment, {
+      const resp = await $client!.createComment({
         post_id: post.post.id,
         content: editor!.value(),
         parent_id: replyingTo?.comment.id,

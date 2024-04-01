@@ -23,7 +23,6 @@
   import { thumbnailURL } from "#/lib/lemmyutils.js"
   import { nestComments } from "#/lib/types.js"
   import { modalStore } from "@skeletonlabs/skeleton"
-  import { UserOperation } from "lemmy-js-client"
   import type { PostView } from "lemmy-js-client"
   import type { NestedCommentView } from "#/lib/types.js"
 
@@ -41,14 +40,12 @@
       return
     }
 
-    const resp = await $client.request(UserOperation.GetPost, {
-      id: postID,
-    })
+    const resp = await $client!.getPost({ id: postID })
     post = resp.post_view
   }
 
   async function initComments() {
-    const resp = await $client.request(UserOperation.GetComments, {
+    const resp = await $client!.getComments({
       post_id: postID,
       type_: "All",
       sort: $commentsSettings.sort,

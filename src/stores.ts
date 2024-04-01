@@ -1,8 +1,6 @@
 import * as store from "svelte/store"
 import * as persistent from "#/lib/persistent.js"
-import { LemmyHTTP } from "#/lib/types.js"
 import { LemmyClient } from "#/lib/lemmyclient.js"
-import { LemmyWebsocketClient } from "#/lib/lemmyws.js"
 import type { Profile, Settings } from "#/lib/types.js"
 import type {
   PostView,
@@ -51,14 +49,10 @@ let lastClient: LemmyClient | null = null
 export const client = store.derived(
   [profiles, currentProfile],
   ([profiles, currentProfile]) => {
-    if (lastClient) {
-      lastClient.close()
-    }
-
     const profile = profiles[currentProfile]
     lastClient = profile
-      ? LemmyClient.auto(profile.instance.url)
-      : LemmyClient.dummy
+      ? new LemmyClient(profile.instance.url, profile.user?.jwt)
+      : null
     return lastClient
   },
 )

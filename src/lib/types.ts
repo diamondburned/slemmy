@@ -10,7 +10,6 @@ export type Profile = {
   user?: {
     name: string
     jwt: string
-
     avatar?: string
     display_name?: string
   }

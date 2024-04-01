@@ -7,7 +7,7 @@
 
   const renderer = new commonmark.HtmlRenderer({
     safe: true,
-    esc: (s: string) => s, // manually escaped in markdown()
+    smart: true,
   })
 
   export function markdownToHTML(md: string): string {
@@ -20,14 +20,9 @@
           node.literal = node.literal
             ? node.literal.replaceAll(
                 /(https?|ftp):\/\/[^\s/$.?#].[^\s]*/gi,
-                "<a href='$&' target='_blank' rel='noopener noreferrer'>$&</a>",
+                "[$&]($&)",
               )
             : node.literal
-          break
-        }
-        case "html_block":
-        case "html_inline": {
-          node.literal = escapeHTML(node.literal ?? "")
           break
         }
       }
@@ -44,12 +39,6 @@
     for (let child = node.firstChild; child; child = child.next) {
       walk(child, f)
     }
-  }
-
-  const escaperElem = document.createElement("textarea")
-  function escapeHTML(html: string): string {
-    escaperElem.textContent = html
-    return escaperElem.innerHTML
   }
 </script>
 

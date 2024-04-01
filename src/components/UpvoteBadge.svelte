@@ -13,7 +13,6 @@
 </script>
 
 <script lang="ts">
-  import { UserOperation } from "lemmy-js-client"
   import { client, profile } from "#/stores.js"
   import { errorToast, infoToast } from "#/lib/toasty.js"
 
@@ -57,7 +56,7 @@
 
     try {
       if (post) {
-        await $client.request(UserOperation.CreatePostLike, {
+        await $client!.likePost({
           post_id: post.post.id,
           score,
           auth: $profile?.user?.jwt!,
@@ -65,7 +64,7 @@
       }
 
       if (comment) {
-        await $client.request(UserOperation.CreateCommentLike, {
+        await $client!.likeComment({
           comment_id: comment.comment.id,
           score,
           auth: $profile?.user?.jwt!,
