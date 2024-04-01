@@ -1,6 +1,6 @@
 <script lang="ts">
   import PostListPage from "#/components/PostListPage.svelte"
-  import { profile } from "#/stores"
+  import { profile } from "#/stores.js"
 </script>
 
 <svelte:head>
