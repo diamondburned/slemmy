@@ -38,6 +38,7 @@
 
   let showFilters = false
   let loading = false
+  let noPosts = false
 
   export let title = ""
   export let communityName = ""
@@ -79,6 +80,7 @@
       $page = Math.max($page, p)
       posts = posts // force update
       loading = false
+      noPosts = resp.posts.length == 0
 
       if ($posts.length > 0) {
         // We can definitely fetch more posts if we're not already exhausted.
@@ -100,7 +102,7 @@
 
   let scrollContainer: HTMLElement
   function checkShouldLoadMore() {
-    if (loading) {
+    if (loading || noPosts) {
       return
     }
 
