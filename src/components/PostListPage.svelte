@@ -195,11 +195,19 @@
             <option value="Active">Active</option>
             <option value="New">New</option>
             <option value="Hot">Hot</option>
+            <option value="TopHour">Top Hour</option>
+            <option value="TopSixHour">Top 6 Hours</option>
+            <option value="TopTwelveHour">Top 12 Hours</option>
             <option value="TopDay">Top Day</option>
             <option value="TopWeek">Top Week</option>
             <option value="TopMonth">Top Month</option>
+            <option value="TopThreeMonths">Top 3 Months</option>
+            <option value="TopSixMonths">Top 6 Months</option>
+            <option value="TopNineMonths">Top 9 Months</option>
             <option value="TopYear">Top Year</option>
             <option value="TopAll">Top All Time</option>
+            <option value="MostComments">Most Comments</option>
+            <option value="NewComments">New Comments</option>
           </select>
         </div>
       </div>
