@@ -1,7 +1,5 @@
 <script lang="ts" context="module">
-  import { UserOperation } from "lemmy-js-client"
   import { LemmyClient } from "#/lib/lemmyclient.js"
-  import type { LemmyConnectMethod } from "#/lib/lemmyclient.js"
 
   async function createProfile({
     instance,
@@ -334,7 +332,6 @@
                   class="input font-mono"
                   pattern={`[0-9]{6}`}
                   bind:value={totp}
-                  disabled
                 />
               </label>
             </div>
