@@ -5,13 +5,20 @@
   import { thumbnailURL, parseUserActorID } from "#/lib/lemmyutils.js"
   import type { Person } from "lemmy-js-client"
 
-  export let user: Person
-  export let width = "w-4"
+  let {
+    user,
+    width = "w-4",
+    isAdmin = false,
+    class: className = "",
+  }: {
+    user: Person
+    width?: string
+    isAdmin?: boolean
+    class?: string
+  } = $props()
 
-  let className = ""
-  export { className as class }
-
-  $: id = parseUserActorID(user.actor_id)
+  let id = $derived(parseUserActorID(user.actor_id))
+  let showAdmin = $derived(isAdmin || (user as any).admin)
 </script>
 
 <a
@@ -26,7 +33,7 @@
     rounded="rounded-full"
   />
   <span class="name">{user.display_name || user.name}</span>
-  {#if user.admin}
+  {#if showAdmin}
     <Symbol
       tooltip="Admin"
       name="verified_user"

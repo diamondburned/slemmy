@@ -4,18 +4,23 @@
 
   import { ProgressRadial } from "@skeletonlabs/skeleton"
 
-  export let post: Post
-  export let prefetchedURL: string | undefined = undefined
+  let {
+    post,
+    prefetchedURL = undefined,
+    class: className = "",
+    imageClass = "",
+  }: {
+    post: Post
+    prefetchedURL?: string
+    class?: string
+    imageClass?: string
+  } = $props()
 
-  $: fullThumbnailURL = postThumbnailURL(post, { original: true })
-
-  let className = ""
-  export { className as class }
-  export let imageClass = ""
-  $: imageClassDefault =
+  let fullThumbnailURL = $derived(postThumbnailURL(post, { original: true }))
+  const imageClassDefault =
     "rounded w-full h-full object-contain m-auto duration-100 transition-opacity"
 
-  let loaded = false
+  let loaded = $state(false)
 </script>
 
 {#if fullThumbnailURL}
@@ -31,8 +36,8 @@
       class="{imageClassDefault} {imageClass} absolute top-0 z-10"
       class:!fixed={!loaded}
       class:!opacity-0={!loaded}
-      on:load={() => (loaded = true)}
-      on:error={() => (loaded = true)}
+      onload={() => (loaded = true)}
+      onerror={() => (loaded = true)}
       src={fullThumbnailURL}
       alt=" "
     />

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type {
     PostView,
     CommentView,
@@ -18,30 +18,36 @@
 
   import Symbol from "#/components/Symbol.svelte"
 
-  export let post: PostView | undefined = undefined
-  export let comment: CommentView | undefined = undefined
-  export let canDownvote: boolean = false
+  let {
+    post = undefined,
+    comment = undefined,
+    canDownvote = false,
+    style = "button",
+    classes = {},
+    class: klass = "",
+  }: {
+    post?: PostView
+    comment?: CommentView
+    canDownvote?: boolean
+    style?: "button" | "none"
+    classes?: {
+      div?: string
+      upvoted?: string
+      downvoted?: string
+    }
+    class?: string
+  } = $props()
 
-  export let style: "button" | "none" = "button"
-  export let classes: {
-    div?: string
-    upvoted?: string
-    downvoted?: string
-  } = {}
+  let item = $derived(post || (comment as PostOrComment))
+  let button = $derived(style == "button")
 
-  let klass = ""
-  export { klass as class }
+  let loggedIn = $derived(!!$profile?.user)
+  let upvoted = $derived(item.my_vote == +1)
+  let downvoted = $derived(item.my_vote == -1)
+  let voting = $state(false)
 
-  $: item = post || (comment as PostOrComment)
-  $: button = style == "button"
-
-  $: loggedIn = !!$profile?.user
-  $: upvoted = item.my_vote == +1
-  $: downvoted = item.my_vote == -1
-  let voting = false
-
-  $: upvotedClasses = upvoted ? classes.upvoted || "" : ""
-  $: downvotedClasses = downvoted ? classes.downvoted || "" : ""
+  let upvotedClasses = $derived(upvoted ? classes.upvoted || "" : "")
+  let downvotedClasses = $derived(downvoted ? classes.downvoted || "" : "")
 
   async function toggleVoteDelta(delta: number, state: boolean) {
     if (!loggedIn || voting) {
@@ -59,7 +65,6 @@
         await $client!.likePost({
           post_id: post.post.id,
           score,
-          auth: $profile?.user?.jwt!,
         })
       }
 
@@ -67,7 +72,6 @@
         await $client!.likeComment({
           comment_id: comment.comment.id,
           score,
-          auth: $profile?.user?.jwt!,
         })
       }
 
@@ -93,7 +97,11 @@
     class:border-r-1={canDownvote}
     class:upvoted={classes.upvoted || ""}
     disabled={voting}
-    on:click|preventDefault|stopPropagation={() => toggleVoteDelta(+1, upvoted)}
+    onclick={(ev) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      toggleVoteDelta(+1, upvoted)
+    }}
   >
     <Symbol name="expand_less" />
     {item.counts.score}
@@ -109,7 +117,11 @@
       class:hover:font-bold={!button}
       class:downvoted={classes.downvoted || ""}
       disabled={voting}
-      on:click={() => toggleVoteDelta(-1, downvoted)}
+      onclick={(ev) => {
+        ev.preventDefault()
+        ev.stopPropagation()
+        toggleVoteDelta(-1, downvoted)
+      }}
     >
       <Symbol name="expand_more" />
     </button>

@@ -1,51 +1,86 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
-
+  import type { Snippet } from "svelte"
   import Symbol from "#/components/Symbol.svelte"
 
-  export let label: string | undefined = undefined
-  export let icon: string | undefined = undefined
-  export let tooltip = ""
-  export let active: boolean | null = null
-  export let href: string | undefined = undefined
-  export let disabled = false
-  $: tag = href ? "a" : "button"
+  let {
+    label = undefined,
+    icon = undefined,
+    tooltip = "",
+    active = $bindable(null),
+    href = undefined,
+    disabled = false,
+    class: className = "",
+    onclick,
+    iconSnippet,
+    labelSnippet,
+  }: {
+    label?: string
+    icon?: string
+    tooltip?: string
+    active?: boolean | null
+    href?: string
+    disabled?: boolean
+    class?: string
+    onclick?: () => void
+    iconSnippet?: Snippet
+    labelSnippet?: Snippet
+  } = $props()
 
-  let className = ""
-  export { className as class }
+  let tag = $derived(href ? "a" : "button")
 
-  const dispatch = createEventDispatcher<{
-    click: void
-  }>()
-</script>
-
-<!-- Fucking Svelte and TypeScript, man. -->
-<svelte:element
-  this={tag}
-  class:btn={label != undefined}
-  class:btn-icon={label == undefined && icon != undefined}
-  class="{className} btn btn-sm btn-icon-sm hover:bg-surface-100-800-token"
-  title={tooltip}
-  class:!variant-filled={active}
-  class:!variant-outlined={!active}
-  on:click={() => {
-    dispatch("click")
+  function handleClick() {
+    onclick?.()
     if (active != null) {
       active = !active
     }
-  }}
-  target={tag == "a" ? "_blank" : undefined}
-  role={tag == "a" ? "button" : undefined}
-  type={tag == "button" ? "button" : undefined}
-  {href}
-  {disabled}
->
-  <slot name="icon">
-    {#if icon}
+  }
+</script>
+
+{#if tag === "a"}
+  <a
+    {href}
+    class:btn={label != undefined}
+    class:btn-icon={label == undefined && icon != undefined}
+    class="{className} btn btn-sm btn-icon-sm hover:bg-surface-100-800-token"
+    title={tooltip}
+    class:!variant-filled={active}
+    class:!variant-outlined={!active}
+    onclick={handleClick}
+    target="_blank"
+    role="button"
+  >
+    {#if iconSnippet}
+      {@render iconSnippet()}
+    {:else if icon}
       <Symbol name={icon} />
     {/if}
-  </slot>
-  <slot name="label">
-    {label || ""}
-  </slot>
-</svelte:element>
+    {#if labelSnippet}
+      {@render labelSnippet()}
+    {:else}
+      {label || ""}
+    {/if}
+  </a>
+{:else}
+  <button
+    type="button"
+    {disabled}
+    class:btn={label != undefined}
+    class:btn-icon={label == undefined && icon != undefined}
+    class="{className} btn btn-sm btn-icon-sm hover:bg-surface-100-800-token"
+    title={tooltip}
+    class:!variant-filled={active}
+    class:!variant-outlined={!active}
+    onclick={handleClick}
+  >
+    {#if iconSnippet}
+      {@render iconSnippet()}
+    {:else if icon}
+      <Symbol name={icon} />
+    {/if}
+    {#if labelSnippet}
+      {@render labelSnippet()}
+    {:else}
+      {label || ""}
+    {/if}
+  </button>
+{/if}

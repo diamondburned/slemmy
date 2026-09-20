@@ -13,13 +13,21 @@
   import Symbol from "./Symbol.svelte"
   import { errorToast } from "#/lib/toasty.js"
 
-  export let communityView: CommunityView
-  export let communityName = communityView.community.name
-  $: ({ community, counts, subscribed } = communityView)
-  $: loggedIn = !!$profile?.user
+  let {
+    communityView = $bindable(),
+    communityName = communityView.community.name,
+  }: {
+    communityView: CommunityView
+    communityName?: string
+  } = $props()
 
-  let expanded = false
-  let subscribing = false
+  let community = $derived(communityView.community)
+  let counts = $derived(communityView.counts)
+  let subscribed = $derived(communityView.subscribed)
+  let loggedIn = $derived(!!$profile?.user)
+
+  let expanded = $state(false)
+  let subscribing = $state(false)
 
   async function toggleSubscribe() {
     if (!loggedIn) {
@@ -32,7 +40,6 @@
       const resp = await $client!.followCommunity({
         community_id: community.id,
         follow: subscribed == "NotSubscribed",
-        auth: $profile!.user!.jwt,
       })
       communityView = resp.community_view
     } catch (err) {
@@ -89,7 +96,7 @@
             Subscribed: "Unsubscribe",
             Pending: "Subscription pending",
           }[subscribed]}
-          on:click={() => toggleSubscribe()}
+          onclick={() => toggleSubscribe()}
           disabled={!loggedIn || subscribing}
         />
       </div>
@@ -127,8 +134,8 @@
           </Badge>
         </a>
 
-        {#if counts.hot_rank}
-          <Badge class="!text-red-400">#{counts.hot_rank}</Badge>
+        {#if (counts as any).hot_rank}
+          <Badge class="!text-red-400">#{(counts as any).hot_rank}</Badge>
         {/if}
         <Badge>
           {humanize.numeral(counts.subscribers)} subscribers

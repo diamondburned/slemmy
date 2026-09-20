@@ -1,41 +1,48 @@
 <script lang="ts">
+  import type { Snippet } from "svelte"
   import { relative, absolute } from "#/lib/time.js"
-
   import Symbol from "#/components/Symbol.svelte"
 
-  let className = ""
-  export { className as class }
+  let {
+    class: className = "",
+    date,
+    icon = true,
+    style = "short",
+    iconSnippet,
+  }: {
+    class?: string
+    date: Date | number | string
+    icon?: boolean
+    style?: "long" | "short"
+    iconSnippet?: Snippet
+  } = $props()
 
-  export let date: Date | number | string
-  export let icon = true
-  export let style: "long" | "short" = "short"
-
-  let date_: Date
   const tzlessRegex = /^\d+-\d+-\d+T\d+:\d+:\d+(?:\.\d+)?$/
-  $: {
+
+  let date_ = $derived.by(() => {
     switch (typeof date) {
       case "number":
-        date_ = new Date(date)
-        break
+        return new Date(date)
       case "string":
-        date_ = new Date(
+        return new Date(
           Date.parse(
             // Deal with Lemmy being stupid.
             tzlessRegex.test(date) ? `${date}Z` : date,
           ),
         )
-        break
       default:
-        date_ = date
+        return date
     }
-  }
+  })
 </script>
 
 <time datetime={date_.toISOString()} title={absolute(date_)} class={className}>
   {#if icon}
-    <slot name="icon">
+    {#if iconSnippet}
+      {@render iconSnippet()}
+    {:else}
       <Symbol name="schedule" />
-    </slot>
+    {/if}
   {/if}
   {relative(date_, style)}
 </time>

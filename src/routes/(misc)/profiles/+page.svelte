@@ -1,5 +1,6 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { LemmyClient } from "#/lib/lemmyclient.js"
+  import type { Profile } from "#/lib/types.js"
 
   async function createProfile({
     instance,
@@ -72,49 +73,49 @@
   import { errorToast } from "#/lib/toasty.js"
   import { thumbnailURL, urlHostname } from "#/lib/lemmyutils.js"
   import debounce from "awesome-debounce-promise"
-  import type { Profile } from "#/lib/types.js"
 
   onMount(() => currentProfile.set(-1))
-  $: {
+
+  $effect(() => {
     if ($profiles[$currentProfile]) {
       goto("/")
     }
-  }
-  let resetting = true
-  $: {
-    if (resetting) {
-      resetting = false
-    }
-  }
+  })
 
   // Defaults.
-  let instance = "beehaw.org"
-  let username = ""
-  let password = ""
-  let totp = ""
+  let instance = $state("beehaw.org")
+  let username = $state("")
+  let password = $state("")
+  let totp = $state("")
 
-  let createInstanceIsValid: boolean | null = null
-  let creatingProfile: Profile | null = null
-  let creatingError: string | null = null
-  let deleteMode = false
-  let loggingIn = false
+  let createInstanceIsValid = $state<boolean | null>(null)
+  let creatingProfile = $state<Profile | null>(null)
+  let creatingError = $state<string | null>(null)
+  let deleteMode = $state(false)
+  let loggingIn = $state(false)
 
   // TypeScript is not smart enough to know that this is a function.
   // @ts-ignore
   const debouncedCreateProfile = debounce(createProfile, 250)
-  $: {
+
+  $effect(() => {
+    const currInstance = instance
     createInstanceIsValid = null
-    debouncedCreateProfile({ instance })
+    debouncedCreateProfile({ instance: currInstance })
       .then((profile: Profile) => {
-        creatingProfile = profile
-        createInstanceIsValid = true
+        if (instance === currInstance) {
+          creatingProfile = profile
+          createInstanceIsValid = true
+        }
       })
       .catch((err: unknown) => {
-        console.info("cannot validate instance:", err)
-        creatingError = `${err}`
-        createInstanceIsValid = false
+        if (instance === currInstance) {
+          console.info("cannot validate instance:", err)
+          creatingError = `${err}`
+          createInstanceIsValid = false
+        }
       })
-  }
+  })
 
   async function applyProfile() {
     if (!creatingProfile) return
@@ -161,6 +162,7 @@
       regionContent="flex-1 overflow-hidden"
       buttonCompleteLabel={username ? "Login" : "Create"}
       on:complete={() => applyProfile()}
+      oncomplete={() => applyProfile()}
     >
       <Step
         class="h-full flex flex-col flex-1 space-y-0"
@@ -174,11 +176,12 @@
 
         <svelte:fragment slot="navigation">
           <button
+            type="button"
             class="btn btn-icon"
             class:variant-ghost={!deleteMode}
             class:variant-ghost-error={deleteMode}
             title="Delete Mode"
-            on:click={() => (deleteMode = !deleteMode)}
+            onclick={() => (deleteMode = !deleteMode)}
           >
             <Symbol name="delete" />
           </button>
@@ -241,10 +244,11 @@
                 </div>
                 {#if deleteMode}
                   <button
+                    type="button"
                     class="btn btn-icon btn-icon-sm variant-ringed-error hover:variant-ghost-error text-red-400"
                     title="Delete This Profile"
-                    on:click={() => deleteProfile(i)}
-                    transition:fly|local={{ duration: 75, x: 10 }}
+                    onclick={() => deleteProfile(i)}
+                    transition:fly={{ duration: 75, x: 10 }}
                   >
                     <Symbol name="clear" />
                   </button>
@@ -319,7 +323,7 @@
           {#if createInstanceIsValid && !!username}
             <div
               class="flex flex-row mb-2 gap-2"
-              transition:slide|local={{ duration: 100 }}
+              transition:slide={{ duration: 100 }}
             >
               <label class="label flex-1">
                 <span>Password</span>
@@ -362,23 +366,22 @@
   </footer>
 </main>
 
-<style global lang="postcss">
+<style lang="postcss">
   #profiles {
     width: 100%;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
 
-    .card {
-      min-height: 300px;
+  #profiles :global(.card) {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+  }
 
-      display: flex;
-      flex-direction: column;
-
-      & > * {
-        flex: 1;
-      }
-    }
+  #profiles :global(.card > *) {
+    flex: 1;
   }
 </style>

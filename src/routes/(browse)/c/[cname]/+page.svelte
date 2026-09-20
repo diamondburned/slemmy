@@ -4,18 +4,17 @@
   import type { CommunityView } from "lemmy-js-client"
 
   import { page } from "$app/stores"
-  import { onMount } from "svelte"
   import { client } from "#/stores.js"
   import { errorToast } from "#/lib/toasty.js"
   import Loading from "#/components/Loading.svelte"
   import { goto } from "$app/navigation"
   import BackButton from "#/components/BackButton.svelte"
 
-  const communityName = $page.params.cname
+  let communityName = $derived($page.params.cname ?? "")
 
-  let communityView: CommunityView | null = null
-  $: communityTitle = community?.title || communityName
-  $: community = communityView?.community
+  let communityView = $state<CommunityView | null>(null)
+  let community = $derived(communityView?.community)
+  let communityTitle = $derived(community?.title || communityName)
 
   async function load() {
     communityView = null
@@ -28,14 +27,14 @@
     }
   }
 
-  // Remove the ! from the community name via a redirection.
-  // Only load the page if not.
-  if (communityName.startsWith("!")) {
-    const pathname = $page.url.pathname.replace(/^\/c\/!/, "/c/")
-    goto(pathname)
-  } else {
-    onMount(load)
-  }
+  $effect(() => {
+    if (communityName.startsWith("!")) {
+      const pathname = $page.url.pathname.replace(/^\/c\/!/, "/c/")
+      goto(pathname)
+    } else if (communityName) {
+      load()
+    }
+  })
 </script>
 
 <svelte:head>
@@ -43,15 +42,17 @@
 </svelte:head>
 
 <PostListPage {communityName}>
-  <svelte:fragment slot="headerLead">
+  {#snippet headerLead()}
     <BackButton />
-  </svelte:fragment>
+  {/snippet}
 
-  <div slot="mainHeader" class="border-b border-surface-600 md:mb-2">
-    {#if !communityView}
-      <Loading />
-    {:else}
-      <CommunitySummary {communityView} {communityName} />
-    {/if}
-  </div>
+  {#snippet mainHeader()}
+    <div class="border-b border-surface-600 md:mb-2">
+      {#if !communityView}
+        <Loading />
+      {:else}
+        <CommunitySummary bind:communityView {communityName} />
+      {/if}
+    </div>
+  {/snippet}
 </PostListPage>

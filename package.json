@@ -3,48 +3,60 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "npm run generate && vite dev --clearScreen=false",
-    "build": "npm run generate && vite build",
-    "preview": "npm run generate && vite preview",
+    "dev": "pnpm run generate && vite dev --clearScreen=false",
+    "build": "pnpm run generate && vite build",
+    "preview": "pnpm run generate && vite preview",
     "generate": "src/scripts/gen.js",
-    "format": "prettier --plugin-search-dir . --write ."
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "format": "prettier --write ."
   },
   "devDependencies": {
-    "@skeletonlabs/skeleton": "^1.7.1",
-    "@sveltejs/adapter-auto": "^2.0.0",
-    "@sveltejs/adapter-static": "^2.0.2",
-    "@sveltejs/kit": "^1.5.0",
-    "@tailwindcss/forms": "^0.5.3",
-    "@tailwindcss/typography": "^0.5.9",
-    "@types/commonmark": "^0.27.6",
-    "@vite-pwa/sveltekit": "^0.2.5",
-    "autoprefixer": "^10.4.14",
+    "@skeletonlabs/skeleton": "^2.11.0",
+    "@skeletonlabs/tw-plugin": "^0.4.1",
+    "@sveltejs/adapter-auto": "^3.3.1",
+    "@sveltejs/adapter-static": "^3.0.8",
+    "@sveltejs/kit": "^2.16.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/commonmark": "^0.27.9",
+    "@types/node": "^22.10.5",
+    "@vite-pwa/sveltekit": "^0.6.6",
+    "autoprefixer": "^10.4.20",
     "awesome-debounce-promise": "^2.1.0",
-    "commonmark": "^0.30.0",
+    "commonmark": "^0.31.2",
     "easymde": "^2.18.0",
-    "lemmy-js-client": "^0.18.0-rc.1",
-    "postcss": "^8.4.24",
-    "postcss-load-config": "^4.0.1",
-    "prettier": "^2.8.0",
-    "prettier-plugin-svelte": "^2.8.1",
-    "sass": "^1.63.4",
-    "svelte": "^3.54.0",
-    "svelte-check": "^3.0.1",
-    "svelte-gestures": "^1.5.2",
-    "svelte-language-server": "^0.15.3",
-    "svelte-preprocess": "^5.0.3",
-    "tailwindcss": "^3.3.1",
-    "ts-node": "^10.9.1",
-    "tslib": "^2.4.1",
-    "typescript": "^5.0.0",
-    "typescript-language-server": "^3.3.2",
-    "vite": "^4.3.0"
+    "lemmy-js-client": "^0.19.9",
+    "postcss": "^8.4.49",
+    "postcss-load-config": "^6.0.1",
+    "prettier": "^3.4.2",
+    "prettier-plugin-svelte": "^3.3.3",
+    "sass": "^1.83.4",
+    "svelte": "^5.2.0",
+    "svelte-check": "^4.1.4",
+    "tailwindcss": "^3.4.17",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.3",
+    "vite": "^5.4.14",
+    "vite-plugin-pwa": "^0.20.5",
+    "workbox-precaching": "^7.3.0"
   },
   "imports": {
     "#/*": "./src/*"
   },
   "prettier": {
     "semi": false,
-    "trailingComma": "all"
+    "trailingComma": "all",
+    "plugins": [
+      "prettier-plugin-svelte"
+    ],
+    "overrides": [
+      {
+        "files": "*.svelte",
+        "options": {
+          "parser": "svelte"
+        }
+      }
+    ]
   }
 }

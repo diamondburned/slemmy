@@ -1,15 +1,27 @@
 <script lang="ts">
-  export let name: string
-  export let size: string | undefined = undefined
-  export let tooltip = ""
-  export let hidden = false
-  export let large = false
-  export let inline = false
-  export let margin = ""
-  export let style = ""
-
-  let className = ""
-  export { className as class }
+  let {
+    name,
+    size = undefined,
+    tooltip = "",
+    hidden = false,
+    large = false,
+    inline = false,
+    margin = "",
+    style = "",
+    class: className = "",
+    ...attrs
+  }: {
+    name: string
+    size?: string
+    tooltip?: string
+    hidden?: boolean
+    large?: boolean
+    inline?: boolean
+    margin?: string
+    style?: string
+    class?: string
+    [key: string]: any
+  } = $props()
 </script>
 
 <span
@@ -24,6 +36,7 @@
   class:inline
   title={tooltip || undefined}
   {style}
+  {...attrs}
 >
   {name.replaceAll("-", "_")}
 </span>

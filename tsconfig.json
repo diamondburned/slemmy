@@ -11,6 +11,6 @@
     "strict": true,
     "module": "esnext",
     "target": "esnext",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "bundler"
   }
 }

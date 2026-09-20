@@ -19,11 +19,11 @@ export function writable<T>(
   const w = store.writable<T>(
     def,
     start
-      ? (set) =>
+      ? (set, update) =>
           start((v) => {
             set(v);
             localStorage.setItem(key, JSON.stringify(v));
-          })
+          }, update)
       : undefined
   );
 

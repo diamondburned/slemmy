@@ -1,7 +1,7 @@
 import type { ScrollDeltaEvent } from "#/lib/events.js"
 
-declare namespace svelte.JSX {
-  interface HTMLAttributes<T> {
-    scrolldelta: (_: ScrollDeltaEvent) => void
+declare module "svelte/elements" {
+  export interface HTMLAttributes<T> {
+    onscrolldelta?: (event: ScrollDeltaEvent) => void
   }
 }

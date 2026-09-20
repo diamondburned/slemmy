@@ -1,7 +1,13 @@
 <script lang="ts">
   import Symbol from "./Symbol.svelte"
 
-  $: canGoBack = history.length > 1
+  let canGoBack = $state(false)
+
+  $effect(() => {
+    if (typeof window !== "undefined") {
+      canGoBack = history.length > 1
+    }
+  })
 
   function goBack() {
     history.back()
@@ -11,7 +17,7 @@
 <button
   class="text-surface-400"
   class:hover:text-current={canGoBack}
-  on:click={() => goBack()}
+  onclick={() => goBack()}
   disabled={!canGoBack}
 >
   <Symbol inline name="arrow_back_ios" class="w-5" />

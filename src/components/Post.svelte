@@ -10,25 +10,37 @@
   import RelativeTimestamp from "#/components/RelativeTimestamp.svelte"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
 
-  export let post: PostView
+  let {
+    post = $bindable(),
+    showCounters = true,
+    showThumbnail = true,
+    showExternalLink = true,
+    authorPosition = "bottom",
+    size = "large",
+    headerClass = "",
+    authorClass = "",
+    titleClass = "",
+    countersClass = "",
+    thumbnailClass = "",
+    contentClass = "",
+    class: klass = "container",
+  }: {
+    post: PostView
+    showCounters?: boolean
+    showThumbnail?: boolean
+    showExternalLink?: boolean
+    authorPosition?: "top" | "bottom"
+    size?: "small" | "large"
+    headerClass?: string
+    authorClass?: string
+    titleClass?: string
+    countersClass?: string
+    thumbnailClass?: string
+    contentClass?: string
+    class?: string
+  } = $props()
 
-  export let showCounters = true
-  export let showThumbnail = true
-  export let showExternalLink = true
-  export let authorPosition: "top" | "bottom" = "bottom"
-  export let size: "small" | "large" = "large"
-
-  $: large = size == "large"
-
-  export let headerClass = ""
-  export let authorClass = ""
-  export let titleClass = ""
-  export let countersClass = ""
-  export let thumbnailClass = ""
-  export let contentClass = ""
-
-  let klass = "container"
-  export { klass as class }
+  let large = $derived(size == "large")
 </script>
 
 <div class={klass}>
@@ -76,7 +88,7 @@
 
     {#if showCounters}
       <div class="flex flex-row flex-wrap gap-2 {countersClass}">
-        <UpvoteBadge bind:post class="btn" />
+        <UpvoteBadge {post} class="btn" />
         <span class="btn variant-soft pointer-events-none">
           <Symbol name="comment" inline margin="mr-1" class="!align-middle" />
           {post.counts.comments}
@@ -86,14 +98,14 @@
           style="long"
           class="btn variant-soft pointer-events-none"
         >
-          <svelte:fragment slot="icon">
+          {#snippet iconSnippet()}
             <Symbol
               name="schedule"
               inline
               margin="mr-1"
               class="!align-middle"
             />
-          </svelte:fragment>
+          {/snippet}
         </RelativeTimestamp>
         {#if post.post.nsfw}
           <span class="btn variant-soft pointer-events-none !text-red-400">

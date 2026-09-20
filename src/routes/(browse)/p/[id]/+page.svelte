@@ -3,7 +3,6 @@
     AppShell,
     AppBar,
     Avatar,
-    ProgressRadial,
   } from "@skeletonlabs/skeleton"
   import Post from "#/components/Post.svelte"
   import Symbol from "#/components/Symbol.svelte"
@@ -23,18 +22,20 @@
   import { errorToast, infoToast } from "#/lib/toasty.js"
   import { thumbnailURL } from "#/lib/lemmyutils.js"
   import { nestComments } from "#/lib/types.js"
-  import { modalStore } from "@skeletonlabs/skeleton"
+  import { getModalStore } from "@skeletonlabs/skeleton"
   import type { PostView } from "lemmy-js-client"
   import type { NestedCommentView } from "#/lib/types.js"
   import BackButton from "#/components/BackButton.svelte"
 
-  const postID = parseInt($page.params.id)
+  const modalStore = getModalStore()
 
-  let post: PostView
-  let comments: NestedCommentView[] | undefined
+  let postID = $derived(parseInt($page.params.id!))
 
-  $: profile = $profile_! // deal with Svelte being bad
-  $: postTitle = post?.post.name || `Post ${postID}`
+  let post = $state<PostView>()
+  let comments = $state<NestedCommentView[]>()
+
+  let profile = $derived($profile_!)
+  let postTitle = $derived(post?.post.name || `Post ${postID}`)
 
   async function initPost() {
     const cached = $posts.find((p) => p.post.id == postID)
@@ -52,10 +53,8 @@
       post_id: postID,
       type_: "All",
       sort: $commentsSettings.sort,
-      // TODO: automatic pagination on scroll
       limit: 50,
       max_depth: 8,
-      auth: profile.user?.jwt,
     })
     comments = nestComments(resp.comments)
   }
@@ -65,21 +64,12 @@
     await initComments()
   }
 
-  $: (async () => {
-    try {
-      await initPost()
-    } catch (err) {
-      handleError(err)
+  $effect(() => {
+    if (postID) {
+      initPost().catch(handleError)
+      resetComments().catch(handleError)
     }
-    try {
-      await resetComments()
-    } catch (err) {
-      handleError(err)
-    }
-  })()
-
-  // It's kind of impossible to guard a possible race condition where a previous
-  // user change may arrive after the latest one.
+  })
 
   function handleError(err: unknown) {
     console.log("Fetch error on route /p:", err)
@@ -87,11 +77,14 @@
   }
 
   function copyLink() {
-    navigator.clipboard.writeText(post.post.ap_id)
-    infoToast("Copied post link to clipboard!")
+    if (post) {
+      navigator.clipboard.writeText(post.post.ap_id)
+      infoToast("Copied post link to clipboard!")
+    }
   }
 
   function makeComment() {
+    if (!post) return
     modalStore.trigger({
       type: "component",
       component: {
@@ -113,63 +106,63 @@
   <Loading fullscreen />
 {:else}
   <AppShell slotPageContent="mx-auto w-full">
-    <div slot="pageHeader">
+    <svelte:fragment slot="pageHeader">
       <AppBar>
         <svelte:fragment slot="lead">
           <BackButton />
         </svelte:fragment>
 
-        <div slot="trail" class="space-x-1">
-          <BarButton
-            icon="add_comment"
-            tooltip="Write a comment"
-            on:click={() => makeComment()}
-          />
-          {#if !post.post.ap_id.startsWith(profile.instance.url)}
+        <svelte:fragment slot="trail">
+          <div class="space-x-1">
             <BarButton
-              icon=""
-              href={post.post.ap_id}
+              icon="add_comment"
+              tooltip="Write a comment"
+              onclick={() => makeComment()}
+            />
+            {#if !post.post.ap_id.startsWith(profile.instance.url)}
+              <BarButton
+                href={post.post.ap_id}
+                class="relative"
+                tooltip="Open original post"
+              >
+                {#snippet iconSnippet()}
+                  <Symbol name="open_in_new" />
+                  <Avatar
+                    src="/fediverse.svg"
+                    width="w-4"
+                    class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
+                    rounded="rounded-full"
+                    background=""
+                  />
+                {/snippet}
+              </BarButton>
+            {/if}
+            <BarButton
+              href="{profile.instance.url}/post/{post.post.id}"
               class="relative"
-              tooltip="Open original post"
+              tooltip="Open in {profile.instance.name || 'current instance'}"
             >
-              <svelte:fragment slot="icon">
+              {#snippet iconSnippet()}
                 <Symbol name="open_in_new" />
                 <Avatar
-                  src="/fediverse.svg"
+                  src={thumbnailURL(profile.instance.icon)}
                   width="w-4"
                   class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
                   rounded="rounded-full"
+                  initials={profile.instance.name || ""}
                   background=""
                 />
-              </svelte:fragment>
+              {/snippet}
             </BarButton>
-          {/if}
-          <BarButton
-            icon=""
-            href="{profile.instance.url}/post/{post.post.id}"
-            class="relative"
-            tooltip="Open in {profile.instance.name || 'current instance'}"
-          >
-            <svelte:fragment slot="icon">
-              <Symbol name="open_in_new" />
-              <Avatar
-                src={thumbnailURL(profile.instance.icon)}
-                width="w-4"
-                class="m-auto absolute -bottom-0 -right-0 align-text-bottom"
-                rounded="rounded-full"
-                initials={profile.instance.name || ""}
-                background=""
-              />
-            </svelte:fragment>
-          </BarButton>
-          <BarButton
-            icon="link"
-            tooltip="Copy original post link"
-            on:click={() => copyLink()}
-          />
-        </div>
+            <BarButton
+              icon="link"
+              tooltip="Copy original post link"
+              onclick={() => copyLink()}
+            />
+          </div>
+        </svelte:fragment>
       </AppBar>
-    </div>
+    </svelte:fragment>
 
     <Post {post} />
 
@@ -189,7 +182,7 @@
           <select
             class="px-2 py-1"
             bind:value={$commentsSettings.sort}
-            on:change={() => resetComments()}
+            onchange={() => resetComments()}
           >
             <option value="Hot">Hot</option>
             <option value="New">New</option>

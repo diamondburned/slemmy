@@ -1,31 +1,39 @@
 <script lang="ts">
   import { AppShell } from "@skeletonlabs/skeleton"
-
-  import { createEventDispatcher } from "svelte"
+  import type { Snippet } from "svelte"
   import { scrollDelta } from "#/lib/events.js"
   import type { ScrollDeltaEvent } from "#/lib/events.js"
 
-  const dispatch = createEventDispatcher<{
-    scroll: Event
-    scrollDelta: ScrollDeltaEvent
-  }>()
+  let {
+    scrollContainer = $bindable(),
+    lockHeaderHeight = false,
+    onscroll,
+    onscrolldelta,
+    pageHeader,
+    children,
+  }: {
+    scrollContainer?: HTMLElement
+    lockHeaderHeight?: boolean
+    onscroll?: (ev: Event) => void
+    onscrolldelta?: (ev: ScrollDeltaEvent) => void
+    pageHeader?: Snippet
+    children?: Snippet
+  } = $props()
 
-  export let scrollContainer: HTMLElement
-  export let lockHeaderHeight = false
-  let lockingHeight = false
+  let lockingHeight = $state(false)
+  let headerHeight = $state(0)
+  let headerPadding = $state<HTMLElement>()
 
-  let headerHeight = 0
-  let headerPadding: HTMLElement
-  $: {
+  $effect(() => {
     if (headerPadding && headerHeight) {
       if (!lockHeaderHeight || !lockingHeight) {
         headerPadding.style.height = `${headerHeight}px`
         lockingHeight = true
       }
     }
-  }
+  })
 
-  let hideBar = false
+  let hideBar = $state(false)
   function handlePostsScroll(event: ScrollDeltaEvent) {
     const { scrollTop } = event.target as HTMLElement
     if (scrollTop < 10) {
@@ -45,28 +53,29 @@
   slotPageContent="h-full overflow-hidden"
   slotPageHeader="relative"
 >
-  <div
-    slot="pageHeader"
-    bind:clientHeight={headerHeight}
-    style="z-index: 1; {hideBar ? `top: -${headerHeight}px` : 'top: 0'}"
-    class="absolute w-full z-10 transition-all duration-100 ease-in-out"
-  >
-    <slot name="pageHeader" />
-  </div>
+  <svelte:fragment slot="pageHeader">
+    <div
+      bind:clientHeight={headerHeight}
+      style="z-index: 1; {hideBar ? `top: -${headerHeight}px` : 'top: 0'}"
+      class="absolute w-full z-10 transition-all duration-100 ease-in-out"
+    >
+      {@render pageHeader?.()}
+    </div>
+  </svelte:fragment>
 
   <div
     class="overflow-y-scroll h-full flex flex-col"
     use:scrollDelta
     bind:this={scrollContainer}
-    on:scroll={(ev) => dispatch("scroll", ev)}
-    on:scrolldelta={(ev) => {
-      dispatch("scrollDelta", ev)
+    onscroll={(ev) => onscroll?.(ev)}
+    onscrolldelta={(ev) => {
+      onscrolldelta?.(ev)
       handlePostsScroll(ev)
     }}
   >
-    <div><div bind:this={headerPadding} /></div>
+    <div><div bind:this={headerPadding}></div></div>
     <div class="container m-auto">
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 </AppShell>

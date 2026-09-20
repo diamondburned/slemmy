@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import * as commonmark from "commonmark"
 
   const parser = new commonmark.Parser({
@@ -44,12 +44,17 @@
 </script>
 
 <script lang="ts">
-  export let markdown: string
-  export let style: string = ""
-  export let inline = false
-
-  let className = ""
-  export { className as class }
+  let {
+    markdown,
+    style = "",
+    inline = false,
+    class: className = "",
+  }: {
+    markdown: string
+    style?: string
+    inline?: boolean
+    class?: string
+  } = $props()
 </script>
 
 <!--

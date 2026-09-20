@@ -4,13 +4,17 @@
   import { thumbnailURL, parseCommunityActorID } from "#/lib/lemmyutils.js"
   import type { Community } from "lemmy-js-client"
 
-  export let community: Community
-  export let width = "w-4"
+  let {
+    community,
+    width = "w-4",
+    class: className = "",
+  }: {
+    community: Community
+    width?: string
+    class?: string
+  } = $props()
 
-  let className = ""
-  export { className as class }
-
-  $: id = parseCommunityActorID(community.actor_id)
+  let id = $derived(parseCommunityActorID(community.actor_id))
 </script>
 
 <a

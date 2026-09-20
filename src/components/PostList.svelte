@@ -12,17 +12,20 @@
   import { fade } from "svelte/transition"
   import { urlHostname } from "#/lib/lemmyutils.js"
 
-  export let posts: PostView[]
-
-  let className: string | undefined = undefined
-  export { className as class }
+  let {
+    posts,
+    class: className = "",
+  }: {
+    posts: PostView[]
+    class?: string
+  } = $props()
 </script>
 
 <ol class="{className} list flex flex-col gap-4 py-4">
-  {#each posts as post}
+  {#each posts as post (post.post.id)}
     <li
       class="flex flex-row gap-0 items-center relative"
-      transition:fade|local={{ duration: 75 }}
+      transition:fade={{ duration: 75 }}
     >
       <div class="flex-1 flex flex-col gap-1 w-full">
         <p class="text-sm text-surface-400">
@@ -61,7 +64,7 @@
         {/if}
 
         <p class="flex flex-wrap gap-2 mt-1">
-          <UpvoteBadge bind:post class="btn-sm" />
+          <UpvoteBadge {post} class="btn-sm" />
           <a
             href="/p/{post.post.id}"
             class="btn btn-sm variant-soft transition inline-flex gap-1 px-3"

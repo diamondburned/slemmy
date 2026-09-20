@@ -1,9 +1,9 @@
-import preprocess from "svelte-preprocess"
 import adapterAuto from "@sveltejs/adapter-auto"
 import adapterStatic from "@sveltejs/adapter-static"
-import { vitePreprocess } from "@sveltejs/kit/vite"
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 import * as fs from "fs/promises"
 import * as childprocess from "child_process"
+import { relative, sep } from "node:path"
 
 // isCloud is true if the app is being deployed to a cloud provider.
 // Keep this up to date with adapterAuto's list of cloud providers:
@@ -47,12 +47,16 @@ const staticAdapter = adapterStatic({
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  preprocess: [
-    vitePreprocess(),
-    preprocess({
-      postcss: true,
-    }),
-  ],
+  compilerOptions: {
+    runes: ({ filename }) => {
+      const relativePath = relative(import.meta.dirname, filename)
+      const pathSegments = relativePath.toLowerCase().split(sep)
+      const isExternalLibrary = pathSegments.includes("node_modules")
+
+      return isExternalLibrary ? undefined : true
+    },
+  },
+  preprocess: [vitePreprocess()],
   kit: {
     adapter: isCloud
       ? adapterAuto()
@@ -66,9 +70,6 @@ const config = {
         },
     alias: {
       "#": "./src",
-    },
-    output: {
-      preloadStrategy: "preload-mjs",
     },
   },
 }

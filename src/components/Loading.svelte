@@ -1,7 +1,11 @@
 <script lang="ts">
   import { ProgressRadial } from "@skeletonlabs/skeleton"
 
-  export let fullscreen = false
+  let {
+    fullscreen = false,
+  }: {
+    fullscreen?: boolean
+  } = $props()
 </script>
 
 <div

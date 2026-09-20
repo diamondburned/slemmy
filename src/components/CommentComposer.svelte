@@ -3,7 +3,7 @@
 
   import { errorToast } from "#/lib/toasty.js"
   import { client, profile } from "#/stores.js"
-  import { createEventDispatcher, onMount } from "svelte"
+  import { onMount } from "svelte"
   import markdownEditor from "easymde"
   import type { Modal } from "@skeletonlabs/skeleton"
   import type { PostView, CommentView } from "lemmy-js-client"
@@ -11,20 +11,27 @@
   import Comment from "#/components/Comment.svelte"
   import Post from "#/components/Post.svelte"
 
-  export let post: PostView
-  export let replyingTo: CommentView | undefined = undefined
+  let {
+    post,
+    replyingTo = undefined,
+    refresh = () => {},
+    parent,
+    oncreate,
+  }: {
+    post: PostView
+    replyingTo?: CommentView
+    refresh?: (_: void) => void
+    parent: Modal
+    oncreate?: (comment: CommentView) => void
+  } = $props()
 
-  // refresh is called when a comment is created to refresh the comments list.
-  export let refresh: (_: void) => void = () => {}
-
-  export let parent: Modal // used only by Skeleton
-
-  let loading = false
-  let content = ""
-  let textarea: HTMLTextAreaElement
+  let loading = $state(false)
+  let content = $state("")
+  let textarea = $state<HTMLTextAreaElement>()
 
   let editor: markdownEditor | undefined
   onMount(() => {
+    if (!textarea) return
     editor = new markdownEditor({
       element: textarea,
       forceSync: true,
@@ -52,8 +59,7 @@
     return () => editor!.codemirror.off("change", update)
   })
 
-  const dispatch = createEventDispatcher<{ create: CommentView }>()
-  $: canSend = !loading && !!content && !!$profile?.user
+  let canSend = $derived(!loading && !!content && !!$profile?.user)
 
   async function sendComment() {
     if (!canSend) {
@@ -66,10 +72,9 @@
         post_id: post.post.id,
         content: editor!.value(),
         parent_id: replyingTo?.comment.id,
-        auth: $profile!.user!.jwt,
       })
 
-      dispatch("create", resp.comment_view)
+      oncreate?.(resp.comment_view)
 
       if (refresh) {
         window.location.hash = `comment-${resp.comment_view.comment.id}`
@@ -119,19 +124,19 @@
     </div>
     <hr class="mx-4" />
     <div class="flex-1 h-3/5 min-h-[18rem] px-4">
-      <textarea class="hidden" bind:this={textarea} bind:value={content} />
+      <textarea class="hidden" bind:this={textarea} bind:value={content}></textarea>
     </div>
   </section>
   <footer class="card-footer">
     <button
       class="btn btn-sm variant-filled float-left"
-      on:click={() => parent.onClose()}
+      onclick={() => parent.onClose()}
     >
       Cancel
     </button>
     <button
       class="btn btn-sm variant-filled-primary float-right"
-      on:click={sendComment}
+      onclick={sendComment}
       disabled={!canSend}
     >
       {replyingTo ? "Reply" : "Comment"}

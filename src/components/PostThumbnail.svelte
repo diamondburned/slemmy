@@ -1,22 +1,25 @@
 <script lang="ts">
   import type { Post } from "lemmy-js-client"
-  import { modalStore } from "@skeletonlabs/skeleton"
+  import { getModalStore } from "@skeletonlabs/skeleton"
   import { postThumbnailURL } from "#/lib/lemmyutils.js"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
 
-  export let post: Post
-  $: fullThumbnailURL = postThumbnailURL(post, { original: true })
-  $: jpegThumbnailURL = postThumbnailURL(post, { format: "jpg" })
+  let { post }: { post: Post } = $props()
 
-  let failed = false
-  let loaded = false
+  const modalStore = getModalStore()
 
-  let image: HTMLImageElement
-  let prefetchedURL = ""
+  let fullThumbnailURL = $derived(postThumbnailURL(post, { original: true }))
+  let jpegThumbnailURL = $derived(postThumbnailURL(post, { format: "jpg" }))
+
+  let failed = $state(false)
+  let loaded = $state(false)
+
+  let image = $state<HTMLImageElement>()
+  let prefetchedURL = $state("")
 
   // True if the background should be rendered.
   // loaded won't be true if post.nsfw is true
-  $: showBackground = prefetchedURL && (post.nsfw || loaded)
+  let showBackground = $derived(!!prefetchedURL && (post.nsfw || loaded))
 
   function openModal() {
     modalStore.trigger({
@@ -39,10 +42,10 @@
     class:nsfw={post.nsfw}
     class:hidden={!fullThumbnailURL}
     style="background-image: url({showBackground ? prefetchedURL : ''})"
-    on:click={() => openModal()}
+    onclick={() => openModal()}
   >
     {#if post.nsfw}
-      <div class="absolute top-0 nsfw-overlay h-full w-full" />
+      <div class="absolute top-0 nsfw-overlay h-full w-full"></div>
     {/if}
     <picture class:opacity-0={post.nsfw}>
       <source srcset={jpegThumbnailURL} />
@@ -52,11 +55,11 @@
         src={fullThumbnailURL}
         alt=" "
         bind:this={image}
-        on:load={() => {
+        onload={() => {
           loaded = true
-          prefetchedURL = image.currentSrc
+          if (image) prefetchedURL = image.currentSrc
         }}
-        on:error={() => (failed = true)}
+        onerror={() => (failed = true)}
       />
     </picture>
   </button>

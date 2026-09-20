@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Comment from "./Comment.svelte"
   import Symbol from "./Symbol.svelte"
   import Markdown from "#/components/Markdown.svelte"
   import UserBadge from "#/components/UserBadge.svelte"
@@ -8,25 +9,40 @@
 
   import type { PostView } from "lemmy-js-client"
   import type { NestedCommentView } from "#/lib/types.js"
-  import { modalStore } from "@skeletonlabs/skeleton"
+  import { getModalStore } from "@skeletonlabs/skeleton"
   import { cubicInOut as inOut } from "svelte/easing"
   import { infoToast } from "#/lib/toasty.js"
   import { slide } from "svelte/transition"
 
-  export let post: PostView
-  export let comment: NestedCommentView
-  export let refresh: () => void
+  let {
+    post,
+    comment = $bindable(),
+    refresh,
+    level = 0,
+    controls = true,
+    expanded = true,
+    outerClass = "",
+    innerClass = "",
+    headerClass = "",
+    contentClass = "",
+  }: {
+    post: PostView
+    comment: NestedCommentView
+    refresh: () => void
+    level?: number
+    controls?: boolean
+    expanded?: boolean
+    outerClass?: string
+    innerClass?: string
+    headerClass?: string
+    contentClass?: string
+  } = $props()
 
-  export let level = 0
-  export let controls = true
-  export let expanded = true
+  const modalStore = getModalStore()
 
-  export let outerClass = ""
-  export let innerClass = ""
-  export let headerClass = ""
-  export let contentClass = ""
-
-  $: children = comment.children
+  // svelte-ignore state_referenced_locally
+  let isExpanded = $state(expanded)
+  let children = $derived(comment.children)
 
   const colors = [
     "red",
@@ -38,7 +54,7 @@
     "purple",
   ]
 
-  $: color = level == 0 ? "surface" : colors[(level - 1) % colors.length]
+  let color = $derived(level == 0 ? "surface" : colors[(level - 1) % colors.length])
 
   const expandingTransition = { duration: 200, easing: inOut }
 
@@ -54,9 +70,8 @@
         ref: CommentComposer,
         props: {
           post,
-          children: children,
-          onComment: () => (children = children), // force update
           replyingTo: comment,
+          refresh,
         },
       },
     })
@@ -69,24 +84,35 @@
     {level > 0 ? `border-l-2 border-${color}-400` : ''}
   "
 >
-  <!-- Special treatment for our first button on:click :) -->
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
     id="comment-{comment.comment.id}"
     class="target:bg-surface-700 comment-self w-full {innerClass}"
   >
-    <!-- on:click|stopPropagation to allow selecting text -->
-    <button
-      class="comment-header text-sm text-left w-full px-3 py-1 hover:bg-surface-700 ease-out duration-150 hover:transition-none {headerClass}"
-      class:text-surface-400={!expanded}
-      on:click|stopPropagation|preventDefault={() => (expanded = !expanded)}
+    <!-- svelte-ignore a11y_interactive_supports_focus -->
+    <div
+      role="button"
+      tabindex="0"
+      class="comment-header cursor-pointer text-sm text-left w-full px-3 py-1 hover:bg-surface-700 ease-out duration-150 hover:transition-none {headerClass}"
+      class:text-surface-400={!isExpanded}
+      onclick={(e) => {
+        e.stopPropagation()
+        e.preventDefault()
+        isExpanded = !isExpanded
+      }}
+      onkeydown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.stopPropagation()
+          e.preventDefault()
+          isExpanded = !isExpanded
+        }
+      }}
     >
       <UserBadge width="w-4" user={comment.creator} class="pr-2" />
       {#if controls}
         <span class="text-surface-400">
           <span>ꞏ</span>
           <UpvoteBadge
-            bind:comment
+            {comment}
             class="text-surface-400 !pl-1 !pr-2 hover:font-bold hover:text-white"
             style="none"
             classes={{
@@ -97,15 +123,25 @@
           />
           <span>ꞏ</span>
           <button
+            type="button"
             class="px-2 hover:text-white hover:font-bold"
-            on:click|preventDefault|stopPropagation={() => copyCommentLink()}
+            onclick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              copyCommentLink()
+            }}
           >
             <Symbol name="link" class="!align-top" />
           </button>
           <span>ꞏ</span>
           <button
+            type="button"
             class="px-2 hover:text-white hover:font-bold"
-            on:click|preventDefault|stopPropagation={() => replyToThis()}
+            onclick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              replyToThis()
+            }}
           >
             <Symbol name="reply" class="!align-top" />
           </button>
@@ -117,9 +153,9 @@
           />
         </span>
       {/if}
-    </button>
-    {#if expanded}
-      <div transition:slide|local={expandingTransition}>
+    </div>
+    {#if isExpanded}
+      <div transition:slide={expandingTransition}>
         <Markdown
           class="comment-body mx-3 mb-1 {contentClass}"
           markdown={comment.comment.content}
@@ -127,10 +163,10 @@
       </div>
     {/if}
   </div>
-  {#if expanded && children}
-    <div class="pl-2" transition:slide|local={expandingTransition}>
-      {#each children as comment}
-        <svelte:self {comment} {refresh} level={level + 1} />
+  {#if isExpanded && children}
+    <div class="pl-2" transition:slide={expandingTransition}>
+      {#each children as child}
+        <Comment comment={child} {post} {refresh} level={level + 1} />
       {/each}
     </div>
   {/if}
