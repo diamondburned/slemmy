@@ -76,7 +76,7 @@
 
 {#if post.thumbnail_url}
   <button
-    class="h-20 w-20 relative aspect-square sm:w-36 sm:aspect-auto overflow-hidden rounded bg-surface-600"
+    class="h-20 w-20 shrink-0 relative aspect-square sm:w-36 sm:aspect-auto overflow-hidden rounded bg-surface-600"
     class:nsfw={post.nsfw}
     class:hidden={!fullThumbnailURL}
     style="background-image: url({showBackground ? prefetchedURL : ''})"

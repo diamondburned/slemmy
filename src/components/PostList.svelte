@@ -27,7 +27,7 @@
       class="flex flex-row gap-0 items-center relative"
       transition:fade={{ duration: 75 }}
     >
-      <div class="flex-1 flex flex-col gap-1 w-full">
+      <div class="flex-1 flex flex-col gap-1 w-full min-w-0">
         <p class="text-sm text-surface-400">
           <UserBadge user={post.creator} />
           <span class="mx-0.5">to</span>

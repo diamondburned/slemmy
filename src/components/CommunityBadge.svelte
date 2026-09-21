@@ -19,15 +19,15 @@
 
 <a
   href={id ? `/c/${id}` : undefined}
-  class="{className} inline-flex items-baseline hover:underline hover:text-white truncate"
+  class="{className} inline-flex items-baseline hover:underline hover:text-white truncate max-w-full"
 >
   <Avatar
     src={thumbnailURL(community.icon)}
     {width}
-    class="mr-1 self-center"
+    class="mr-1 self-center shrink-0"
     rounded="rounded-full"
     initials={community.name}
     background=""
   />
-  {community.title}
+  <span class="truncate">{community.title}</span>
 </a>
