@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Post } from "lemmy-js-client"
+  import { pushState } from "$app/navigation"
   import { getModalStore } from "@skeletonlabs/skeleton"
+  import { onDestroy } from "svelte"
   import { postThumbnailURL } from "#/lib/lemmyutils.js"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
 
@@ -21,7 +23,36 @@
   // loaded won't be true if post.nsfw is true
   let showBackground = $derived(!!prefetchedURL && (post.nsfw || loaded))
 
+  let cleanupNavigation: (() => void) | undefined
+
+  onDestroy(() => {
+    cleanupNavigation?.()
+  })
+
   function openModal() {
+    const targetHash = `#${post.id}-thumbnail`
+    let closedByNavigation = false
+
+    const onCloseNavigation = () => {
+      if (location.hash !== targetHash) {
+        closedByNavigation = true
+        cleanupNavigation?.()
+        modalStore.close()
+      }
+    }
+
+    window.addEventListener("popstate", onCloseNavigation)
+    window.addEventListener("hashchange", onCloseNavigation)
+    cleanupNavigation = () => {
+      window.removeEventListener("popstate", onCloseNavigation)
+      window.removeEventListener("hashchange", onCloseNavigation)
+      cleanupNavigation = undefined
+    }
+
+    if (location.hash !== targetHash) {
+      pushState(targetHash, {})
+    }
+
     modalStore.trigger({
       type: "component",
       component: {
@@ -32,6 +63,12 @@
           prefetchedURL,
           modal: true,
         },
+      },
+      response: () => {
+        cleanupNavigation?.()
+        if (!closedByNavigation && location.hash === targetHash) {
+          history.back()
+        }
       },
     })
   }
