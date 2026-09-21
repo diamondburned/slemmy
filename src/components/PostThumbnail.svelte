@@ -30,6 +30,7 @@
           post,
           class: "pointer-events-none",
           prefetchedURL,
+          modal: true,
         },
       },
     })
