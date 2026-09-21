@@ -80,7 +80,6 @@
         <svelte:fragment slot="trail">
           {#if user}
             <AppRailAnchor
-              target="_blank"
               href="/u/{user.name}"
               title={user.display_name || user.name}
             >
