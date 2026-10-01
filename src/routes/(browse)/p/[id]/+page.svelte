@@ -10,7 +10,7 @@
   import { page } from "$app/stores"
   import {
     client,
-    posts,
+    findCachedPost,
     commentsSettings,
     profile as profile_,
     markPostAsRead,
@@ -35,7 +35,7 @@
   let postTitle = $derived(post?.post.name || `Post ${postID}`)
 
   async function initPost() {
-    const cached = $posts.find((p) => p.post.id == postID)
+    const cached = findCachedPost(postID)
     if (cached) {
       post = cached
       return

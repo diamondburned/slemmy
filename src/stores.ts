@@ -3,6 +3,16 @@ import * as persistent from "#/lib/persistent.js"
 import { LemmyClient } from "#/lib/lemmyclient.js"
 import type { Profile, Settings } from "#/lib/types.js"
 import { profileKey, addToLRU, READ_POSTS_LRU_SIZE } from "#/lib/readposts.js"
+import {
+  communityPosts,
+  findCachedPost,
+  updateCachedPost,
+} from "#/lib/postcache.js"
+export {
+  communityPosts,
+  findCachedPost,
+  updateCachedPost,
+} from "#/lib/postcache.js"
 import type {
   PostView,
   CommentView,
@@ -48,7 +58,10 @@ export const readPosts = persistent.writable<Record<string, number[]>>(
 
 // posts is a cache of posts for the current profile.
 export const posts = store.writable<PostView[]>([])
-currentProfile.subscribe(() => posts.set([]))
+currentProfile.subscribe(() => {
+  posts.set([])
+  communityPosts.clear()
+})
 
 let lastClient: LemmyClient | null = null
 

@@ -13,7 +13,7 @@
 </script>
 
 <script lang="ts">
-  import { client, profile } from "#/stores.js"
+  import { client, profile, updateCachedPost } from "#/stores.js"
   import { errorToast, infoToast } from "#/lib/toasty.js"
 
   import Symbol from "#/components/Symbol.svelte"
@@ -61,11 +61,13 @@
     state = !state
 
     try {
+      let respPostView: PostView | undefined
       if (post) {
-        await $client!.likePost({
+        const resp = await $client!.likePost({
           post_id: post.post.id,
           score,
         })
+        respPostView = resp.post_view
       }
 
       if (comment) {
@@ -75,8 +77,17 @@
         })
       }
 
-      item.counts.score += state ? delta : -delta
-      item.my_vote = score
+      if (respPostView) {
+        item.counts = respPostView.counts
+        item.my_vote = respPostView.my_vote
+      } else {
+        item.counts.score += state ? delta : -delta
+        item.my_vote = score
+      }
+
+      if (post) {
+        updateCachedPost(post)
+      }
     } catch (err) {
       errorToast(`${err}`)
     } finally {

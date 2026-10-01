@@ -1,20 +1,11 @@
 <script lang="ts" module>
-  import type { PostView } from "lemmy-js-client"
-  import type { Profile } from "#/lib/types.js"
-
-  export type PostsCache = {
-    posts: PostView[]
-    page: number
-    lastScrollTop: number
-  }
-
-  // In-memory cache for posts of a community. An empty name means global frontpage.
-  const communityPosts = new Map<string, PostsCache>()
-  let currentProfile: Profile | null = null
+  import type { PostsCache } from "#/lib/postcache.js"
+  export type { PostsCache }
 </script>
 
 <script lang="ts">
   import type { Snippet } from "svelte"
+  import type { PostView } from "lemmy-js-client"
   import { AppBar, ProgressRadial } from "@skeletonlabs/skeleton"
   import { fade, fly } from "svelte/transition"
   import Symbol from "#/components/Symbol.svelte"
@@ -24,7 +15,8 @@
 
   import { onMount, tick } from "svelte"
   import { errorToast } from "#/lib/toasty.js"
-  import { client, profile, postsSettings } from "#/stores.js"
+  import { client, profile, postsSettings, communityPosts } from "#/stores.js"
+  import { clearCommunityPostsIfProfileChanged } from "#/lib/postcache.js"
 
   let {
     title = "",
@@ -53,10 +45,7 @@
 
   // Clear cache if profile changes
   $effect(() => {
-    if ($profile != currentProfile) {
-      currentProfile = $profile
-      communityPosts.clear()
-    }
+    clearCommunityPostsIfProfileChanged($profile)
   })
 
   // Synchronize cache when communityName changes or on load
