@@ -11,6 +11,7 @@
 
   import { fade } from "svelte/transition"
   import { urlHostname } from "#/lib/lemmyutils.js"
+  import { readPostIDs, markPostAsRead } from "#/stores.js"
 
   let {
     posts,
@@ -23,8 +24,11 @@
 
 <ol class="{className} list flex flex-col gap-4 py-4">
   {#each posts as post (post.post.id)}
+    {@const isRead = $readPostIDs.has(post.post.id)}
     <li
-      class="flex flex-row gap-0 items-center relative"
+      class="flex flex-row gap-0 items-center relative transition-opacity duration-150"
+      class:opacity-50={isRead}
+      class:post-read={isRead}
       transition:fade={{ duration: 75 }}
     >
       <div class="flex-1 flex flex-col gap-1 w-full min-w-0">
@@ -37,6 +41,11 @@
         <h3>
           <a
             href={post.post.url || `/p/${post.post.id}`}
+            onclick={() => {
+              if (!post.post.url) {
+                markPostAsRead(post.post.id)
+              }
+            }}
             class="hover:underline font-semibold"
             target={post.post.url ? "_blank" : ""}
           >
@@ -67,6 +76,7 @@
           <UpvoteBadge {post} class="btn-sm" />
           <a
             href="/p/{post.post.id}"
+            onclick={() => markPostAsRead(post.post.id)}
             class="btn btn-sm variant-soft transition inline-flex gap-1 px-3"
           >
             <Symbol name="comment" />

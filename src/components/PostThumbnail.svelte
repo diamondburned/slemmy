@@ -5,6 +5,7 @@
   import { onDestroy } from "svelte"
   import { postThumbnailURL } from "#/lib/lemmyutils.js"
   import PostThumbnailLarge from "#/components/PostThumbnailLarge.svelte"
+  import { markPostAsRead } from "#/stores.js"
 
   let { post }: { post: Post } = $props()
 
@@ -30,6 +31,7 @@
   })
 
   function openModal() {
+    markPostAsRead(post.id)
     const targetHash = `#${post.id}-thumbnail`
     let closedByNavigation = false
 

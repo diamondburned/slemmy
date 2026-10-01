@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    AppShell,
-    AppBar,
-    Avatar,
-  } from "@skeletonlabs/skeleton"
+  import { AppShell, AppBar, Avatar } from "@skeletonlabs/skeleton"
   import Post from "#/components/Post.svelte"
   import Symbol from "#/components/Symbol.svelte"
   import Comment from "#/components/Comment.svelte"
@@ -17,6 +13,7 @@
     posts,
     commentsSettings,
     profile as profile_,
+    markPostAsRead,
   } from "#/stores.js"
 
   import { errorToast, infoToast } from "#/lib/toasty.js"
@@ -66,6 +63,7 @@
 
   $effect(() => {
     if (postID) {
+      markPostAsRead(postID)
       initPost().catch(handleError)
       resetComments().catch(handleError)
     }

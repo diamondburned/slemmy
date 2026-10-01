@@ -2,6 +2,7 @@ import * as store from "svelte/store"
 import * as persistent from "#/lib/persistent.js"
 import { LemmyClient } from "#/lib/lemmyclient.js"
 import type { Profile, Settings } from "#/lib/types.js"
+import { profileKey, addToLRU, READ_POSTS_LRU_SIZE } from "#/lib/readposts.js"
 import type {
   PostView,
   CommentView,
@@ -35,6 +36,11 @@ export const commentsSettings = persistent.writable<{
 }>("slemmy-comments-settings", {
   sort: "Hot",
 })
+
+export const readPosts = persistent.writable<Record<string, number[]>>(
+  "slemmy-read-posts",
+  {},
+)
 
 /*
  * In-memory/temporary stores
@@ -80,5 +86,35 @@ export function subscribeLater<T>(
       return
     }
     callback(value)
+  })
+}
+
+// readPostIDs is a derived store containing the Set of read post IDs for the current profile.
+export const readPostIDs = store.derived(
+  [readPosts, profile],
+  ([$readPosts, $profile]) => {
+    const key = profileKey($profile)
+    if (!key) return new Set<number>()
+    const ids = $readPosts[key]
+    return new Set<number>(Array.isArray(ids) ? ids : [])
+  },
+)
+
+// markPostAsRead marks a post as read for the active profile using a 500-capacity LRU.
+export function markPostAsRead(postID: number) {
+  const current = store.get(profile)
+  const key = profileKey(current)
+  if (!key) return
+
+  readPosts.update((all) => {
+    const existing = Array.isArray(all[key]) ? all[key] : []
+    if (existing[0] === postID) {
+      return all
+    }
+    const updated = addToLRU(existing, postID, READ_POSTS_LRU_SIZE)
+    return {
+      ...all,
+      [key]: updated,
+    }
   })
 }
